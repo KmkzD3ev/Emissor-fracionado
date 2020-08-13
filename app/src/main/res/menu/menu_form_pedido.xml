@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_infor_novo_pedido"
+        android:icon="@drawable/ic_info_outline"
+        android:title="Infor. Novo Pedido"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_intro_principal"
+        android:orderInCategory="101"
+        android:title="Ver Introduçao"
+        app:showAsAction="never" />
+</menu>

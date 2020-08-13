@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/NSdadosNFCeCont"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:layout_marginBottom="20dp"
+                    android:tint="@android:color/holo_red_light"
+                    app:srcCompat="@drawable/ic_sentiment_dissatisfied" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Não conseguimos transmitir esta NF-e! \nEntre em contato com o setor fiscal da empresa."
+                    android:textSize="24sp" />
+
+                <Button
+                    android:id="@+id/btnPrintNotaCont"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="EMITIR NFC-e EM CONTIGÊNCIA"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btn_reTransmitir"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TENTAR NOVAMENTE"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btn_finalizar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:background="@drawable/bg_btn"
+                    android:text="FECHAR"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
+</RelativeLayout>

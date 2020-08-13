@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/nfc_e">
+        <menu>
+            <item
+                android:id="@+id/nav_camera"
+                android:icon="@drawable/ic_insert_drive_file"
+                android:title="@string/nova_nota" />
+            <item
+                android:id="@+id/nav_slideshow"
+                android:icon="@drawable/ic_autorenew"
+                android:title="@string/sincronizar_nfc_e" />
+        </menu>
+    </item>
+
+    <item android:title="@string/nf_e">
+        <menu>
+            <item
+                android:id="@+id/nav_nfe"
+                android:icon="@drawable/ic_insert_drive_file"
+                android:title="@string/nova_nfe" />
+            <item
+                android:id="@+id/nav_consultar_nfe"
+                android:icon="@drawable/ic_search"
+                android:title="@string/consultar_nfe" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/nav_gallery"
+        android:icon="@drawable/ic_format_list_bulleted"
+        android:title="@string/relatorios" />
+
+    <item
+        android:id="@+id/nav_status"
+        android:icon="@drawable/ic_status_nfce_nfe"
+        android:title="@string/status" />
+    <item
+        android:id="@+id/nav_finalizar"
+        android:icon="@drawable/ic_exit_to_app_black"
+        android:title="@string/finalizar_remessa" />
+
+    <item android:title="@string/configuracoes">
+        <menu>
+            <item
+                android:id="@+id/nav_suporte"
+                android:icon="@drawable/ic_chat"
+                android:title="@string/suporte" />
+            <item
+                android:id="@+id/nav_sobre"
+                android:icon="@drawable/ic_info_outline"
+                android:title="@string/sobre" />
+            <item
+                android:id="@+id/nav_configuracoes"
+                android:icon="@drawable/ic_settings"
+                android:title="@string/cofiguracoes_app" />
+        </menu>
+    </item>
+
+    <!--<group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_manage"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Tools" />
+
+    </group>-->
+</menu>

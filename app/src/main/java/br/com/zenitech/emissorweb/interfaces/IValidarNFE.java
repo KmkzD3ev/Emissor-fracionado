@@ -1,0 +1,42 @@
+package br.com.zenitech.emissorweb.interfaces;
+
+import br.com.zenitech.emissorweb.Configuracoes;
+import br.com.zenitech.emissorweb.domains.ValidarNFE;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.POST;
+
+public interface IValidarNFE {
+
+    // TRANSMITIR NOTAS NFC-E
+    @FormUrlEncoded
+    @POST("indexApp.php")
+    Call<ValidarNFE> validarNotaNFE(
+            @Field("TELA") String tela,
+            @Field("QTDS") String qtd,
+            @Field("SERIAL") String serial,
+            @Field("PRODS") String produto,
+            @Field("VLRS") String vlr,
+            @Field("FORMAPAG") String formap,
+            @Field("CODCLI") String cpfcli
+    );
+
+    // REIMPRIMIR NOTA
+    @FormUrlEncoded
+    @POST("indexApp.php")
+    Call<ValidarNFE> reimprimirNotaNFE(
+            @Field("TELA") String tela,
+            @Field("CODPED") String CODPED,
+            @Field("SERIE") String SERIE,
+            @Field("SERIAL") String SERIAL
+    );
+
+    Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl(String.format("%s%s", new Configuracoes().GetUrlServer(), "/POSSIAC/"))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
+
+}

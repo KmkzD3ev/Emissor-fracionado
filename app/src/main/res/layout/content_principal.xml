@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LLlistaPedidos"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="br.com.zenitech.emissorweb.Principal"
+    tools:showIn="@layout/app_bar_principal">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.0"
+        android:contentDescription="@string/app_name"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bgtopo" />
+
+    <LinearLayout
+        android:id="@+id/btnSincronizarNotasPrincipal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#f3214b"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/btnSincronizarNotasNFC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/existe_nfc_e_emitida_em_contig_ncia_lembre_se_de_sincronizar_antes_de_fazer_o_fechamento_do_dia"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="#994d52" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgEmissor"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:layout_marginTop="90dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo_emissor_web"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/txtNFCeVinculada"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:textSize="16sp"
+        android:layout_marginTop="210dp" />
+
+    <TextView
+        android:id="@+id/txtTotMemoria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:layout_marginTop="210dp"
+        android:textColor="@android:color/holo_red_dark" />
+
+    <TextView
+        android:id="@+id/txtchave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:textAlignment="center"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical"
+        android:visibility="gone" />
+
+</RelativeLayout>
