@@ -76,8 +76,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
     private BluetoothSocket mBtSocket;*/
     //
     String[] listaTotalParcelas = {
-            "À VISTA",
-            "2X Sem Juros"
+            "À VISTA"
     };
     Spinner spParcelas;
     //
@@ -368,7 +367,10 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
                             to.getSubMerchantAddress(),
                             "",//to.getUserModel().toString()
                             String.valueOf(to.isFallbackTransaction()),
-                            to.getAppLabel()
+                            to.getAppLabel(),
+                            to.getUserModel().getMerchantName(),
+                            to.getUserModel().getMerchantAddress().getCity() + "/" + to.getUserModel().getMerchantAddress().getDistric(),
+                            to.getUserModel().getMerchantDocumentNumber()
                     ));
 
                     msg(true);
@@ -521,7 +523,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
             //
             if (statusPag) {
-                llPagamentoImprimir.setVisibility(View.VISIBLE);
+                //llPagamentoImprimir.setVisibility(View.VISIBLE);
+                _finalizarPagamento();
             } else {
                 Intent returnIntent = new Intent();
                 setResult(Activity.RESULT_CANCELED, returnIntent);

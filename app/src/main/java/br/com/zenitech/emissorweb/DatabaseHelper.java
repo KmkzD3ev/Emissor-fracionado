@@ -620,6 +620,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String userModel_AUTORIZACOES_PINPAD = "userModel";
     private static final String isFallbackTransaction_AUTORIZACOES_PINPAD = "isFallbackTransaction";
     private static final String appLabel_AUTORIZACOES_PINPAD = "appLabel";
+    private static final String nomeEmpresa_AUTORIZACOES_PINPAD = "nomeEmpresa";
+    private static final String enderecoEmpresa_AUTORIZACOES_PINPAD = "enderecoEmpresa";
+    private static final String cnpjEmpresa_AUTORIZACOES_PINPAD = "cnpjEmpresa";
 
     // COLUNAS_AUTORIZACOES
     private static final String[] COLUNAS_AUTORIZACOES_PINPAD = {
@@ -663,8 +666,62 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             subMerchantAddress_AUTORIZACOES_PINPAD,
             userModel_AUTORIZACOES_PINPAD,
             isFallbackTransaction_AUTORIZACOES_PINPAD,
-            appLabel_AUTORIZACOES_PINPAD
+            appLabel_AUTORIZACOES_PINPAD,
+            nomeEmpresa_AUTORIZACOES_PINPAD,
+            enderecoEmpresa_AUTORIZACOES_PINPAD,
+            cnpjEmpresa_AUTORIZACOES_PINPAD
     };
+
+    //CURSOR PEDIDOS
+    private AutorizacoesPinpad cursorToAutorizacoesPinpad(Cursor cursor) {
+        AutorizacoesPinpad aP = new AutorizacoesPinpad(null,null,null,null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        //
+        aP.setId(cursor.getString(0));
+        aP.setPedido(cursor.getString(1));
+        aP.setIdFromBase(cursor.getString(2));
+        aP.setAmount(cursor.getString(3));
+        aP.setRequestId(cursor.getString(4));
+        aP.setEmailSent(cursor.getString(5));
+        aP.setTimeToPassTransaction(cursor.getString(6));
+        aP.setInitiatorTransactionKey(cursor.getString(7));
+        aP.setRecipientTransactionIdentification(cursor.getString(8));
+        aP.setCardHolderNumber(cursor.getString(9));
+        aP.setCardHolderName(cursor.getString(10));
+        aP.setDate(cursor.getString(11));
+        aP.setTime(cursor.getString(12));
+        aP.setAid(cursor.getString(13));
+        aP.setArcq(cursor.getString(14));
+        aP.setAuthorizationCode(cursor.getString(15));
+        aP.setIccRelatedData(cursor.getString(16));
+        aP.setTransactionReference(cursor.getString(17));
+        aP.setActionCode(cursor.getString(18));
+        aP.setCommandActionCode(cursor.getString(19));
+        aP.setPinpadUsed(cursor.getString(20));
+        aP.setSaleAffiliationKey(cursor.getString(21));
+        aP.setCne(cursor.getString(22));
+        aP.setCvm(cursor.getString(23));
+        aP.setBalance(cursor.getString(24));
+        aP.setServiceCode(cursor.getString(25));
+        aP.setSubMerchantCategoryCode(cursor.getString(26));
+        aP.setEntryMode(cursor.getString(27));
+        aP.setCardBrand(cursor.getString(28));
+        aP.setInstalmentTransaction(cursor.getString(29));
+        aP.setTransactionStatus(cursor.getString(30));
+        aP.setInstalmentType(cursor.getString(31));
+        aP.setTypeOfTransactionEnum(cursor.getString(32));
+        aP.setSignature(cursor.getString(33));
+        aP.setCancellationDate(cursor.getString(34));
+        aP.setCapture(cursor.getString(35));
+        aP.setShortName(cursor.getString(36));
+        aP.setSubMerchantAddress(cursor.getString(37));
+        aP.setUserModel(cursor.getString(38));
+        aP.setIsFallbackTransaction(cursor.getString(39));
+        aP.setAppLabel(cursor.getString(40));
+        aP.setNomeEmpresa(cursor.getString(41));
+        aP.setEnderecoEmpresa(cursor.getString(42));
+        aP.setCnpjEmpresa(cursor.getString(43));
+        return aP;
+    }
 
     public void addAutorizacoesPinPad(AutorizacoesPinpad autorizacoesPinpad) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -710,6 +767,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(userModel_AUTORIZACOES_PINPAD, autorizacoesPinpad.getUserModel());
         values.put(isFallbackTransaction_AUTORIZACOES_PINPAD, autorizacoesPinpad.getIsFallbackTransaction());
         values.put(appLabel_AUTORIZACOES_PINPAD, autorizacoesPinpad.getAppLabel());
+        values.put(nomeEmpresa_AUTORIZACOES_PINPAD, autorizacoesPinpad.getNomeEmpresa());
+        values.put(enderecoEmpresa_AUTORIZACOES_PINPAD, autorizacoesPinpad.getEnderecoEmpresa());
+        values.put(cnpjEmpresa_AUTORIZACOES_PINPAD, autorizacoesPinpad.getCnpjEmpresa());
+
         Log.i("Stone BD", values.toString());
         db.insert(TABELA_AUTORIZACOES_PINPAD, null, values);
         db.close();
@@ -734,7 +795,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
 
             String query = "SELECT aut.id FROM " + TABELA_AUTORIZACOES_PINPAD + " aut " +
-                    " ORDER BY aut.id DESC";
+                    " ORDER BY aut.id DESC LIMIT 1";
 
             Cursor cursor = db.rawQuery(query, null);
             if (cursor.getCount() > 0) {
@@ -750,6 +811,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
 
         return id;
+    }
+
+    //ULTIMA NFC-E EMITIDA
+    public AutorizacoesPinpad getAutorizacaoPinpad() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction();
+
+        AutorizacoesPinpad autorizacoesPinpad = new AutorizacoesPinpad(null,null,null,null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+
+        try {
+
+            String query = "SELECT * FROM " + TABELA_AUTORIZACOES_PINPAD + " aut " +
+                    " ORDER BY aut.id DESC LIMIT 1";
+
+            Cursor cursor = db.rawQuery(query, null);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                autorizacoesPinpad = cursorToAutorizacoesPinpad(cursor);
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        db.endTransaction();
+        db.close();
+
+        return autorizacoesPinpad;
     }
 
     //########## PEDIDOS ############

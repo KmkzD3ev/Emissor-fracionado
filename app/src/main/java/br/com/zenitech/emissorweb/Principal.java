@@ -45,6 +45,7 @@ import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -525,6 +526,20 @@ public class Principal extends AppCompatActivity
         } else if (id == R.id.nav_configuracoes) {
             //
             startActivity(new Intent(context, ConfiguracoesApp.class));
+        }
+        // Reimprimir comprovante pagamento logista
+        else if (id == R.id.nav_reimprimir) {
+            //
+            Intent i = new Intent(context, Impressora.class);
+            i.putExtra("imprimir", "reimpressao_comprovante");
+            startActivity(i);
+        }
+        // Cancelar pagamento cartão
+        else if (id == R.id.nav_cancelar_pag) {
+            //
+            Intent i = new Intent(context, Impressora.class);
+            i.putExtra("imprimir", "reimpressao_comprovante");
+            startActivity(i);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

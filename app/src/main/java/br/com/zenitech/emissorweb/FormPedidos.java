@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.Unidades;
+import timber.log.Timber;
 
 public class FormPedidos extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     static final int PAGAMENTO_REQUEST = 1;
@@ -555,9 +556,15 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
             if (resultCode == Activity.RESULT_OK) {
                 String result = data.getStringExtra("result");
-                //ShowMsgToast(result);
+                ShowMsgToast(data.getStringExtra("result"));
 
-                //Timber.tag("Stone").i(Objects.requireNonNull(transactionObject).toString());
+                etCodAutorizacao.setText(data.getStringExtra("authorizationCode"));
+                etCodAutorizacao.setEnabled(false);
+                etNsuCeara.setText(data.getStringExtra("nsu"));
+                etNsuCeara.setEnabled(false);
+
+                confirmar();
+                //Timber.tag("Stone").i(Objects.requireNonNull(data.getStringExtra("authorizationCode")));
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result

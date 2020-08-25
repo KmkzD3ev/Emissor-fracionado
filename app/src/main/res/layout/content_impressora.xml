@@ -99,7 +99,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="TextView"
+        android:gravity="center_horizontal"
+        android:text=""
         android:textAlignment="center" />
 
     <LinearLayout
@@ -113,15 +114,16 @@
             android:id="@+id/qrcode"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            app:srcCompat="@drawable/ic_info_outline"
-            android:contentDescription="@string/app_name" />
+            android:contentDescription="@string/app_name"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_info_outline" />
 
         <ImageView
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:tint="#0288d1"
+            android:contentDescription="@string/app_name"
             app:srcCompat="@drawable/ic_print"
-            android:contentDescription="@string/app_name" />
+            app:tint="#0288d1" />
 
         <ProgressBar
             android:id="@+id/progressBar"

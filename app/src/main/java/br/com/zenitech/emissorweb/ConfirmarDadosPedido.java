@@ -117,7 +117,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         posApp = elementosPos.get(0);
 
         // SE O SERIAL FOR DE TESTE ATIVA O MODO TESTE
-        if (posApp.getSerial().equals("005000001")) {
+        if (posApp.getSerial().equals("005000002")) {
             modo_teste = true;
         }
 

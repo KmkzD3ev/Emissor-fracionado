@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -59,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
+import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosNFE;
@@ -135,6 +137,9 @@ public class Impressora extends AppCompatActivity {
     //
     String root = Environment.getExternalStorageDirectory().getAbsolutePath();
     File myDir = new File(root + "/Emissor_Web");
+
+    //
+    private boolean impComPagViaCliente = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -231,7 +236,7 @@ public class Impressora extends AppCompatActivity {
 
     public void tempo(int tempo) {
 
-        // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
+        //
         new Handler().postDelayed(() -> {
             //Log.i(LOG_TAG, "Relatório");
 
@@ -261,14 +266,28 @@ public class Impressora extends AppCompatActivity {
                     //printImage();
                     //printBarcode();
 
+                } else if (tipoImpressao.equals("reimpressao_comprovante")) {
+
+                    //Imprimir comprovante do pagamento cartão
+                    tempoImprCompViaEsta(1000, true);
+
                 } else {
 
                     //Imprimir nota fiscal eletronica
-
                     if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("58mm")) {
                         printNFCE58mm(linhaProduto);
+                        /*if (form_pagamento.equalsIgnoreCase("CARTAO DE CREDITO") || form_pagamento.equalsIgnoreCase("CARTAO DE DEBITO")) {
+                            tempoImprCompViaCli(linhaProduto);
+                        }*/
+                        tempoImprCompViaCli();
+
                     } else {
                         printNFCE(linhaProduto);
+                        /*if (form_pagamento.equalsIgnoreCase("CARTAO DE CREDITO") || form_pagamento.equalsIgnoreCase("CARTAO DE DEBITO")) {
+                            tempoImprCompViaCli(linhaProduto);
+                        }*/
+
+                        tempoImprCompViaCli();
                     }
 
                     //printImage();
@@ -552,7 +571,6 @@ public class Impressora extends AppCompatActivity {
         }
     }
 
-    // KLEILSON
     private void establishBluetoothConnection(final String address) {
         final ProgressDialog dialog = new ProgressDialog(Impressora.this);
         dialog.setTitle(getString(R.string.title_please_wait));
@@ -609,7 +627,6 @@ public class Impressora extends AppCompatActivity {
         t.start();
     }
 
-    // KLEILSON
     private void establishNetworkConnection(final String address) {
         closePrinterServer();
 
@@ -1046,6 +1063,8 @@ public class Impressora extends AppCompatActivity {
         }
     }
 
+    // -------------------- IMPRESSÃO DE NFCe 80 E 58 mm ---------------------------
+
     // ** NFC-e 80mm
     private void printNFCE(final String[] texto) {
         //Log.d(LOG_TAG, "Print NFC-e");
@@ -1194,6 +1213,15 @@ public class Impressora extends AppCompatActivity {
             File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
             imgQrC.delete();
 
+            //IMPRIMIR COMPROVANTE DE PAGAMENTO CARTÃO
+            StringBuilder textBuffer2 = new StringBuilder();
+            textBuffer2.append("{reset}{center}").append(tamFont).append(texto[4]).append("{br}");
+            textBuffer2.append("{reset}").append(tamFont).append("------------------------------------------------");
+
+            printer.reset();
+            printer.printTaggedText(textBuffer2.toString());
+            printer.feedPaper(38);
+
             Intent i = new Intent(Impressora.this, Principal.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.putExtra("nomeImpressoraBlt", enderecoBlt);
@@ -1203,12 +1231,12 @@ public class Impressora extends AppCompatActivity {
         }, R.string.msg_printing_nfce);
     }
 
-    // ** FNC-e 58mm
+    // ** FNC-e 58mm KLEILSON
     private void printNFCE58mm(final String[] texto) {
         //Log.d(LOG_TAG, "Print NFC-e");
 
         runTask((dialog, printer) -> {
-            printer.reset();
+            /*//printer.reset();
 
             String serie = bd.getSeriePOS();
             elementosUnidade = bd.getUnidades();
@@ -1277,7 +1305,7 @@ public class Impressora extends AppCompatActivity {
             StringBuilder textBuffer = new StringBuilder();
 
             //IMPRIMIR CABEÇALHO
-            textBuffer.append(tamFont).append(" {br}");
+            textBuffer.append(tamFont).append("{br}");
             textBuffer.append(tamFont).append(texto[7]).append("{br}");
             textBuffer.append(tamFont).append(texto[8]).append("{br}");
             textBuffer.append(tamFont).append(texto[9]).append("{br}");
@@ -1300,7 +1328,7 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append("Qtde. Total de Itens                  ").append(quantidade).append("{br}");
             textBuffer.append(tamFont).append("Valor Total                        ").append(texto[2]).append("{br}");
             textBuffer.append(tamFont).append("FORMA DE PAGAMENTO            VALOR PAGO{br}");
-            textBuffer.append(tamFont).append(cAux.removerAcentos(texto[12])).append("                           ").append(texto[2]).append("{br}");
+            textBuffer.append(tamFont).append(cAux.removerAcentos(texto[12])).append("                         ").append(texto[2]).append("{br}");
             textBuffer.append(tamFont).append("-----------------------------------------{br}");
 
             //TRIBUTOS TOTAIS
@@ -1332,7 +1360,7 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append(texto[4]).append("{br}");
             textBuffer.append(tamFont).append("-----------------------------------------");
 
-            printer.reset();
+            //printer.reset();
             printer.selectPageMode();
             printer.setPageXY(0, 0);
             printer.setAlign(1);
@@ -1353,16 +1381,167 @@ public class Impressora extends AppCompatActivity {
 
             // Apaga a imgem anterior
             File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();
+            imgQrC.delete();*/
 
-            Intent i = new Intent(Impressora.this, Principal.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            i.putExtra("nomeImpressoraBlt", enderecoBlt);
-            i.putExtra("enderecoBlt", enderecoBlt);
-            startActivity(i);
-            finish();
+            if (cAux.removerAcentos(texto[12]).equalsIgnoreCase("CARTAO DE CREDITO") || cAux.removerAcentos(texto[12]).equalsIgnoreCase("CARTAO DE DEBITO")) {
+                //
+                impComPagViaCliente = true;
+            } else {
+                finalizarImpressao();
+            }
+
         }, R.string.msg_printing_nfce);
     }
+
+    void imprimirComprovantePagCartao() {
+        runTask((dialog, printer) -> {
+            final BitmapFactory.Options optionsStone = new BitmapFactory.Options();
+            optionsStone.inScaled = false;
+
+            final AssetManager assetManagerStone = getApplicationContext().getAssets();
+            final Bitmap bitmapStone = BitmapFactory.decodeStream(assetManagerStone.open("stone.png"),
+                    null, optionsStone);
+            final int widthStone = Objects.requireNonNull(bitmapStone).getWidth();
+            final int heightStone = bitmapStone.getHeight();
+            final int[] argbStone = new int[widthStone * heightStone];
+            bitmapStone.getPixels(argbStone, 0, widthStone, 0, 0, widthStone, heightStone);
+            bitmapStone.recycle();
+
+            //printer.reset();
+            printer.printImage(argbStone, widthStone, heightStone, Printer.ALIGN_CENTER, true);
+            printer.feedPaper(0);
+
+            //Unidades unidades;
+            //elementosUnidade = bd.getUnidades();
+            AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
+
+            String txtCompPag = "{br}" +
+                    tamFont + "Via Cliente{br}{br}" +
+                    tamFont + cAux.removerAcentos(pinpad.getNomeEmpresa()) + "{br}" +
+                    tamFont + cAux.removerAcentos(pinpad.getEnderecoEmpresa()) + "{br}" +
+                    tamFont + cAux.exibirData(pinpad.getDate()) + " " + pinpad.getTime() + " CNPJ:" + pinpad.getCnpjEmpresa() + "{br}" +
+                    tamFont + "------------------------------------------{br}" +
+                    pinpad.getTypeOfTransactionEnum() + "                       RS " + cAux.maskMoney(cAux.converterValores(pinpad.getAmount())).trim() + "{br}" +
+                    tamFont + "------------------------------------------{br}" +
+                    tamFont + pinpad.getCardBrand() + " - " + pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8) + "  AUT: " + pinpad.getAuthorizationCode() + "{br}" +
+                    tamFont + pinpad.getCardHolderName() + "{br}" +
+                    tamFont + "Aprovado com senha{br}" +
+                    tamFont + "SN: " + prefs.getString("serial_app", "") + " - " + BuildConfig.VERSION_NAME + "{br}";
+            //printer.reset();
+            printer.printTaggedText(txtCompPag);
+            printer.feedPaper(120);
+
+            /*String txtCompPag1 = tamFont + "CREDITO                       {right}{b}{h}R{w}$ 50,00{br}";
+            //printer.reset();
+            printer.printTaggedText(txtCompPag1);*/
+            printer.flush();
+
+        }, R.string.msg_printing_comp_pag_cartao_nfce);
+    }
+
+    void imprimirComprovantePagCartaoEsta(boolean reimpressao) {
+        runTask((dialog, printer) -> {
+            final BitmapFactory.Options optionsStone = new BitmapFactory.Options();
+            optionsStone.inScaled = false;
+
+            // Logo Stone
+            final AssetManager assetManagerStone = getApplicationContext().getAssets();
+            final Bitmap bitmapStone = BitmapFactory.decodeStream(assetManagerStone.open("stone.png"),
+                    null, optionsStone);
+            final int widthStone = Objects.requireNonNull(bitmapStone).getWidth();
+            final int heightStone = bitmapStone.getHeight();
+            final int[] argbStone = new int[widthStone * heightStone];
+            bitmapStone.getPixels(argbStone, 0, widthStone, 0, 0, widthStone, heightStone);
+            bitmapStone.recycle();
+
+            //printer.reset();
+            printer.printImage(argbStone, widthStone, heightStone, Printer.ALIGN_CENTER, true);
+            printer.feedPaper(0);
+
+            // Reimpressao
+            final BitmapFactory.Options optionsReimpressao = new BitmapFactory.Options();
+            optionsReimpressao.inScaled = false;
+            final AssetManager assetManagerReimpressao = getApplicationContext().getAssets();
+            final Bitmap bitmapReimpressao = BitmapFactory.decodeStream(assetManagerReimpressao.open("reimpressao.png"),
+                    null, optionsReimpressao);
+            final int widthReimpressao = Objects.requireNonNull(bitmapReimpressao).getWidth();
+            final int heightReimpressao = bitmapReimpressao.getHeight();
+            final int[] argbReimpressao = new int[widthReimpressao * heightReimpressao];
+            bitmapReimpressao.getPixels(argbReimpressao, 0, widthReimpressao, 0, 0, widthReimpressao, heightReimpressao);
+            bitmapReimpressao.recycle();
+
+            //Unidades unidades;
+            //elementosUnidade = bd.getUnidades();
+            AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
+
+            //
+            String txtCompPag = "{br}" + tamFont + "Via do Lojista{br}{br}";
+            printer.printTaggedText(txtCompPag);
+            printer.feedPaper(38);
+
+            //
+            if (reimpressao) {
+                printer.printImage(argbReimpressao, widthReimpressao, heightReimpressao, Printer.ALIGN_CENTER, true);
+                printer.feedPaper(0);
+            }
+
+            //
+            String txtCompPag2 = tamFont + cAux.removerAcentos(pinpad.getNomeEmpresa()) + "{br}" +
+                    tamFont + cAux.removerAcentos(pinpad.getEnderecoEmpresa()) + "{br}" +
+                    tamFont + cAux.exibirData(pinpad.getDate()) + " " + pinpad.getTime() + " CNPJ:" + pinpad.getCnpjEmpresa() + "{br}" +
+                    tamFont + "------------------------------------------{br}" +
+                    pinpad.getTypeOfTransactionEnum() + "                       RS " + cAux.maskMoney(cAux.converterValores(pinpad.getAmount())).trim() + "{br}" +
+                    tamFont + "------------------------------------------{br}" +
+                    tamFont + pinpad.getCardBrand() + " - " + pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8) + "  AUT: " + pinpad.getAuthorizationCode() + "{br}" +
+                    tamFont + pinpad.getCardHolderName() + "{br}" +
+                    tamFont + pinpad.getRecipientTransactionIdentification() + "{br}" +
+                    tamFont + "Aprovado com senha{br}" +
+                    tamFont + "SN: " + prefs.getString("serial_app", "") + " - " + BuildConfig.VERSION_NAME + "{br}";
+            //printer.reset();
+            printer.printTaggedText(txtCompPag2);
+            printer.feedPaper(120);
+
+            /*String txtCompPag1 = tamFont + "CREDITO                       {right}{b}{h}R{w}$ 50,00{br}";
+            //printer.reset();
+            printer.printTaggedText(txtCompPag1);*/
+            printer.flush();
+
+        }, R.string.msg_printing_comp_pag_cartao_nfce);
+    }
+
+    void tempoImprCompViaCli() {
+        // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
+        new Handler().postDelayed(() -> {
+
+            if (impComPagViaCliente) {
+                imprimirComprovantePagCartao();
+                tempoImprCompViaEsta(6000, false);
+                //finalizarImpressao();
+            } else {
+                tempoImprCompViaCli();
+            }
+        }, 3000);
+    }
+
+    void tempoImprCompViaEsta(long tempo, boolean reimpressao) {
+        // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
+        new Handler().postDelayed(() -> {
+
+            imprimirComprovantePagCartaoEsta(reimpressao);
+            finalizarImpressao();
+        }, tempo);
+    }
+
+    private void finalizarImpressao() {
+        Intent i = new Intent(Impressora.this, Principal.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.putExtra("nomeImpressoraBlt", enderecoBlt);
+        i.putExtra("enderecoBlt", enderecoBlt);
+        startActivity(i);
+        finish();
+    }
+
+    // -------------------- IMPRESSÃO DE NFe 80 E 58 mm ---------------------------
 
     // ** NF-e 80mm
     private void printNFE(final String[] texto) {
@@ -1694,6 +1873,8 @@ public class Impressora extends AppCompatActivity {
             finish();
         }, R.string.msg_printing_nfce);
     }
+
+    // -------------------- IMPRESSÃO DE RELATÓRIOS 80 E 58 mm ---------------------------
 
     // ** RELATÓRIO 80mm
     private void printRelatorioNFCE() {

@@ -65,6 +65,7 @@
     <string name="msg_invalid_identity">Invalid identity</string>
     <string name="msg_downloading_image">Downloading image&#8230;</string>
     <string name="msg_printing_nfce">Imprimindo NFC-e&#8230;</string>
+    <string name="msg_printing_comp_pag_cartao_nfce">Imprimindo Comprovante Pagamento&#8230;</string>
 
     <string name="printer_info">Printer information</string>
     <string name="card_info">Card information</string>
@@ -149,4 +150,5 @@
     <string name="debito">Débito</string>
     <string name="forma_de_pagamento_escolhida">Forma de pagamento escolhida</string>
     <string name="rs">R$</string>
+    <string name="title_activity_cancelar_pagamento_cartao">Cancelar Pagamento</string>
 </resources>

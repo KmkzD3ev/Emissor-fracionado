@@ -43,8 +43,11 @@ public class AutorizacoesPinpad {
     private String userModel;
     private String isFallbackTransaction;
     private String appLabel;
+    private String nomeEmpresa;
+    private String enderecoEmpresa;
+    private String cnpjEmpresa;
 
-    public AutorizacoesPinpad(String id, String pedido, String idFromBase, String amount, String requestId, String emailSent, String timeToPassTransaction, String initiatorTransactionKey, String recipientTransactionIdentification, String cardHolderNumber, String cardHolderName, String date, String time, String aid, String arcq, String authorizationCode, String iccRelatedData, String transactionReference, String actionCode, String commandActionCode, String pinpadUsed, String saleAffiliationKey, String cne, String cvm, String balance, String serviceCode, String subMerchantCategoryCode, String entryMode, String cardBrand, String instalmentTransaction, String transactionStatus, String instalmentType, String typeOfTransactionEnum, String signature, String cancellationDate, String capture, String shortName, String subMerchantAddress, String userModel, String isFallbackTransaction, String appLabel) {
+    public AutorizacoesPinpad(String id, String pedido, String idFromBase, String amount, String requestId, String emailSent, String timeToPassTransaction, String initiatorTransactionKey, String recipientTransactionIdentification, String cardHolderNumber, String cardHolderName, String date, String time, String aid, String arcq, String authorizationCode, String iccRelatedData, String transactionReference, String actionCode, String commandActionCode, String pinpadUsed, String saleAffiliationKey, String cne, String cvm, String balance, String serviceCode, String subMerchantCategoryCode, String entryMode, String cardBrand, String instalmentTransaction, String transactionStatus, String instalmentType, String typeOfTransactionEnum, String signature, String cancellationDate, String capture, String shortName, String subMerchantAddress, String userModel, String isFallbackTransaction, String appLabel, String nomeEmpresa, String enderecoEmpresa, String cnpjEmpresa) {
         this.id = id;
         this.pedido = pedido;
         this.idFromBase = idFromBase;
@@ -86,6 +89,9 @@ public class AutorizacoesPinpad {
         this.userModel = userModel;
         this.isFallbackTransaction = isFallbackTransaction;
         this.appLabel = appLabel;
+        this.nomeEmpresa = nomeEmpresa;
+        this.enderecoEmpresa = enderecoEmpresa;
+        this.cnpjEmpresa = cnpjEmpresa;
     }
 
     public String getId() {
@@ -414,5 +420,29 @@ public class AutorizacoesPinpad {
 
     public void setAppLabel(String appLabel) {
         this.appLabel = appLabel;
+    }
+
+    public String getNomeEmpresa() {
+        return nomeEmpresa;
+    }
+
+    public void setNomeEmpresa(String nomeEmpresa) {
+        this.nomeEmpresa = nomeEmpresa;
+    }
+
+    public String getEnderecoEmpresa() {
+        return enderecoEmpresa;
+    }
+
+    public void setEnderecoEmpresa(String enderecoEmpresa) {
+        this.enderecoEmpresa = enderecoEmpresa;
+    }
+
+    public String getCnpjEmpresa() {
+        return cnpjEmpresa;
+    }
+
+    public void setCnpjEmpresa(String cnpjEmpresa) {
+        this.cnpjEmpresa = cnpjEmpresa;
     }
 }
