@@ -278,7 +278,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         /*
         Nome de exibição no extrato do cliente (máximo de 14 caracteres). Deixar em branco caso queira que apareça o nome do estabelecimento cadastrado na Stone
          */
-        transactionObject.setShortName("TST_014");
+        //transactionObject.setShortName("TST_014");
 
         //Define se transação será feita com captura ou não.
         transactionObject.setCapture(true);
@@ -590,9 +590,9 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment((Environment.SANDBOX));
+        //Stone.setEnvironment((Environment.SANDBOX));
         //Ambiente de Produção
-        //Stone.setEnvironment((Environment.PRODUCTION));
+        Stone.setEnvironment((Environment.PRODUCTION));
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);

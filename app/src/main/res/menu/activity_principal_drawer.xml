@@ -43,20 +43,18 @@
 
     <item
         android:id="@+id/menuStone"
-        android:title="">
-        <item android:title="STONE">
-            <menu>
-                <item
-                    android:id="@+id/nav_reimprimir"
-                    android:icon="@drawable/ic_print"
-                    android:title="Reimprimir Comprovante" />
-                <item
-                    android:id="@+id/nav_cancelar_pag"
-                    android:icon="@drawable/ic_credit_card"
-                    android:title="Cancelar Pagamento" />
-            </menu>
-        </item>
-
+        android:title="STONE"
+        android:visible="false">
+        <menu>
+            <item
+                android:id="@+id/nav_reimprimir"
+                android:icon="@drawable/ic_print"
+                android:title="Reimprimir Comprovante" />
+            <item
+                android:id="@+id/nav_cancelar_pag"
+                android:icon="@drawable/ic_credit_card"
+                android:title="Cancelar Pagamento" />
+        </menu>
     </item>
     <item android:title="@string/configuracoes">
         <menu>

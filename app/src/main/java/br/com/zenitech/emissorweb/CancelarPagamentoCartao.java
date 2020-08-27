@@ -67,6 +67,8 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
     private DatabaseHelper bd;
     AutorizacoesPinpad pinpad;
 
+    ClassAuxiliar cAux;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +79,7 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
 
         context = this;
         bd = new DatabaseHelper(this);
+        cAux = new ClassAuxiliar();
         pinpad = bd.getAutorizacaoPinpad();
 
         elementos = bd.getUnidades();
@@ -194,6 +197,7 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
 
     //
     int transactionId;
+
     void iniciarTranzacao() {
         // Verifica se o bluetooth esta ligado e se existe algum pinpad conectado.
         if (Stone.getPinpadListSize() > 0) {
@@ -220,7 +224,23 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
             public void onSuccess() {
                 //Transação Cancelada com sucesso
                 toastMsg("Transação Cancelada com sucesso");
+                //
 
+                // Cria o DAO object
+                transactionDAO = new TransactionDAO(context);
+                // Pega o id da última transação
+                transactionId = transactionDAO.getLastTransactionId();
+                // Cria o TransactionObject da última transação
+                TransactionObject to = transactionDAO.findTransactionWithId(transactionId);
+                Log.i("Cancelar", to.getCancellationDate().toString());
+
+                String dataHora = cAux.exibirData(to.getDate()) + " " + to.getTime();
+
+                Intent i = new Intent(context, Impressora.class);
+                i.putExtra("imprimir", "comprovante_cancelamento");
+                i.putExtra("dataHoraCan", dataHora);
+                i.putExtra("codAutCan", to.getAuthorizationCode());
+                startActivity(i);
                 //finish();
             }
 

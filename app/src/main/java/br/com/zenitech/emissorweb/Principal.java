@@ -222,6 +222,7 @@ public class Principal extends AppCompatActivity
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
+
         //double v = 50.00;
         //double v1 = 30.75 / 100;
         //double tributo = v - (v - (v1 * v));
@@ -288,6 +289,19 @@ public class Principal extends AppCompatActivity
                     }
                 }
 
+            }
+        }
+
+
+
+        // ATIVAR O MENU DA STONE
+        if (!unidades.getCodloja().equalsIgnoreCase("")) {
+            Menu menu = navigationView.getMenu();
+            for (int menuItemIndex = 0; menuItemIndex < menu.size(); menuItemIndex++) {
+                MenuItem menuItem = menu.getItem(menuItemIndex);
+                if (menuItem.getItemId() == R.id.menuStone) {
+                    menuItem.setVisible(true);
+                }
             }
         }
     }
