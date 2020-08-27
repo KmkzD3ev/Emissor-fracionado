@@ -31,11 +31,13 @@ import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.text.Normalizer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.Autorizacoes;
 import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
+import br.com.zenitech.emissorweb.domains.Unidades;
 import stone.application.StoneStart;
 import stone.application.enums.Action;
 import stone.application.enums.InstalmentTransactionEnum;
@@ -67,13 +69,17 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
     TransactionObject transactionObject;
     TransactionDAO transactionDAO;
 
-    String STONE_CODE = "177391172";
+    String STONE_CODE;
+    //ZENITECH TESTE - String STONE_CODE = "177391172";
     //String STONE_CODE = "111111111";
     /*// Pedido para obter o dispositivo bluetooth
     private static final int REQUEST_GET_DEVICE = 0;
     // Pedido para obter o dispositivo bluetooth
     private static final int DEFAULT_NETWORK_PORT = 9100;
     private BluetoothSocket mBtSocket;*/
+
+    ArrayList<Unidades> elementos;
+    Unidades unidades;
     //
     String[] listaTotalParcelas = {
             "À VISTA"
@@ -114,6 +120,10 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         bd = new DatabaseHelper(this);
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         cAux = new ClassAuxiliar();
+
+        elementos = bd.getUnidades();
+        unidades = elementos.get(0);
+        STONE_CODE = unidades.getCodloja();
 
         // **
         txtTotalPagar = findViewById(R.id.txtTotalPagarCartao);
@@ -296,25 +306,6 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
                 //transactionObject = transactionDAO.findTransactionWithId(transactionId);
                 //Log.i("Stone", String.valueOf(transactionDAO.findTransactionWithId(transactionId)));
 
-                /*bd.addAutorizacoes(new Autorizacoes(
-                        String.valueOf(transactionId),
-                        "",
-                        "",
-                        String.valueOf(transactionDAO.findTransactionWithId(transactionId).getCardBrand()),
-                        "",
-                        transactionDAO.findTransactionWithId(transactionId).getActionCode(),
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        transactionDAO.findTransactionWithId(transactionId).getCardSequenceNumber(),
-                        transactionDAO.findTransactionWithId(transactionId).getAuthorizationCode()
-                ));*/
-
                 TransactionObject to = transactionDAO.findTransactionWithId(transactionId);
 
                 // **
@@ -403,7 +394,6 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
     // ENVIAR COMPROVANTE POR EMAIL
     private void enviarComprovantePorEmail() {
-
         //
         // Exibir um popup para o usuário inserir um texto
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -601,6 +591,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
         Stone.setEnvironment((Environment.SANDBOX));
+        //Ambiente de Produção
+        //Stone.setEnvironment((Environment.PRODUCTION));
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);
@@ -650,6 +642,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         // O SDK já foi ativado.
         Toast.makeText(context, "O SDK já foi ativado.", Toast.LENGTH_SHORT).show();
         btnEnviarTrazacao.setVisibility(View.VISIBLE);
+        iniciarTranzacao();
     }
 
     // Desativar Stone Code

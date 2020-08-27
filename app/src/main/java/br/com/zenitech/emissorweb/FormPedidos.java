@@ -188,7 +188,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if (parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE CRÉDITO") || parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE DÉBITO")) {
+                if (
+                        (parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE CRÉDITO") ||
+                                parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE DÉBITO")) && !unidades.getCodloja().equalsIgnoreCase("")
+                ) {
                     llCredenciadora.setVisibility(View.VISIBLE);
                     if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
                         TiNsuCeara.setVisibility(View.VISIBLE);
@@ -556,7 +559,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
             if (resultCode == Activity.RESULT_OK) {
                 String result = data.getStringExtra("result");
-                ShowMsgToast(data.getStringExtra("result"));
+                //ShowMsgToast(data.getStringExtra("result"));
 
                 etCodAutorizacao.setText(data.getStringExtra("authorizationCode"));
                 etCodAutorizacao.setEnabled(false);

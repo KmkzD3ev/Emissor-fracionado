@@ -271,6 +271,10 @@ public class Impressora extends AppCompatActivity {
                     //Imprimir comprovante do pagamento cartão
                     tempoImprCompViaEsta(1000, true);
 
+                } else if (tipoImpressao.equals("comprovante_cancelamento")) {
+
+                    //Imprimir comprovante do pagamento cartão
+                    imprimirComprovanteCancelCartaoEsta(false);
                 } else {
 
                     //Imprimir nota fiscal eletronica
@@ -1236,7 +1240,7 @@ public class Impressora extends AppCompatActivity {
         //Log.d(LOG_TAG, "Print NFC-e");
 
         runTask((dialog, printer) -> {
-            /*//printer.reset();
+            //printer.reset();
 
             String serie = bd.getSeriePOS();
             elementosUnidade = bd.getUnidades();
@@ -1381,9 +1385,9 @@ public class Impressora extends AppCompatActivity {
 
             // Apaga a imgem anterior
             File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();*/
+            imgQrC.delete();
 
-            if (cAux.removerAcentos(texto[12]).equalsIgnoreCase("CARTAO DE CREDITO") || cAux.removerAcentos(texto[12]).equalsIgnoreCase("CARTAO DE DEBITO")) {
+            if ((cAux.removerAcentos(texto[12]).equalsIgnoreCase("CARTAO DE CREDITO") || cAux.removerAcentos(texto[12]).equalsIgnoreCase("CARTAO DE DEBITO")) && !unidades.getCodloja().equalsIgnoreCase("")) {
                 //
                 impComPagViaCliente = true;
             } else {
@@ -1415,7 +1419,30 @@ public class Impressora extends AppCompatActivity {
             //elementosUnidade = bd.getUnidades();
             AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
 
-            String txtCompPag = "{br}" +
+            StringBuilder textBuffer = new StringBuilder();
+
+            //IMPRIMIR CABEÇALHO
+            textBuffer.append(tamFont).append("{br}");
+            textBuffer.append(tamFont).append("Via Cliente{br}{br}");
+            textBuffer.append(tamFont).append(cAux.removerAcentos(pinpad.getNomeEmpresa())).append("{br}");
+            textBuffer.append(tamFont).append(cAux.removerAcentos(pinpad.getEnderecoEmpresa())).append("{br}");
+            textBuffer.append(tamFont).append(cAux.exibirData(pinpad.getDate()))
+                    .append(" ").append(pinpad.getTime()).append(" CNPJ:")
+                    .append(pinpad.getCnpjEmpresa()).append("{br}");
+            textBuffer.append(tamFont).append("------------------------------------------").append("{br}");
+            textBuffer.append(tamFont).append(pinpad.getTypeOfTransactionEnum()).append("                       RS ")
+                    .append(cAux.maskMoney(cAux.converterValores(pinpad.getAmount()))).append("{br}");
+            textBuffer.append(tamFont).append("------------------------------------------").append("{br}");
+            textBuffer.append(tamFont).append(pinpad.getCardBrand()).append(" - ")
+                    .append(pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8))
+                    .append("  AUT: ").append(pinpad.getAuthorizationCode()).append("{br}");
+
+            textBuffer.append(tamFont).append(pinpad.getCardHolderName()).append("{br}");
+            textBuffer.append(tamFont).append("Aprovado com senha").append("{br}");
+            textBuffer.append(tamFont).append("SN: ").append(prefs.getString("serial_app", ""))
+                    .append(" - ").append(BuildConfig.VERSION_NAME).append("{br}");
+
+            /*String txtCompPag = "{br}" +
                     tamFont + "Via Cliente{br}{br}" +
                     tamFont + cAux.removerAcentos(pinpad.getNomeEmpresa()) + "{br}" +
                     tamFont + cAux.removerAcentos(pinpad.getEnderecoEmpresa()) + "{br}" +
@@ -1426,9 +1453,9 @@ public class Impressora extends AppCompatActivity {
                     tamFont + pinpad.getCardBrand() + " - " + pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8) + "  AUT: " + pinpad.getAuthorizationCode() + "{br}" +
                     tamFont + pinpad.getCardHolderName() + "{br}" +
                     tamFont + "Aprovado com senha{br}" +
-                    tamFont + "SN: " + prefs.getString("serial_app", "") + " - " + BuildConfig.VERSION_NAME + "{br}";
+                    tamFont + "SN: " + prefs.getString("serial_app", "") + " - " + BuildConfig.VERSION_NAME + "{br}";*/
             //printer.reset();
-            printer.printTaggedText(txtCompPag);
+            printer.printTaggedText(textBuffer.toString());
             printer.feedPaper(120);
 
             /*String txtCompPag1 = tamFont + "CREDITO                       {right}{b}{h}R{w}$ 50,00{br}";
@@ -1530,6 +1557,77 @@ public class Impressora extends AppCompatActivity {
             imprimirComprovantePagCartaoEsta(reimpressao);
             finalizarImpressao();
         }, tempo);
+    }
+
+    // IMPRESSÃO COMPROVANTE DO CANCELAMENTO
+    void imprimirComprovanteCancelCartaoEsta(boolean reimpressao) {
+        runTask((dialog, printer) -> {
+            final BitmapFactory.Options optionsStone = new BitmapFactory.Options();
+            optionsStone.inScaled = false;
+
+            // Logo Stone
+            final AssetManager assetManagerStone = getApplicationContext().getAssets();
+            final Bitmap bitmapStone = BitmapFactory.decodeStream(assetManagerStone.open("stone.png"),
+                    null, optionsStone);
+            final int widthStone = Objects.requireNonNull(bitmapStone).getWidth();
+            final int heightStone = bitmapStone.getHeight();
+            final int[] argbStone = new int[widthStone * heightStone];
+            bitmapStone.getPixels(argbStone, 0, widthStone, 0, 0, widthStone, heightStone);
+            bitmapStone.recycle();
+
+            //printer.reset();
+            printer.printImage(argbStone, widthStone, heightStone, Printer.ALIGN_CENTER, true);
+            printer.feedPaper(0);
+
+            // Reimpressao
+            final BitmapFactory.Options optionsReimpressao = new BitmapFactory.Options();
+            optionsReimpressao.inScaled = false;
+            final AssetManager assetManagerReimpressao = getApplicationContext().getAssets();
+            final Bitmap bitmapReimpressao = BitmapFactory.decodeStream(assetManagerReimpressao.open("reimpressao.png"),
+                    null, optionsReimpressao);
+            final int widthReimpressao = Objects.requireNonNull(bitmapReimpressao).getWidth();
+            final int heightReimpressao = bitmapReimpressao.getHeight();
+            final int[] argbReimpressao = new int[widthReimpressao * heightReimpressao];
+            bitmapReimpressao.getPixels(argbReimpressao, 0, widthReimpressao, 0, 0, widthReimpressao, heightReimpressao);
+            bitmapReimpressao.recycle();
+
+            //Unidades unidades;
+            //elementosUnidade = bd.getUnidades();
+            AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
+
+            //
+            String txtCompPag = "{br}" + tamFont + "Via do Lojista{br}{br}";
+            printer.printTaggedText(txtCompPag);
+            printer.feedPaper(38);
+
+            //
+            if (reimpressao) {
+                printer.printImage(argbReimpressao, widthReimpressao, heightReimpressao, Printer.ALIGN_CENTER, true);
+                printer.feedPaper(0);
+            }
+
+            //
+            String txtCompPag2 = tamFont + cAux.removerAcentos(pinpad.getNomeEmpresa()) + "{br}" +
+                    tamFont + cAux.removerAcentos(pinpad.getEnderecoEmpresa()) + "{br}" +
+                    tamFont + cAux.exibirData(pinpad.getDate()) + " " + pinpad.getTime() + " CNPJ:" + pinpad.getCnpjEmpresa() + "{br}" +
+                    tamFont + "------------------------------------------{br}" +
+                    pinpad.getTypeOfTransactionEnum() + "                       RS " + cAux.maskMoney(cAux.converterValores(pinpad.getAmount())).trim() + "{br}" +
+                    tamFont + "------------------------------------------{br}" +
+                    tamFont + pinpad.getCardBrand() + " - " + pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8) + "  AUT: " + pinpad.getAuthorizationCode() + "{br}" +
+                    tamFont + pinpad.getCardHolderName() + "{br}" +
+                    tamFont + pinpad.getRecipientTransactionIdentification() + "{br}" +
+                    tamFont + "Aprovado com senha{br}" +
+                    tamFont + "SN: " + prefs.getString("serial_app", "") + " - " + BuildConfig.VERSION_NAME + "{br}";
+            //printer.reset();
+            printer.printTaggedText(txtCompPag2);
+            printer.feedPaper(120);
+
+            /*String txtCompPag1 = tamFont + "CREDITO                       {right}{b}{h}R{w}$ 50,00{br}";
+            //printer.reset();
+            printer.printTaggedText(txtCompPag1);*/
+            printer.flush();
+
+        }, R.string.msg_printing_comp_pag_cartao_nfce);
     }
 
     private void finalizarImpressao() {

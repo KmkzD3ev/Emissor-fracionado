@@ -537,8 +537,7 @@ public class Principal extends AppCompatActivity
         // Cancelar pagamento cartão
         else if (id == R.id.nav_cancelar_pag) {
             //
-            Intent i = new Intent(context, Impressora.class);
-            i.putExtra("imprimir", "reimpressao_comprovante");
+            Intent i = new Intent(context, CancelarPagamentoCartao.class);
             startActivity(i);
         }
 
