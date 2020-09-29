@@ -290,6 +290,13 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             // TODO: handle exception
         }
 
+        //Log.i("Valor", String.valueOf(aux.converterValores(etPreco.getText().toString())));
+
+        String valEtPreco = "";
+        if (!etPreco.getText().toString().equals("")) {
+            valEtPreco = String.valueOf(aux.converterValores(etPreco.getText().toString()));
+        }
+
         //
         if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             ShowMsgToast("Selecione a forma de pagamento.");
@@ -299,7 +306,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             ShowMsgToast("Informe a quantidade.");
         } else if (Integer.parseInt(etQuantidade.getText().toString()) > quant) {
             ShowMsgToast("Restam apenas " + quant + " itens. Diminua a quantidade!");
-        } else if (etPreco.getText().toString().equals("")) {
+        } else if (etPreco.getText().toString().equals("")
+                || valEtPreco.equals("R$ 0,00")
+                || valEtPreco.equals("0.0")
+                || valEtPreco.equals("0.00")) {
             ShowMsgToast("Informe o valor unitário.");
         } else {
 
