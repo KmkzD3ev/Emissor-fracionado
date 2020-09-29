@@ -48,9 +48,9 @@
                             android:layout_height="32dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginRight="16dp"
-                            android:tint="@color/colorPrimary"
                             android:visibility="gone"
-                            app:srcCompat="@drawable/logo_emissor_web" />
+                            app:srcCompat="@drawable/logo_emissor_web"
+                            app:tint="@color/colorPrimary" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
@@ -89,7 +89,8 @@
                             android:id="@+id/llCredenciadora"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:visibility="gone">
 
                             <Spinner
                                 android:id="@+id/spDescricaoCredenciadora"
@@ -127,7 +128,6 @@
                                     android:hint="Cod. Autorização"
                                     android:imeActionLabel="ADD"
                                     android:imeOptions="actionNext"
-                                    android:inputType="number"
                                     android:maxLines="1" />
 
                             </com.google.android.material.textfield.TextInputLayout>
@@ -146,7 +146,6 @@
                                     android:hint="NSU"
                                     android:imeActionLabel="ADD"
                                     android:imeOptions="actionNext"
-                                    android:inputType="number"
                                     android:maxLines="1" />
 
                             </com.google.android.material.textfield.TextInputLayout>

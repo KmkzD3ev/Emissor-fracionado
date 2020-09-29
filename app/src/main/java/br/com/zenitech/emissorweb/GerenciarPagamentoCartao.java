@@ -82,7 +82,18 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
     Unidades unidades;
     //
     String[] listaTotalParcelas = {
-            "À VISTA"
+            "1x (à vista)",
+            "2x sem juros",
+            "3x sem juros",
+            "4x sem juros",
+            "5x sem juros",
+            "6x sem juros",
+            "7x sem juros",
+            "8x sem juros",
+            "9x sem juros",
+            "10x sem juros",
+            "11x sem juros",
+            "12x sem juros"
     };
     Spinner spParcelas;
     //
@@ -261,8 +272,41 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         //transactionObject.setInitiatorTransactionKey("SEU_IDENTIFICADOR_UNICO");
 
         //Informar a quantidade de parcelas, veja a tabela de valores para o InstalmentTransactionEnum
-        if (spParcelas.getSelectedItem().toString().equals("2X Sem Juros")) {
+        /*
+        TWO_INSTALMENT_NO_INTEREST	2x sem juros
+        THREE_INSTALMENT_NO_INTEREST	3x sem juros
+        FOUR_INSTALMENT_NO_INTEREST	4x sem juros
+        FIVE_INSTALMENT_NO_INTEREST	5x sem juros
+        SIX_INSTALMENT_NO_INTEREST	6x sem juros
+        SEVEN_INSTALMENT_NO_INTEREST	7x sem juros
+        EIGHT_INSTALMENT_NO_INTEREST	8x sem juros
+        NINE_INSTALMENT_NO_INTEREST	9x sem juros
+        TEN_INSTALMENT_NO_INTEREST	10x sem juros
+        ELEVEN_INSTALMENT_NO_INTEREST	11x sem juros
+        TWELVE_INSTALMENT_NO_INTEREST	12x sem juros
+         */
+        if (spParcelas.getSelectedItem().toString().equals("2x sem juros")) {
             transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.TWO_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("3x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.THREE_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("4x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.FOUR_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("5x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.FIVE_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("6x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.SIX_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("7x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.SEVEN_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("8x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.EIGHT_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("9x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.NINE_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("10x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.TEN_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("11x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.ELEVEN_INSTALMENT_NO_INTEREST);
+        } else if (spParcelas.getSelectedItem().toString().equals("12x sem juros")) {
+            transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.TWELVE_INSTALMENT_NO_INTEREST);
         } else {
             transactionObject.setInstalmentTransaction(InstalmentTransactionEnum.ONE_INSTALMENT);
         }

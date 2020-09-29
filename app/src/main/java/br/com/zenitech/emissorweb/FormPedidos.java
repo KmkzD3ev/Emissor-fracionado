@@ -188,30 +188,64 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                if (
-                        (parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE CRÉDITO") ||
-                                parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE DÉBITO")) && !unidades.getCodloja().equalsIgnoreCase("")
-                ) {
-                    llCredenciadora.setVisibility(View.VISIBLE);
-                    if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
-                        TiNsuCeara.setVisibility(View.VISIBLE);
-                    } else {
-                        TiNsuCeara.setVisibility(View.GONE);
+                // SE EXISTIR STONE CODE OU OUTRO MEIO DE PAGAMENTO COM A MAQUININHA
+                if (!unidades.getCodloja().equalsIgnoreCase("")) {
+                    if (
+                            (parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE CRÉDITO") ||
+                                    parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE DÉBITO")) && !unidades.getCodloja().equalsIgnoreCase("")
+                    ) {
+                        llCredenciadora.setVisibility(View.GONE);
+                        /*if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
+                            TiNsuCeara.setVisibility(View.VISIBLE);
+                        } else {
+                            TiNsuCeara.setVisibility(View.GONE);
+                        }*/
+
+                        //
+                        btnAvancarNFCE.setVisibility(View.GONE);
+                        btnPagamentoCartaoNFCE.setVisibility(View.VISIBLE);
+
+                        // Retirar quando for usar o pinpad
+                        //btnAvancarNFCE.setVisibility(View.VISIBLE);
                     }
 
-                    //
-                    btnAvancarNFCE.setVisibility(View.GONE);
-                    btnPagamentoCartaoNFCE.setVisibility(View.VISIBLE);
-
-                    // Retirar quando for usar o pinpad
-                    //btnAvancarNFCE.setVisibility(View.VISIBLE);
-                } else {
-                    //
-                    llCredenciadora.setVisibility(View.GONE);
-                    //
-                    btnPagamentoCartaoNFCE.setVisibility(View.GONE);
-                    btnAvancarNFCE.setVisibility(View.VISIBLE);
+                    /* else {
+                        //
+                        llCredenciadora.setVisibility(View.VISIBLE);
+                        //
+                        btnPagamentoCartaoNFCE.setVisibility(View.GONE);
+                        btnAvancarNFCE.setVisibility(View.VISIBLE);
+                    }*/
                 }
+
+                // SE NÃO EXISTIR OUTRO MEIO DE PAGAMENTO POR MAQUININHA
+                else {
+                    if (parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE CRÉDITO") ||
+                            parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE DÉBITO")
+                    ) {
+                        llCredenciadora.setVisibility(View.VISIBLE);
+                        if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
+                            TiNsuCeara.setVisibility(View.VISIBLE);
+                        } else {
+                            TiNsuCeara.setVisibility(View.GONE);
+                        }
+
+                        //
+                        btnPagamentoCartaoNFCE.setVisibility(View.GONE);
+                        btnAvancarNFCE.setVisibility(View.VISIBLE);
+
+                        // Retirar quando for usar o pinpad
+                        //btnAvancarNFCE.setVisibility(View.VISIBLE);
+                    } else {
+                        //
+                        llCredenciadora.setVisibility(View.GONE);
+                        //
+                        btnPagamentoCartaoNFCE.setVisibility(View.GONE);
+                        btnAvancarNFCE.setVisibility(View.VISIBLE);
+                    }
+                }
+
+
             }
 
             @Override
