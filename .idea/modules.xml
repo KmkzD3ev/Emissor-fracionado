@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/EMISSOR_WEB_VERSSIONADO.iml" filepath="$PROJECT_DIR$/.idea/modules/EMISSOR_WEB_VERSSIONADO.iml" group="EMISSOR_WEB_VERSSIONADO" />
-      <module fileurl="file://$PROJECT_DIR$/EmissorWeb.iml" filepath="$PROJECT_DIR$/EmissorWeb.iml" group="EmissorWeb" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="EMISSOR_WEB_VERSSIONADO/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/EMISSOR_WEB_VERSSIONADO.iml" filepath="$PROJECT_DIR$/.idea/modules/EMISSOR_WEB_VERSSIONADO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.iml" />
     </modules>
   </component>
 </project>

@@ -50,15 +50,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     String[] listaFormasPagamento = {
             "FORMA PAGAMENTO",
             "DINHEIRO",
-            "CHEQUE",
             "CARTÃO DE CRÉDITO",
-            "CARTÃO DE DÉBITO",
-            "CRÉDITO LOJA",
-            "VALE ALIMENTAÇÃO",
-            "VALE REFEIÇÃO",
-            "VALE PRESENTE",
-            "VALE COMBUSTÍVEL",
-            "OUTROS"
+            "CARTÃO DE DÉBITO"
     };
 
     private Spinner spProduto, spFormasPagamento, spDescricaoCredenciadora, spBandeiraCredenciadora;
