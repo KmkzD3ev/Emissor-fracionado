@@ -80,6 +80,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
     ArrayList<Unidades> elementos;
     Unidades unidades;
+
     //
     String[] listaTotalParcelas = {
             "1x (à vista)",
