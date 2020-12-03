@@ -674,7 +674,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private AutorizacoesPinpad cursorToAutorizacoesPinpad(Cursor cursor) {
-        AutorizacoesPinpad aP = new AutorizacoesPinpad(null,null,null,null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        AutorizacoesPinpad aP = new AutorizacoesPinpad(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         //
         aP.setId(cursor.getString(0));
         aP.setPedido(cursor.getString(1));
@@ -818,7 +818,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         db.beginTransaction();
 
-        AutorizacoesPinpad autorizacoesPinpad = new AutorizacoesPinpad(null,null,null,null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        AutorizacoesPinpad autorizacoesPinpad = new AutorizacoesPinpad(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
         try {
 
@@ -1189,18 +1189,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         String total = "0", totalNFE = "0";
 
-
         try {
-            String query = "SELECT SUM(ipe.quantidade * ipe.valor) FROM " + TABELA_PEDIDOS + " ped " +
+            String query = "SELECT SUM((ipe.valor * ipe.quantidade)) / 100 " +
+                    "FROM " + TABELA_PEDIDOS + " ped " +
                     " INNER JOIN itens_pedidos ipe ON ipe.pedido = ped.id " +
                     " INNER JOIN produtos pro ON pro.codigo = ipe.produto " +
                     " ORDER BY " + ID_PEDIDOS + " DESC";
+
+            Log.i("SQL", query);
 
             Cursor cursor = db.rawQuery(query, null);
 
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                total = cursor.getString(0);
+
+                total = String.valueOf(Double.parseDouble(cursor.getString(0)));
+                //String[] a = total.split(".");
+
+                //Log.i("TOTAL", "TOTAL NFC-e = " + a.length);
+
+                Log.i("TOTAL", "TOTAL NFC-e = " + Double.parseDouble(cursor.getString(0)));
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -1208,13 +1216,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         try {
-            String query = "SELECT SUM(ipe.quantidade * ipe.valor) FROM itens_pedidosNFE ipe";
+            String query = "SELECT SUM((ipe.valor * ipe.quantidade)) / 100 FROM itens_pedidosNFE ipe";
 
             Cursor cursor = db.rawQuery(query, null);
 
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                totalNFE = cursor.getString(0);
+                totalNFE = String.valueOf(Double.parseDouble(cursor.getString(0)));
+                Log.i("TOTAL", "TOTAL NF-e = " + cursor.getString(0));
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -1228,8 +1237,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         */
 
 
-        String[] qs = {(total != null ? String.valueOf(aux.converterValores(total)) : "0"), (totalNFE != null ? String.valueOf(aux.converterValores(totalNFE)) : "0")};
-        String q = String.valueOf(aux.somar(qs));
+        String[] qs = {
+                (total != null ? String.valueOf(aux.converterValores(total)) : "0"),
+                (totalNFE != null ? String.valueOf(aux.converterValores(totalNFE)) : "0")
+        };
+        String q = String.valueOf(aux.somar_valores(qs));
 
         Log.i("TOTAL", q);
         //String valorUnit = String.valueOf(aux.converterValores(q));

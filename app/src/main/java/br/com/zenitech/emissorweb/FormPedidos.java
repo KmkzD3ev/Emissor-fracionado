@@ -202,13 +202,13 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                         //btnAvancarNFCE.setVisibility(View.VISIBLE);
                     }
 
-                    /* else {
+                     else {
                         //
-                        llCredenciadora.setVisibility(View.VISIBLE);
+                        //llCredenciadora.setVisibility(View.VISIBLE);
                         //
                         btnPagamentoCartaoNFCE.setVisibility(View.GONE);
                         btnAvancarNFCE.setVisibility(View.VISIBLE);
-                    }*/
+                    }
                 }
 
                 // SE NÃO EXISTIR OUTRO MEIO DE PAGAMENTO POR MAQUININHA

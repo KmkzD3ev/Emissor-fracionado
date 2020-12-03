@@ -83,7 +83,7 @@ public class ClassAuxiliar {
 
         //long millis = new Date().getTime();
 
-       SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHH:mm:ss", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHH:mm:ss", Locale.getDefault());
 
         return dateFormat.format(new Date());
     }
@@ -96,8 +96,23 @@ public class ClassAuxiliar {
         for (String v : args) {
             valor = new BigDecimal(String.valueOf(valor)).add(new BigDecimal(v));
             //
-            Log.e("TOTAL", "SOMAR" + valor);
+            Log.e("TOTAL", "SOMAR = " + valor);
         }
+        return valor;
+    }
+
+    //SOMAR VALORES
+    public BigDecimal somar_valores(String[] args) {
+        //BigDecimal valor = new BigDecimal("0.0");
+
+        //
+        /*for (String v : args) {
+            valor = new BigDecimal(String.valueOf(valor)).add(new BigDecimal(v));
+            //
+            Log.e("TOTAL", "SOMAR = " + valor);
+        }*/
+        BigDecimal valor = new BigDecimal(args[1]).add(new BigDecimal(args[0]));
+        Log.e("TOTAL", "SOMAR NOVO = " + valor);
         return valor;
     }
 

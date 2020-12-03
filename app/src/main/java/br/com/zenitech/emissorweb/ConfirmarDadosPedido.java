@@ -528,7 +528,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 protocolo,//PROTOCOLO
                 dataEmissao,//DATA EMISSÃO
                 horaEmissao,//HORA EMISSÃO
-                cAux.soNumeros(total),//VALOR TOTAL
+                "" + cAux.converterValores(cAux.soNumeros(total)),//VALOR TOTAL
                 dataProtocolo,//DATA PROTOCOLO - "28042017"
                 horaProtocolo,//HORA PROTOCOLO - "151540"
                 cpf,//CPF/CNPJ CLIENTE
