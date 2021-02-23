@@ -70,8 +70,9 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
     TransactionDAO transactionDAO;
 
     String STONE_CODE;
-    //ZENITECH TESTE - String STONE_CODE = "177391172";
-    //String STONE_CODE = "111111111";
+    //ZENITECH TESTE -
+    //String STONE_CODE = "177391172";
+    //String STONE_CODE = "208931932";
     /*// Pedido para obter o dispositivo bluetooth
     private static final int REQUEST_GET_DEVICE = 0;
     // Pedido para obter o dispositivo bluetooth
@@ -635,9 +636,9 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        //Stone.setEnvironment((Environment.SANDBOX));
+        Stone.setEnvironment((Environment.SANDBOX));
         //Ambiente de Produção
-        Stone.setEnvironment((Environment.PRODUCTION));
+        //Stone.setEnvironment((Environment.PRODUCTION));
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);

@@ -1187,7 +1187,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         db.beginTransaction();
-        String total = "0", totalNFE = "0";
+        String total = "0.00", totalNFE = "0.00";
 
         try {
             String query = "SELECT SUM((ipe.valor * ipe.quantidade)) / 100 " +
@@ -1209,6 +1209,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 //Log.i("TOTAL", "TOTAL NFC-e = " + a.length);
 
                 Log.i("TOTAL", "TOTAL NFC-e = " + Double.parseDouble(cursor.getString(0)));
+                Log.i("TOTAL", "TOTAL NFC-e = " + total);
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -1237,9 +1238,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         */
 
 
+        /*String[] qs = {
+                (total != null ? String.valueOf(aux.converterValores(total)) : "0.00"),
+                (totalNFE != null ? String.valueOf(aux.converterValores(totalNFE)) : "0.00")
+        };*/
+
         String[] qs = {
-                (total != null ? String.valueOf(aux.converterValores(total)) : "0"),
-                (totalNFE != null ? String.valueOf(aux.converterValores(totalNFE)) : "0")
+                (total != null ? total : "0.00"),
+                (totalNFE != null ? totalNFE : "0.00")
         };
         String q = String.valueOf(aux.somar_valores(qs));
 
