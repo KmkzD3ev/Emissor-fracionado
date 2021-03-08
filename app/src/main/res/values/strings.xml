@@ -151,4 +151,5 @@
     <string name="forma_de_pagamento_escolhida">Forma de pagamento escolhida</string>
     <string name="rs">R$</string>
     <string name="title_activity_cancelar_pagamento_cartao">Cancelar Pagamento</string>
+    <string name="retire_o_cartao">Retire o Cartão</string>
 </resources>

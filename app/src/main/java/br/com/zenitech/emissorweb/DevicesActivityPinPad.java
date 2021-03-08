@@ -17,7 +17,6 @@ import java.util.Set;
 import stone.application.interfaces.StoneCallbackInterface;
 import stone.providers.BluetoothConnectionProvider;
 import stone.utils.PinpadObject;
-import timber.log.Timber;
 
 public class DevicesActivityPinPad extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
@@ -85,7 +84,7 @@ public class DevicesActivityPinPad extends AppCompatActivity implements AdapterV
 
             public void onError() {
                 Toast.makeText(getApplicationContext(), "Erro durante a conexao. Verifique a lista de erros do provider para mais informacoes", Toast.LENGTH_SHORT).show();
-                Timber.e("onError: %s", bluetoothConnectionProvider.getListOfErrors());
+                //Timber.e("onError: %s", bluetoothConnectionProvider.getListOfErrors());
             }
         });
         bluetoothConnectionProvider.execute(); // Executa o provider de conexão bluetooth.

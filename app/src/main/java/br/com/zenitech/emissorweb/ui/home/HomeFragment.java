@@ -37,7 +37,6 @@ import br.com.zenitech.emissorweb.interfaces.IPrincipal;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import timber.log.Timber;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -149,7 +148,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<DomainPrincipal> call, @NonNull Throwable t) {
-                Timber.i(Objects.requireNonNull(t.getMessage()));
+                //Timber.i(Objects.requireNonNull(t.getMessage()));
             }
         });
     }

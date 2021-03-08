@@ -146,6 +146,15 @@
             android:orientation="horizontal">
 
             <TextView
+                style="@style/ReceiptManager.Report.TextAppearance.Small"
+                android:id="@+id/t"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Imprimir teste"
+                android:textSize="24sp" />
+
+            <TextView
                 android:id="@+id/imprimindo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

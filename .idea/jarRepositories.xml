@@ -41,5 +41,15 @@
       <option name="name" value="Google" />
       <option name="url" value="https://dl.google.com/dl/android/maven2/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven5" />
+      <option name="name" value="maven5" />
+      <option name="url" value="https://packagecloud.io/stone/sdk-android-internal/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://packagecloud.io/priv/7abe41be9e2722a35336f92348ff5617df8c2a70e8a76f71/stone/pos-android/maven2" />
+    </remote-repository>
   </component>
 </project>

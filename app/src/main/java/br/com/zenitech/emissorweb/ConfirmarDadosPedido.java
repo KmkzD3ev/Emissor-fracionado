@@ -556,20 +556,12 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         // TODO Auto-generated method stub
         switch (v.getId()) {
             case R.id.btnPrint: {
-                if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("")) {
-                    selectTamPapImpressora();
-                } else {
+                if (new Configuracoes().GetDevice()) {
+                    prefs.edit().putString("tamPapelImpressora", "58mm").apply();
                     double v0 = Double.parseDouble(total);
                     double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
                     double tributo = v0 - (v0 - (v1 * v0));
-
-                /*
-                PackageManager packageManager = getPackageManager();
-                String packageName = "br.com.zenitech.impressora";
-                Intent i = packageManager.getLaunchIntentForPackage(packageName);
-                */
-
-                    Intent i = new Intent(contexto, Impressora.class);
+                    Intent i = new Intent(contexto, ImpressoraPOS.class);
 
                     String serie = bd.getSeriePOS();
                     ArrayList<Unidades> elementosUnidade = bd.getUnidades();
@@ -592,7 +584,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     i.putExtra("protocolo", (
                             protocoloNota.getText().toString().equals("EMITIDA EM CONTINGENCIA") ?
                                     "EMITIDA EM CONTINGENCIA" :
-                                    protocoloNota.getText().toString() + " - {br}" + dataHoraNota.getText().toString()
+                                    protocoloNota.getText().toString() + " - " + dataHoraNota.getText().toString()
                     ));
                     i.putExtra("quantidade", qnt.getText().toString());
                     i.putExtra("valor", "" + cAux.maskMoney(new BigDecimal(String.valueOf(total))).replace("R$", ""));
@@ -613,6 +605,65 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     );
 
                     startActivity(i);
+                } else {
+                    if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("")) {
+                        selectTamPapImpressora();
+                    } else {
+                        double v0 = Double.parseDouble(total);
+                        double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
+                        double tributo = v0 - (v0 - (v1 * v0));
+
+                /*
+                PackageManager packageManager = getPackageManager();
+                String packageName = "br.com.zenitech.impressora";
+                Intent i = packageManager.getLaunchIntentForPackage(packageName);
+                */
+
+                        Intent i = new Intent(contexto, Impressora.class);
+
+                        String serie = bd.getSeriePOS();
+                        ArrayList<Unidades> elementosUnidade = bd.getUnidades();
+                        unidades = elementosUnidade.get(0);
+
+                        //UNIDADE
+                        i.putExtra("razao_social", unidades.getRazao_social());
+                        i.putExtra("cnpj", "CNPJ: " + unidades.getCnpj() + " I.E.: " + unidades.getIe());
+                        i.putExtra("endereco", unidades.getEndereco() + ", " + unidades.getNumero());
+                        i.putExtra("bairro", unidades.getBairro() + ", " + unidades.getCidade() + ", " + unidades.getUf());
+                        i.putExtra("cep", unidades.getCep() + "  " + unidades.getTelefone());
+
+                        //NOTA
+                        i.putExtra("imprimir", "nota");
+                        i.putExtra("pedido", "" + id);
+                        i.putExtra("cliente", (!cpfCnpj_cliente.getText().toString().equals("") ? cpfCnpj_cliente.getText().toString() : "CONSUMIDOR NAO IDENTIFICADO"));
+                        i.putExtra("id_produto", "" + bd.getIdProduto(produto.getText().toString()));
+                        i.putExtra("produto", produto.getText().toString());
+                        i.putExtra("chave", bd.gerarChave(id));
+                        i.putExtra("protocolo", (
+                                protocoloNota.getText().toString().equals("EMITIDA EM CONTINGENCIA") ?
+                                        "EMITIDA EM CONTINGENCIA" :
+                                        protocoloNota.getText().toString() + " - {br}" + dataHoraNota.getText().toString()
+                        ));
+                        i.putExtra("quantidade", qnt.getText().toString());
+                        i.putExtra("valor", "" + cAux.maskMoney(new BigDecimal(String.valueOf(total))).replace("R$", ""));
+                        i.putExtra("valorUnit", "" + cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))).replace("R$", ""));
+                        i.putExtra("tributos", "" + cAux.maskMoney(new BigDecimal(String.valueOf(tributo))).replace("R$", ""));
+                        i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
+
+                        Log.e(TAG,
+                                "pedido: " + id + "\n" +
+                                        "cliente: " + (!cpfCnpj_cliente.getText().toString().equals("") ? cpfCnpj_cliente.getText().toString() : "CONSUMIDOR NAO IDENTIFICADO") + "\n" +
+                                        "id_produto: " + bd.getIdProduto(produto.getText().toString()) + "\n" +
+                                        "produto: " + produto.getText().toString() + "\n" +
+                                        "protocolo: " + protocoloNota.getText().toString() + "\n" +
+                                        "quantidade: " + qnt.getText().toString() + "\n" +
+                                        "valor: " + "" + cAux.maskMoney(new BigDecimal(String.valueOf(total))) + "\n" +
+                                        "valorUnit: " + "" + cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))) + "\n" +
+                                        "tributos: " + "" + cAux.maskMoney(new BigDecimal(String.valueOf(tributo)))
+                        );
+
+                        startActivity(i);
+                    }
                 }
 
                 break;

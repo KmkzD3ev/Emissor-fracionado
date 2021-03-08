@@ -38,6 +38,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,7 +50,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import br.com.stone.posandroid.providers.PosPrintProvider;
 import br.com.zenitech.emissorweb.adapters.PedidosAdapter;
+import br.com.zenitech.emissorweb.controller.PrintViewHelper;
 import br.com.zenitech.emissorweb.domains.DomainPrincipal;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
@@ -62,7 +65,7 @@ import br.com.zenitech.emissorweb.interfaces.ISincronizar;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import timber.log.Timber;
+import stone.application.interfaces.StoneCallbackInterface;
 
 public class Principal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -102,6 +105,8 @@ public class Principal extends AppCompatActivity
     ImageView imgEmissor;
     TextView txtNFCeVinculada, txtTotMemoria;
 
+    RelativeLayout LLlistaPedidos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +131,8 @@ public class Principal extends AppCompatActivity
             e.printStackTrace();
         }
          */
+
+        LLlistaPedidos = findViewById(R.id.LLlistaPedidos);
 
         txtNFCeVinculada = findViewById(R.id.txtNFCeVinculada);
         txtTotMemoria = findViewById(R.id.txtTotMemoria);
@@ -169,7 +176,7 @@ public class Principal extends AppCompatActivity
                 }
             }
         } catch (Exception e) {
-            Timber.d(Objects.requireNonNull(e.getMessage()));
+            //Timber.d(Objects.requireNonNull(e.getMessage()));
 
             //APAGA O BANCO DE DADOS E VAI PARA TELA INICIAL DE SINCRONIZAÇÃO
             context.deleteDatabase("emissorwebDB");
@@ -305,6 +312,8 @@ public class Principal extends AppCompatActivity
             }
         }
     }
+
+
 
     @Override
     protected void onResume() {

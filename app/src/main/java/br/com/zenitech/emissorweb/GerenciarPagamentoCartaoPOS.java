@@ -1,15 +1,24 @@
 package br.com.zenitech.emissorweb;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,31 +26,24 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
 
-import android.os.Handler;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
-
-import android.view.MenuItem;
-import android.widget.Toast;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.math.BigDecimal;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import br.com.zenitech.emissorweb.domains.Autorizacoes;
+import br.com.stone.posandroid.providers.PosPrintProvider;
+import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
+import br.com.stone.posandroid.providers.PosTransactionProvider;
+import br.com.stonesdk.sdkdemo.controller.PrintController;
 import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import stone.application.StoneStart;
 import stone.application.enums.Action;
 import stone.application.enums.InstalmentTransactionEnum;
 import stone.application.enums.ReceiptType;
+import stone.application.enums.TransactionStatusEnum;
 import stone.application.enums.TypeOfTransactionEnum;
 import stone.application.interfaces.StoneActionCallback;
 import stone.application.interfaces.StoneCallbackInterface;
@@ -49,7 +51,6 @@ import stone.database.transaction.TransactionDAO;
 import stone.database.transaction.TransactionObject;
 import stone.environment.Environment;
 import stone.providers.ActiveApplicationProvider;
-import stone.providers.BaseTransactionProvider;
 import stone.providers.CancellationProvider;
 import stone.providers.SendEmailTransactionProvider;
 import stone.providers.TransactionProvider;
@@ -61,12 +62,13 @@ import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 
 // implements StoneActionCallback
-public class GerenciarPagamentoCartao extends AppCompatActivity {
+public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements StoneActionCallback {
 
     // ** STONE MODULO **
-    TransactionProvider provider;
+    //TransactionProvider provider;
     TransactionObject transactionObject;
     TransactionDAO transactionDAO;
+    PosTransactionProvider Posprovider;
 
     String STONE_CODE;
     //ZENITECH TESTE -
@@ -102,7 +104,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
     private DatabaseHelper bd;
     TextView txtTotalPagar, txtStatusPagamento, txtMsgCausaErro;
     ClassAuxiliar cAux;
-    LinearLayoutCompat llDebito, llCredito, llPagamentoImprimir;
+    LinearLayoutCompat llDebito, llCredito, llPagamentoImprimir, llPagamentoPedirCartao, llProcessandoPagamento;
+    LinearLayoutCompat llPagamentoAprovado, llPagamentoReprovado;
     AlertDialog alerta;
     SharedPreferences prefs;
 
@@ -144,6 +147,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         llDebito = findViewById(R.id.llDebito);
         llCredito = findViewById(R.id.llCredito);
         llPagamentoImprimir = findViewById(R.id.llPagamentoImprimir);
+        llPagamentoPedirCartao = findViewById(R.id.llPagamentoPedirCartao);
+        llProcessandoPagamento = findViewById(R.id.llProcessandoPagamento);
         //
         btnEnviarTrazacao = findViewById(R.id.btnEnviarTrazacao);
 
@@ -157,7 +162,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         btnCancelarFinalizarPagamento = findViewById(R.id.btnCancelarFinalizarPagamento);
         btnCancelarFinalizarPagamento.setOnClickListener(v -> cancelarPagamento());
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listaTotalParcelas);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, listaTotalParcelas);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spParcelas = findViewById(R.id.spParcelas);
         spParcelas.setAdapter(adapter);
         spParcelas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -227,7 +233,10 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         });
 
 
-        btnEnviarTrazacao.setOnClickListener(v -> iniciarTranzacao());
+        //btnEnviarTrazacao.setOnClickListener(v -> iniciarTranzacao());
+        btnEnviarTrazacao.setOnClickListener(view -> {
+            iniciarCaptura();
+        });
 
         iniciarStone();
     }
@@ -236,15 +245,15 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
     void iniciarTranzacao() {
         // Verifica se o bluetooth esta ligado e se existe algum pinpad conectado.
         if (Stone.getPinpadListSize() > 0) {
-            /*Intent transactionIntent = new Intent(MainActivity.this, TransactionActivity.class);
-            startActivity(transactionIntent);*/
+            //Intent transactionIntent = new Intent(MainActivity.this, TransactionActivity.class);
+            //startActivity(transactionIntent);
 
             //makeText(getApplicationContext(), "Pinpad conectado.", LENGTH_SHORT).show();
             btnEnviarTrazacao.setVisibility(View.GONE);
             iniciarCaptura();
         } else {
 
-            Intent devicesIntent = new Intent(GerenciarPagamentoCartao.this, DevicesActivityPinPad.class);
+            Intent devicesIntent = new Intent(GerenciarPagamentoCartaoPOS.this, DevicesActivityPinPad.class);
             startActivity(devicesIntent);
 
 
@@ -315,7 +324,6 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         //Definir forma de pagamento
         if (formaPagamento.equalsIgnoreCase("CARTAO DE CREDITO")) {
             transactionObject.setTypeOfTransaction(TypeOfTransactionEnum.CREDIT);
-
         } else if (formaPagamento.equalsIgnoreCase("CARTAO DE DEBITO")) {
             transactionObject.setTypeOfTransaction(TypeOfTransactionEnum.DEBIT);
         }
@@ -328,17 +336,34 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         //Define se transação será feita com captura ou não.
         transactionObject.setCapture(true);
 
+        //Processo para envio da transação
+        // Stone.getUserModel(0) é o usuário atual do aplicativo, que está na posição zero.
+        Log.i("PinPad_Teste", String.valueOf(Stone.getUserModel(0)));
+        Posprovider = new PosTransactionProvider(context, transactionObject, Stone.getUserModel(0));
+        /*provider.setConnectionCallback(new StoneCallbackInterface() {
+            public void onSuccess() {
+                // Transação enviada com sucesso e salva no banco. Para acessar, use o TransactionDAO
+                imprimircomprovantePOS();
+            }
+
+            public void onError() {
+                // Erro na transação
+                Log.i("PinPad_Teste", "Erro");
+            }
+        });*/
+
         //Timber.tag("PinPad_Teste: ").i(String.valueOf(Stone.getUserModel(0)));
         //Timber.tag("PinPad_Teste: ").i(String.valueOf(Stone.getPinpadFromListAt(0)));
 
         // Processo para envio da transação
-        provider = new TransactionProvider(context, transactionObject, Stone.getUserModel(0), Stone.getPinpadFromListAt(0));
+        //provider = new TransactionProvider(context, transactionObject, Stone.getUserModel(0), Stone.getPinpadFromListAt(0));
 
-        provider.useDefaultUI(true);
-        provider.setDialogTitle("Aguarde"); // Título do Dialog
-        provider.setDialogMessage("Enviando..."); // Mensagem do Dialog
-        //provider.setConnectionCallback(this);
-        provider.setConnectionCallback(new StoneCallbackInterface() {
+        //provider.useDefaultUI(true);
+        Posprovider.setDialogTitle("Aguarde"); // Título do Dialog
+        Posprovider.setDialogMessage("Enviando..."); // Mensagem do Dialog
+        Posprovider.setConnectionCallback(this);
+        //Posprovider.getTransactionStatus();
+        /*Posprovider.setConnectionCallback(new StoneCallbackInterface() {
             @Override
             public void onSuccess() {
                 // Transação enviada com sucesso e salva no banco. Para acessar, use o TransactionDAO
@@ -414,7 +439,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
                     //
                     //provider.getMessageFromAuthorize();
                     if (to.getActionCode().equalsIgnoreCase("1016")) {
-                        txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), provider.getMessageFromAuthorize()));//Saldo insuficiente
+                        txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), Posprovider.getMessageFromAuthorize()));//Saldo insuficiente
                     }
                     //
                     else if (to.getActionCode().equalsIgnoreCase("1017")) {
@@ -430,11 +455,62 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
             @Override
             public void onError() {
+
+                Log.e("POS", Posprovider.getTransactionStatus().toString());
                 // Erro na transação
-                msg(false);
+                //msg(false);
+            }
+        });*/
+        Posprovider.execute();
+    }
+
+    // IMPRIMIR COMPROVANTE
+    private void imprimircomprovantePOS() {
+        final PrintController printMerchant =
+                new PrintController(GerenciarPagamentoCartaoPOS.this,
+                        new PosPrintReceiptProvider(this.getApplicationContext(),
+                                transactionObject, ReceiptType.MERCHANT));
+
+        //printMerchant.print();
+
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Transação aprovada! Deseja imprimir a via do cliente?");
+
+        builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+            final PrintController printClient =
+                    new PrintController(GerenciarPagamentoCartaoPOS.this,
+                            new PosPrintReceiptProvider(getApplicationContext(),
+                                    transactionObject, ReceiptType.CLIENT));
+            //printClient.print();
+            _finalizarPagamento();
+        });
+
+        builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
+            _finalizarPagamento();
+        });
+
+        runOnUiThread(builder::show);
+
+
+        /*PosPrintProvider customPosPrintProvider = new PosPrintProvider(context);
+        customPosPrintProvider.addLine("PAN : " + transactionObject.getCardHolderNumber());
+        customPosPrintProvider.addLine("DATE/TIME : " + transactionObject.getDate() + " " + transactionObject.getTime());
+        customPosPrintProvider.addLine("AMOUNT : " + transactionObject.getAmount());
+        customPosPrintProvider.addLine("ATK : " + transactionObject.getRecipientTransactionIdentification());
+        customPosPrintProvider.addLine("Signature");
+        //customPosPrintProvider.addBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.logo_emissor_web));
+        customPosPrintProvider.setConnectionCallback(new StoneCallbackInterface() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(context, "Recibo impresso", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(context, "Erro ao imprimir: " + customPosPrintProvider.getListOfErrors(), Toast.LENGTH_SHORT).show();
             }
         });
-        provider.execute();
+        customPosPrintProvider.execute();*/
     }
 
     // ENVIAR COMPROVANTE POR EMAIL
@@ -539,19 +615,34 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
     void msg(boolean statusPag) {
         //
-        LinearLayoutCompat llPagamentoAprovado, llPagamentoReprovado;
         llPagamentoAprovado = findViewById(R.id.llPagamentoAprovado);
         llPagamentoReprovado = findViewById(R.id.llPagamentoReprovado);
 
-        //
-        if (statusPag) {
-            llPagamentoAprovado.setVisibility(View.VISIBLE);
-        } else {
-            llPagamentoReprovado.setVisibility(View.VISIBLE);
-        }
 
+        runOnUiThread(() -> {
+            //
+            if (statusPag) {
+                llProcessandoPagamento.setVisibility(View.GONE);
+                llPagamentoAprovado.setVisibility(View.VISIBLE);
+                imprimircomprovantePOS();
+            } else {
+                llPagamentoReprovado.setVisibility(View.VISIBLE);
+                int time = 4000;
+
+                // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    //
+                    Intent returnIntent = new Intent();
+                    setResult(Activity.RESULT_CANCELED, returnIntent);
+                    finish();
+                }, time);
+            }
+        });
+    }
+
+    private void _aguardarImpressaoComprovante() {
         // **
-        int time = 4000;
+        /*int time = 4000;
 
         // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
         new Handler().postDelayed(() -> {
@@ -565,7 +656,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
                 setResult(Activity.RESULT_CANCELED, returnIntent);
                 finish();
             }
-        }, time);
+        }, time);*/
     }
 
     private void _finalizarPagamento() {
@@ -635,9 +726,9 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        //Stone.setEnvironment((Environment.SANDBOX));
+        Stone.setEnvironment((Environment.SANDBOX));
         //Ambiente de Produção
-        Stone.setEnvironment((Environment.PRODUCTION));
+        //Stone.setEnvironment((Environment.PRODUCTION));
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);
@@ -685,9 +776,10 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
     void _pinpadAtivado() {
         // O SDK já foi ativado.
-        Toast.makeText(context, "O SDK já foi ativado.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "O SDK já foi ativado.", Toast.LENGTH_SHORT).show();
         btnEnviarTrazacao.setVisibility(View.VISIBLE);
-        iniciarTranzacao();
+        //iniciarTranzacao();
+        //iniciarCaptura();
     }
 
     // Desativar Stone Code
@@ -715,117 +807,130 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         activeApplicationProvider.deactivate(STONE_CODE);
     }
 
-    /*@Override
-    public void onStatusChanged(Action action) {
-        switch (action){
-            case TRANSACTION_WAITING_CARD:
-                txtStatusPagamento.append("Aguardando o cartão ser inserido" + "\n");
-                break;
-            case TRANSACTION_WAITING_PASSWORD:
-                txtStatusPagamento.append("Aguardando a senha do cartão" + "\n");
-                break;
-            case TRANSACTION_SENDING:
-                txtStatusPagamento.append("Enviando a transação para a Stone" + "\n");
-                break;
-            case TRANSACTION_REMOVE_CARD:
-                txtStatusPagamento.append("Aguardando o cartão ser retirado" + "\n");
-                break;
-            case TRANSACTION_CARD_REMOVED:
-                txtStatusPagamento.append("Indica que o cartão foi removido" + "\n");
-                break;
-            case REVERSING_TRANSACTION_WITH_ERROR:
-                txtStatusPagamento.append("Tentando reverter transação com status WITH_ERROR" + "\n");
-                break;
-        }
-        //txtStatusPagamento.append(action.name() + "\n");
+    @Override
+    public void onStatusChanged(final Action action) {
+
+        runOnUiThread(() -> {
+            if (action == Action.TRANSACTION_WAITING_CARD) {
+                btnEnviarTrazacao.setVisibility(View.GONE);
+                llPagamentoPedirCartao.setVisibility(View.VISIBLE);
+            } else if (action == Action.TRANSACTION_WAITING_PASSWORD) {
+                llPagamentoPedirCartao.setVisibility(View.GONE);
+            }else{
+                llProcessandoPagamento.setVisibility(View.VISIBLE);
+            }
+        });
+
+        /*if(action.name().equals("TRANSACTION_WAITING_CARD")){
+            btnEnviarTrazacao.setVisibility(View.GONE);
+            llPagamentoPedirCartao.setVisibility(View.VISIBLE);
+        }else if(action.name().equals("TRANSACTION_WAITING_PASSWORD")){
+            llPagamentoPedirCartao.setVisibility(View.GONE);
+        }*/
     }
 
     @Override
     public void onSuccess() {
 
+        // Transação enviada com sucesso e salva no banco. Para acessar, use o TransactionDAO
+
+        //
+        transactionDAO = new TransactionDAO(context);
+        // Pega o id da última transação
+        transactionId = transactionDAO.getLastTransactionId();
+        // Pega os dados da última transação
+        //transactionObject = transactionDAO.findTransactionWithId(transactionId);
+        Log.i("Stone", String.valueOf(transactionDAO.findTransactionWithId(transactionId)));
+
+        TransactionObject to = transactionDAO.findTransactionWithId(transactionId);
+
+
+        if (Objects.requireNonNull(to).getTransactionStatus() == TransactionStatusEnum.APPROVED) {
+
+            //imprimircomprovantePOS();
+
+            // **
+            //String actionCode = Objects.requireNonNull(to).getActionCode();
+            String actionCode = transactionObject.getActionCode();
+            Log.i("Stone", "ActionCode : " + actionCode);
+            if (actionCode.equalsIgnoreCase("0000") ||
+                    actionCode.equalsIgnoreCase("0001") ||
+                    actionCode.equalsIgnoreCase("0002") ||
+                    actionCode.equalsIgnoreCase("0003") ||
+                    actionCode.equalsIgnoreCase("0004")
+            ) {
+                // ** ADD
+                bd.addAutorizacoesPinPad(new AutorizacoesPinpad(
+                        String.valueOf(transactionId),
+                        "",
+                        String.valueOf(Objects.requireNonNull(to).getIdFromBase()),
+                        to.getAmount(),
+                        to.getRequestId(),
+                        to.getEmailSent(),
+                        to.getTimeToPassTransaction(),
+                        to.getInitiatorTransactionKey(),
+                        to.getRecipientTransactionIdentification(),
+                        to.getCardHolderNumber(),
+                        to.getCardHolderName(),
+                        to.getDate(),
+                        to.getTime(),
+                        to.getAid(),
+                        to.getArcq(),
+                        to.getAuthorizationCode(),
+                        to.getIccRelatedData(),
+                        to.getTransactionReference(),
+                        to.getActionCode(),
+                        to.getCommandActionCode(),
+                        to.getPinpadUsed(),
+                        to.getSaleAffiliationKey(),
+                        to.getCne(),
+                        to.getCvm(),
+                        to.getBalance(),
+                        to.getServiceCode(),
+                        to.getSubMerchantCategoryCode(),
+                        String.valueOf(to.getEntryMode()),
+                        String.valueOf(to.getCardBrand()),
+                        String.valueOf(to.getInstalmentTransaction()),
+                        String.valueOf(to.getTransactionStatus()),
+                        String.valueOf(to.getInstalmentType()),
+                        String.valueOf(to.getTypeOfTransactionEnum()),
+                        "",//String.valueOf(to.getSignature())
+                        String.valueOf(to.getCancellationDate()),
+                        String.valueOf(to.isCapture()),
+                        to.getShortName(),
+                        to.getSubMerchantAddress(),
+                        "",//to.getUserModel().toString()
+                        String.valueOf(to.isFallbackTransaction()),
+                        to.getAppLabel(),
+                        to.getUserModel().getMerchantName(),
+                        to.getUserModel().getMerchantAddress().getCity() + "/" + to.getUserModel().getMerchantAddress().getDistric(),
+                        to.getUserModel().getMerchantDocumentNumber()
+                ));
+
+                msg(true);
+            }
+        } else {
+            //
+            //provider.getMessageFromAuthorize();
+            if (to.getActionCode().equalsIgnoreCase("1016")) {
+                txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), Posprovider.getMessageFromAuthorize()));//Saldo insuficiente
+            }
+            //
+            else if (to.getActionCode().equalsIgnoreCase("1017")) {
+                txtMsgCausaErro.setText(String.format("%s\nSenha inválida", to.getActionCode()));
+            }
+            //
+            else {
+                txtMsgCausaErro.setText(to.getActionCode());
+            }
+            msg(false);
+        }
     }
 
     @Override
     public void onError() {
-
-        Toast.makeText(context, "Erro: " + provider.getListOfErrors(), Toast.LENGTH_SHORT).show();
-    }*/
+        Log.e("POS", Posprovider.getTransactionStatus().toString());
+        // Erro na transação
+        msg(false);
+    }
 }
-
-
-// ** MODULO BLUETOOTH ** //
-/*
-
-    // BLUETOOTH **
-    private void ativarBluetooth() {
-        new AtivarDesativarBluetooth().enableBT();
-    }
-
-    // BLUETOOTH **
-    private synchronized void waitForConnection() {
-        //status(null);
-
-        closeActiveConnection();
-
-        // Show dialog to select a Bluetooth device.
-        startActivityForResult(new Intent(this, DeviceListActivity.class), REQUEST_GET_DEVICE);
-    }
-
-    // BLUETOOTH **
-    private void establishBluetoothConnection(final String address) {
-        final ProgressDialog dialog = new ProgressDialog(GerenciarPagamentoCartao.this);
-        dialog.setTitle(getString(R.string.title_please_wait));
-        dialog.setMessage(getString(R.string.msg_connecting));
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-
-        final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-        final Thread t = new Thread(() -> {
-            Timber.d("BluetoothConnection - Conectando à " + address + "...");
-
-            btAdapter.cancelDiscovery();
-
-            try {
-                UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-                BluetoothDevice btDevice = btAdapter.getRemoteDevice(address);
-
-                try {
-                    BluetoothSocket btSocket = btDevice.createRfcommSocketToServiceRecord(uuid);
-                    btSocket.connect();
-
-                    mBtSocket = btSocket;
-                } catch (IOException e) {
-                    error("Falhou ao conectar: " + e.getMessage());
-                    waitForConnection();
-                    return;
-                }
-
-            } finally {
-                dialog.dismiss();
-            }
-        });
-        t.start();
-    }
-
-    // BLUETOOTH **
-    private synchronized void closeActiveConnection() {
-        closeBluetoothConnection();
-    }
-
-    private synchronized void closeBluetoothConnection() {
-        // Close Bluetooth connection
-        BluetoothSocket s = mBtSocket;
-        mBtSocket = null;
-        if (s != null) {
-            Timber.d("Close Bluetooth socket");
-            try {
-                s.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-*/
-
-// ** FIM DO MODULO BLUETOOTH ** //

@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.Unidades;
-import timber.log.Timber;
 
 public class FormPedidos extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     static final int PAGAMENTO_REQUEST = 1;
@@ -75,6 +74,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     // BTNs **
     Button btnPagamentoCartaoNFCE, btnAvancarNFCE;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,9 +200,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
                         // Retirar quando for usar o pinpad
                         //btnAvancarNFCE.setVisibility(View.VISIBLE);
-                    }
-
-                     else {
+                    } else {
                         //
                         //llCredenciadora.setVisibility(View.VISIBLE);
                         //
@@ -362,7 +360,15 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void iniciarPagamento() {
-        Intent i = new Intent(getBaseContext(), GerenciarPagamentoCartao.class);
+        Intent i;
+
+        //
+        if (new Configuracoes().GetDevice()) {
+            i = new Intent(getBaseContext(), GerenciarPagamentoCartaoPOS.class);
+        } else {
+            i = new Intent(getBaseContext(), GerenciarPagamentoCartao.class);
+        }
+
         /*i.putExtra("qnt", etQuantidade.getText().toString());
         i.putExtra("vlt", etPreco.getText().toString());
         i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());*/

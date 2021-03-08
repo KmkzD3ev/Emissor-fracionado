@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.4.21'
+    ext.kotlin_version = '1.4.30'
 
     repositories {
         jcenter()
@@ -23,8 +23,15 @@ allprojects {
         google()
 
         // Stone **
-        maven { url "https://packagecloud.io/stone/sdk-android/maven2" }
+        /*maven { url "https://packagecloud.io/stone/sdk-android/maven2" }
         maven { url "https://packagecloud.io/stone/sdk-android-snapshot/maven2" }
+        maven { url "https://packagecloud.io/Stone/pos-android-service-container/maven2" }*/
+
+        maven { url "https://packagecloud.io/priv/7abe41be9e2722a35336f92348ff5617df8c2a70e8a76f71/stone/pos-android/maven2" }
+
+        maven { url "https://packagecloud.io/stone/sdk-android/maven2" }
+        maven { url "https://packagecloud.io/stone/sdk-android/maven2" }
+        maven { url "https://packagecloud.io/stone/sdk-android-internal/maven2" }
         maven { url "https://packagecloud.io/Stone/pos-android-service-container/maven2" }
     }
 }
