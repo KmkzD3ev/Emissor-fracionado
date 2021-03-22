@@ -265,14 +265,14 @@
                 android:textColor="#FFFFFF"
                 android:textSize="40sp" />
 
-            <TextView
+            <!--<TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="@string/retire_o_cartao"
                 android:textColor="#FFFFFF"
-                android:textSize="40sp" />
+                android:textSize="40sp" />-->
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <!-- Painel Erro -->

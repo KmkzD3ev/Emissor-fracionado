@@ -108,45 +108,88 @@ public class ConsultarNFE extends AppCompatActivity {
                     runOnUiThread(() -> {
                         if (!sincronizacao.getProtocolo().isEmpty() && sincronizacao.getProtocolo().length() >= 10) {
 
-                            prefs.edit().putString("barcode", sincronizacao.getBarcode()).apply();
-                            prefs.edit().putString("nome", sincronizacao.getNome()).apply();
-                            prefs.edit().putString("endereco_dest", sincronizacao.getEndereco_dest()).apply();
-                            prefs.edit().putString("cnpj_dest", sincronizacao.getCnpj_dest()).apply();
-                            prefs.edit().putString("ie_dest", sincronizacao.getIe_dest()).apply();
-                            prefs.edit().putString("nnf", sincronizacao.getNnf()).apply();
-                            prefs.edit().putString("serie", sincronizacao.getSerie()).apply();
-                            prefs.edit().putString("chave", sincronizacao.getChave()).apply();
-                            prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
-                            prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
-                            prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
+                            if (new Configuracoes().GetDevice()) {
+                                prefs.edit().putString("barcode", sincronizacao.getBarcode()).apply();
+                                prefs.edit().putString("nome", sincronizacao.getNome()).apply();
+                                prefs.edit().putString("endereco_dest", sincronizacao.getEndereco_dest()).apply();
+                                prefs.edit().putString("cnpj_dest", sincronizacao.getCnpj_dest()).apply();
+                                prefs.edit().putString("ie_dest", sincronizacao.getIe_dest()).apply();
+                                prefs.edit().putString("nnf", sincronizacao.getNnf()).apply();
+                                prefs.edit().putString("serie", sincronizacao.getSerie()).apply();
+                                prefs.edit().putString("chave", sincronizacao.getChave()).apply();
+                                prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
+                                prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
+                                prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
 
-                            Intent i = new Intent(context, Impressora.class);
+                                Intent i = new Intent(context, ImpressoraPOS.class);
 
-                            ArrayList<Unidades> elementosUnidade = bd.getUnidades();
-                            unidades = elementosUnidade.get(0);
+                                ArrayList<Unidades> elementosUnidade = bd.getUnidades();
+                                unidades = elementosUnidade.get(0);
 
-                            //UNIDADE
-                            i.putExtra("razao_social", unidades.getRazao_social());
-                            i.putExtra("cnpj", "CNPJ: " + unidades.getCnpj() + " I.E.: " + unidades.getIe());
-                            i.putExtra("endereco", unidades.getEndereco() + ", " + unidades.getNumero());
-                            i.putExtra("bairro", unidades.getBairro() + ", " + unidades.getCidade() + ", " + unidades.getUf());
-                            i.putExtra("cep", unidades.getCep() + "  " + unidades.getTelefone());
+                                //UNIDADE
+                                i.putExtra("razao_social", unidades.getRazao_social());
+                                i.putExtra("cnpj", "CNPJ: " + unidades.getCnpj() + " I.E.: " + unidades.getIe());
+                                i.putExtra("endereco", unidades.getEndereco() + ", " + unidades.getNumero());
+                                i.putExtra("bairro", unidades.getBairro() + ", " + unidades.getCidade() + ", " + unidades.getUf());
+                                i.putExtra("cep", unidades.getCep() + "  " + unidades.getTelefone());
 
-                            //NOTA
-                            i.putExtra("imprimir", "nfe");
-                            i.putExtra("pedido", "");
-                            i.putExtra("cliente", "CONSUMIDOR NAO IDENTIFICADO");
-                            i.putExtra("id_produto", "");
-                            i.putExtra("produto", "");
-                            i.putExtra("chave", "");
-                            i.putExtra("protocolo", "");
-                            i.putExtra("quantidade", "");
-                            i.putExtra("valor", "");
-                            i.putExtra("valorUnit", "");
-                            i.putExtra("tributos", "");
-                            i.putExtra("form_pagamento", "");
+                                //NOTA
+                                i.putExtra("imprimir", "nfe");
+                                i.putExtra("pedido", "");
+                                i.putExtra("cliente", "CONSUMIDOR NAO IDENTIFICADO");
+                                i.putExtra("id_produto", "");
+                                i.putExtra("produto", "");
+                                i.putExtra("chave", "");
+                                i.putExtra("protocolo", "");
+                                i.putExtra("quantidade", "");
+                                i.putExtra("valor", "");
+                                i.putExtra("valorUnit", "");
+                                i.putExtra("tributos", "");
+                                i.putExtra("form_pagamento", "");
 
-                            startActivity(i);
+                                startActivity(i);
+                            }else {
+
+                                prefs.edit().putString("barcode", sincronizacao.getBarcode()).apply();
+                                prefs.edit().putString("nome", sincronizacao.getNome()).apply();
+                                prefs.edit().putString("endereco_dest", sincronizacao.getEndereco_dest()).apply();
+                                prefs.edit().putString("cnpj_dest", sincronizacao.getCnpj_dest()).apply();
+                                prefs.edit().putString("ie_dest", sincronizacao.getIe_dest()).apply();
+                                prefs.edit().putString("nnf", sincronizacao.getNnf()).apply();
+                                prefs.edit().putString("serie", sincronizacao.getSerie()).apply();
+                                prefs.edit().putString("chave", sincronizacao.getChave()).apply();
+                                prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
+                                prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
+                                prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
+
+                                Intent i = new Intent(context, Impressora.class);
+
+                                ArrayList<Unidades> elementosUnidade = bd.getUnidades();
+                                unidades = elementosUnidade.get(0);
+
+                                //UNIDADE
+                                i.putExtra("razao_social", unidades.getRazao_social());
+                                i.putExtra("cnpj", "CNPJ: " + unidades.getCnpj() + " I.E.: " + unidades.getIe());
+                                i.putExtra("endereco", unidades.getEndereco() + ", " + unidades.getNumero());
+                                i.putExtra("bairro", unidades.getBairro() + ", " + unidades.getCidade() + ", " + unidades.getUf());
+                                i.putExtra("cep", unidades.getCep() + "  " + unidades.getTelefone());
+
+                                //NOTA
+                                i.putExtra("imprimir", "nfe");
+                                i.putExtra("pedido", "");
+                                i.putExtra("cliente", "CONSUMIDOR NAO IDENTIFICADO");
+                                i.putExtra("id_produto", "");
+                                i.putExtra("produto", "");
+                                i.putExtra("chave", "");
+                                i.putExtra("protocolo", "");
+                                i.putExtra("quantidade", "");
+                                i.putExtra("valor", "");
+                                i.putExtra("valorUnit", "");
+                                i.putExtra("tributos", "");
+                                i.putExtra("form_pagamento", "");
+
+                                startActivity(i);
+                            }
                         }
 
                         Log.i("CNFE", sincronizacao.getProtocolo());

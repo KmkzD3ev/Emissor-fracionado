@@ -18,6 +18,7 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -42,6 +43,7 @@ import stone.application.StoneStart;
 import stone.application.enums.Action;
 import stone.application.enums.InstalmentTransactionEnum;
 import stone.application.enums.ReceiptType;
+import stone.application.enums.TransactionStatusEnum;
 import stone.application.enums.TypeOfTransactionEnum;
 import stone.application.interfaces.StoneActionCallback;
 import stone.application.interfaces.StoneCallbackInterface;
@@ -61,7 +63,7 @@ import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 
 // implements StoneActionCallback
-public class GerenciarPagamentoCartao extends AppCompatActivity {
+public class GerenciarPagamentoCartao extends AppCompatActivity implements StoneActionCallback {
 
     // ** STONE MODULO **
     TransactionProvider provider;
@@ -330,6 +332,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
         //Timber.tag("PinPad_Teste: ").i(String.valueOf(Stone.getUserModel(0)));
         //Timber.tag("PinPad_Teste: ").i(String.valueOf(Stone.getPinpadFromListAt(0)));
+        Log.i("PinPad_Teste", String.valueOf(Stone.getUserModel(0)));
+        Log.i("PinPad_Teste1", String.valueOf(Stone.getPinpadFromListAt(0)));
 
         // Processo para envio da transação
         provider = new TransactionProvider(context, transactionObject, Stone.getUserModel(0), Stone.getPinpadFromListAt(0));
@@ -337,8 +341,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         provider.useDefaultUI(true);
         provider.setDialogTitle("Aguarde"); // Título do Dialog
         provider.setDialogMessage("Enviando..."); // Mensagem do Dialog
-        //provider.setConnectionCallback(this);
-        provider.setConnectionCallback(new StoneCallbackInterface() {
+        provider.setConnectionCallback(this);
+        /*provider.setConnectionCallback(new StoneCallbackInterface() {
             @Override
             public void onSuccess() {
                 // Transação enviada com sucesso e salva no banco. Para acessar, use o TransactionDAO
@@ -433,7 +437,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
                 // Erro na transação
                 msg(false);
             }
-        });
+        });*/
         provider.execute();
     }
 
@@ -543,29 +547,30 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         llPagamentoAprovado = findViewById(R.id.llPagamentoAprovado);
         llPagamentoReprovado = findViewById(R.id.llPagamentoReprovado);
 
-        //
-        if (statusPag) {
-            llPagamentoAprovado.setVisibility(View.VISIBLE);
-        } else {
-            llPagamentoReprovado.setVisibility(View.VISIBLE);
-        }
-
-        // **
-        int time = 4000;
-
-        // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
-        new Handler().postDelayed(() -> {
-
+        runOnUiThread(() -> {
             //
             if (statusPag) {
-                //llPagamentoImprimir.setVisibility(View.VISIBLE);
-                _finalizarPagamento();
+                llPagamentoAprovado.setVisibility(View.VISIBLE);
             } else {
-                Intent returnIntent = new Intent();
-                setResult(Activity.RESULT_CANCELED, returnIntent);
-                finish();
+                llPagamentoReprovado.setVisibility(View.VISIBLE);
             }
-        }, time);
+
+            // **
+            int time = 4000;
+
+            // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
+            new Handler(Looper.myLooper()).postDelayed(() -> {
+                //
+                if (statusPag) {
+                    //llPagamentoImprimir.setVisibility(View.VISIBLE);
+                    _finalizarPagamento();
+                } else {
+                    Intent returnIntent = new Intent();
+                    setResult(Activity.RESULT_CANCELED, returnIntent);
+                    finish();
+                }
+            }, time);
+        });
     }
 
     private void _finalizarPagamento() {
@@ -575,6 +580,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         //Log.i("Stone", String.valueOf(transactionDAO.findTransactionWithId(transactionId)));
 
         //
+        transactionDAO = new TransactionDAO(getApplicationContext());
+        Log.e("transactionDAO", transactionDAO.toString());
         Intent returnIntent = new Intent();
         returnIntent.putExtra("result", "ok");
         // **
@@ -635,9 +642,9 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        //Stone.setEnvironment((Environment.SANDBOX));
+        Stone.setEnvironment(new Configuracoes().Ambiente());
         //Ambiente de Produção
-        Stone.setEnvironment((Environment.PRODUCTION));
+        //Stone.setEnvironment((Environment.PRODUCTION));
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);
@@ -673,7 +680,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
                 public void onError() {
                     // Ocorreu algum erro na ativação
-                    Toast.makeText(context, "Ocorreu algum erro na ativação", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, activeApplicationProvider.getListOfErrors().toString() + " ------ Ocorreu algum erro na ativação", Toast.LENGTH_SHORT).show();
                 }
             });
             activeApplicationProvider.activate(STONE_CODE);
@@ -685,9 +692,9 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
 
     void _pinpadAtivado() {
         // O SDK já foi ativado.
-        Toast.makeText(context, "O SDK já foi ativado.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "O SDK já foi ativado.", Toast.LENGTH_SHORT).show();
         btnEnviarTrazacao.setVisibility(View.VISIBLE);
-        iniciarTranzacao();
+        //iniciarTranzacao();
     }
 
     // Desativar Stone Code
@@ -713,6 +720,112 @@ public class GerenciarPagamentoCartao extends AppCompatActivity {
             }
         });
         activeApplicationProvider.deactivate(STONE_CODE);
+    }
+
+    @Override
+    public void onStatusChanged(Action action) {
+
+    }
+
+    @Override
+    public void onSuccess() {
+        runOnUiThread(() -> {
+            // Transação enviada com sucesso e salva no banco. Para acessar, use o TransactionDAO
+
+            //
+            transactionDAO = new TransactionDAO(context);
+            // Pega o id da última transação
+            transactionId = transactionDAO.getLastTransactionId();
+            // Pega os dados da última transação
+            //transactionObject = transactionDAO.findTransactionWithId(transactionId);
+            Log.i("Stone", String.valueOf(transactionDAO.findTransactionWithId(transactionId)));
+            Log.i("PinPad 2", String.valueOf(transactionDAO.findTransactionWithId(transactionId)));
+
+            TransactionObject to = transactionDAO.findTransactionWithId(transactionId);
+
+            if (to.getTransactionStatus() == TransactionStatusEnum.APPROVED) {
+
+                // **
+                String actionCode = Objects.requireNonNull(to).getActionCode();
+                if (actionCode.equalsIgnoreCase("0000") ||
+                        actionCode.equalsIgnoreCase("0001") ||
+                        actionCode.equalsIgnoreCase("0002") ||
+                        actionCode.equalsIgnoreCase("0003") ||
+                        actionCode.equalsIgnoreCase("0004")
+                ) {
+                    // ** ADD
+                    bd.addAutorizacoesPinPad(new AutorizacoesPinpad(
+                            String.valueOf(transactionId),
+                            "",
+                            String.valueOf(Objects.requireNonNull(to).getIdFromBase()),
+                            to.getAmount(),
+                            to.getRequestId(),
+                            to.getEmailSent(),
+                            to.getTimeToPassTransaction(),
+                            to.getInitiatorTransactionKey(),
+                            to.getRecipientTransactionIdentification(),
+                            to.getCardHolderNumber(),
+                            to.getCardHolderName(),
+                            to.getDate(),
+                            to.getTime(),
+                            to.getAid(),
+                            to.getArcq(),
+                            to.getAuthorizationCode(),
+                            to.getIccRelatedData(),
+                            to.getTransactionReference(),
+                            to.getActionCode(),
+                            to.getCommandActionCode(),
+                            to.getPinpadUsed(),
+                            to.getSaleAffiliationKey(),
+                            to.getCne(),
+                            to.getCvm(),
+                            to.getBalance(),
+                            to.getServiceCode(),
+                            to.getSubMerchantCategoryCode(),
+                            String.valueOf(to.getEntryMode()),
+                            String.valueOf(to.getCardBrand()),
+                            String.valueOf(to.getInstalmentTransaction()),
+                            String.valueOf(to.getTransactionStatus()),
+                            String.valueOf(to.getInstalmentType()),
+                            String.valueOf(to.getTypeOfTransactionEnum()),
+                            "",//String.valueOf(to.getSignature())
+                            String.valueOf(to.getCancellationDate()),
+                            String.valueOf(to.isCapture()),
+                            to.getShortName(),
+                            to.getSubMerchantAddress(),
+                            "",//to.getUserModel().toString()
+                            String.valueOf(to.isFallbackTransaction()),
+                            to.getAppLabel(),
+                            to.getUserModel().getMerchantName(),
+                            to.getUserModel().getMerchantAddress().getCity() + "/" + to.getUserModel().getMerchantAddress().getDistric(),
+                            to.getUserModel().getMerchantDocumentNumber()
+                    ));
+
+                    msg(true);
+                }
+            } else {
+                //
+                //provider.getMessageFromAuthorize();
+                if (to.getActionCode().equalsIgnoreCase("1016")) {
+                    txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), provider.getMessageFromAuthorize()));//Saldo insuficiente
+                }
+                //
+                else if (to.getActionCode().equalsIgnoreCase("1017")) {
+                    txtMsgCausaErro.setText(String.format("%s\nSenha inválida", to.getActionCode()));
+                }
+                //
+                else {
+                    txtMsgCausaErro.setText(to.getActionCode());
+                }
+                msg(false);
+            }
+        });
+    }
+
+    @Override
+    public void onError() {
+        // Erro na transação
+        msg(false);
     }
 
     /*@Override

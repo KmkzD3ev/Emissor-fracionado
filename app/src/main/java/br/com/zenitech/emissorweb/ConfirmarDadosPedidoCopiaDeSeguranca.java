@@ -506,10 +506,10 @@ public class ConfirmarDadosPedidoCopiaDeSeguranca extends AppCompatActivity impl
             String FPagamento
     ) {
 
-
-        double v = Double.parseDouble(total);
-        double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
-        double tributo = v - (v - (v1 * v));
+        //double v = Double.parseDouble(total);
+        //double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
+        //double tributo = v - (v - (v1 * v));
+        double tributo = bd.getTributosProduto(produto.getText().toString(), total);
 
         linhaProduto = new String[]{
                 "1 1      " + produto.getText().toString() + "\n",
@@ -663,9 +663,9 @@ public class ConfirmarDadosPedidoCopiaDeSeguranca extends AppCompatActivity impl
             case R.id.btnPrint: {
                 //es.submit(new TaskPrint(mLabel));
                 //es.submit(new TaskPrintPOS(mPos));
-                double v0 = Double.parseDouble(total);
-                double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
-                double tributo = v0 - (v0 - (v1 * v0));
+                //double v0 = Double.parseDouble(total);
+                //double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
+                double tributo = bd.getTributosProduto(produto.getText().toString(), total);
 
                 PackageManager packageManager = getPackageManager();
                 String packageName = "br.com.zenitech.impressora";

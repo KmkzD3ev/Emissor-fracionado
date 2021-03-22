@@ -104,7 +104,7 @@ public class Impressora extends AppCompatActivity {
 
     //DADOS PARA IMPRESSÃO
     String pedido, cliente, id_produto, produto, protocolo, chave, quantidade,
-            valor, valorUnit, tributos, posicao, tipoImpressao, form_pagamento;
+            valor, valorUnit, tributos, tributosN, tributosE, tributosM, posicao, tipoImpressao, form_pagamento;
 
     TextView total;
     public TextView imprimindo;
@@ -189,6 +189,9 @@ public class Impressora extends AppCompatActivity {
                 valor = params.getString("valor");
                 valorUnit = params.getString("valorUnit");
                 tributos = params.getString("tributos");
+                tributosN = params.getString("tributosN");
+                tributosE = params.getString("tributosE");
+                tributosM = params.getString("tributosM");
                 tipoImpressao = params.getString("imprimir");
                 form_pagamento = params.getString("form_pagamento");
 
@@ -205,7 +208,10 @@ public class Impressora extends AppCompatActivity {
                         params.getString("endereco"),
                         params.getString("bairro"),
                         params.getString("cep"),
-                        form_pagamento
+                        form_pagamento,
+                        tributosN,
+                        tributosE,
+                        tributosM
                 };
 
                 // COMPROVANTE CANCELAMENTO CARTÃO
@@ -1172,14 +1178,17 @@ public class Impressora extends AppCompatActivity {
 
             //INFOR. VALORES
             textBuffer.append("{reset}").append(tamFont).append("Qtde. Total de Itens                           ").append(quantidade).append("{br}");
-            textBuffer.append("{reset}").append(tamFont).append("Valor Total                             ").append(texto[2]).append("{br}");
+            textBuffer.append("{reset}").append(tamFont).append("Valor Total                             ").append(texto[2].trim()).append("{br}");
             textBuffer.append("{reset}").append(tamFont).append("FORMA DE PAGAMENTO                    VALOR PAGO{br}");
-            textBuffer.append("{reset}").append(tamFont).append(cAux.removerAcentos(texto[12])).append("                                ").append(texto[2]).append("{br}");
+            textBuffer.append("{reset}").append(tamFont).append(cAux.removerAcentos(texto[12])).append("                                ").append(texto[2].trim()).append("{br}");
             textBuffer.append("{reset}").append(tamFont).append("------------------------------------------------{br}");
 
             //TRIBUTOS TOTAIS
             textBuffer.append("{reset}").append(tamFont).append("Tributos totais incidentes{br}");
-            textBuffer.append("{reset}").append(tamFont).append("(Lei Federal 12.741/2012)                ").append(texto[5]).append("{br}");
+            textBuffer.append("{reset}").append(tamFont).append("(Lei Federal 12.741/2012)                ").append(texto[5].trim()).append("{br}");
+            textBuffer.append("{reset}").append(tamFont).append("TRIBUTOS FEDERAIS                        ").append(texto[13].trim()).append("{br}");
+            textBuffer.append("{reset}").append(tamFont).append("TRIBUTOS ESTADUAIS                       ").append(texto[14].trim()).append("{br}");
+            textBuffer.append("{reset}").append(tamFont).append("TRIBUTOS MUNICIPAIS                      ").append(texto[15].trim()).append("{br}");
             textBuffer.append("{reset}").append(tamFont).append("------------------------------------------------{br}");
 
             //EMISSÃO
@@ -1339,14 +1348,17 @@ public class Impressora extends AppCompatActivity {
 
             //INFOR. VALORES
             textBuffer.append(tamFont).append("Qtde. Total de Itens                  ").append(quantidade).append("{br}");
-            textBuffer.append(tamFont).append("Valor Total                        ").append(texto[2]).append("{br}");
+            textBuffer.append(tamFont).append("Valor Total                        ").append(texto[2].trim()).append("{br}");
             textBuffer.append(tamFont).append("FORMA DE PAGAMENTO            VALOR PAGO{br}");
-            textBuffer.append(tamFont).append(cAux.removerAcentos(texto[12])).append("                         ").append(texto[2]).append("{br}");
+            textBuffer.append(tamFont).append(cAux.removerAcentos(texto[12])).append("                         ").append(texto[2].trim()).append("{br}");
             textBuffer.append(tamFont).append("-----------------------------------------{br}");
 
             //TRIBUTOS TOTAIS
             textBuffer.append(tamFont).append("Tributos totais incidentes{br}");
-            textBuffer.append(tamFont).append("(Lei Federal 12.741/2012)         ").append(texto[5]).append("{br}");
+            textBuffer.append(tamFont).append("(Lei Federal 12.741/2012)         ").append(texto[5].trim()).append("{br}");
+            textBuffer.append(tamFont).append("TRIBUTOS FEDERAIS                 ").append(texto[13].trim()).append("{br}");
+            textBuffer.append(tamFont).append("TRIBUTOS ESTADUAIS                ").append(texto[14].trim()).append("{br}");
+            textBuffer.append(tamFont).append("TRIBUTOS MUNICIPAIS               ").append(texto[15].trim()).append("{br}");
             textBuffer.append(tamFont).append("-----------------------------------------{br}");
 
             //EMISSÃO

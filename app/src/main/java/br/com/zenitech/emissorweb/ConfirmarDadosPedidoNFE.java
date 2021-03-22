@@ -368,9 +368,9 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
     }
 
     private void imprimirPedido() {
-        double v0 = Double.parseDouble(total);
-        double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
-        double tributo = v0 - (v0 - (v1 * v0));
+        //double v0 = Double.parseDouble(total);
+        //double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
+        double tributo = bd.getTributosProduto(produto.getText().toString(), total);
 
         Intent i = new Intent(context, Impressora.class);
 

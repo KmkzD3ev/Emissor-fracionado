@@ -558,9 +558,13 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
             case R.id.btnPrint: {
                 if (new Configuracoes().GetDevice()) {
                     prefs.edit().putString("tamPapelImpressora", "58mm").apply();
-                    double v0 = Double.parseDouble(total);
-                    double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
-                    double tributo = v0 - (v0 - (v1 * v0));
+                    //double v0 = Double.parseDouble(total);
+                    //double v1 = bd.getTributosProduto(produto.getText().toString());
+                    //double tributo = v0 - (v0 - (v1 * v0));
+                    double tributo = bd.getTributosProduto(produto.getText().toString(), total);
+                    double tributoN = bd.getTributosNProduto(produto.getText().toString(), total);
+                    double tributoE = bd.getTributosEProduto(produto.getText().toString(), total);
+                    double tributoM = bd.getTributosMProduto(produto.getText().toString(), total);
                     Intent i = new Intent(contexto, ImpressoraPOS.class);
 
                     String serie = bd.getSeriePOS();
@@ -587,9 +591,12 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                                     protocoloNota.getText().toString() + " - " + dataHoraNota.getText().toString()
                     ));
                     i.putExtra("quantidade", qnt.getText().toString());
-                    i.putExtra("valor", "" + cAux.maskMoney(new BigDecimal(String.valueOf(total))).replace("R$", ""));
-                    i.putExtra("valorUnit", "" + cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))).replace("R$", ""));
-                    i.putExtra("tributos", "" + cAux.maskMoney(new BigDecimal(String.valueOf(tributo))).replace("R$", ""));
+                    i.putExtra("valor", cAux.maskMoney(new BigDecimal(String.valueOf(total))));
+                    i.putExtra("valorUnit", cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))));
+                    i.putExtra("tributos", cAux.maskMoney(new BigDecimal(String.valueOf(tributo))));
+                    i.putExtra("tributosN", cAux.maskMoney(new BigDecimal(String.valueOf(tributoN))));
+                    i.putExtra("tributosE", cAux.maskMoney(new BigDecimal(String.valueOf(tributoE))));
+                    i.putExtra("tributosM", cAux.maskMoney(new BigDecimal(String.valueOf(tributoM))));
                     i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
 
                     Log.e(TAG,
@@ -609,15 +616,19 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("")) {
                         selectTamPapImpressora();
                     } else {
-                        double v0 = Double.parseDouble(total);
-                        double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
-                        double tributo = v0 - (v0 - (v1 * v0));
+                        //double v0 = Double.parseDouble(total);
+                        //double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
+                        //double tributo = v0 - (v0 - (v1 * v0));
+                        double tributo = bd.getTributosProduto(produto.getText().toString(), total);
+                        double tributoN = bd.getTributosNProduto(produto.getText().toString(), total);
+                        double tributoE = bd.getTributosEProduto(produto.getText().toString(), total);
+                        double tributoM = bd.getTributosMProduto(produto.getText().toString(), total);
 
-                /*
-                PackageManager packageManager = getPackageManager();
-                String packageName = "br.com.zenitech.impressora";
-                Intent i = packageManager.getLaunchIntentForPackage(packageName);
-                */
+                        /*
+                        PackageManager packageManager = getPackageManager();
+                        String packageName = "br.com.zenitech.impressora";
+                        Intent i = packageManager.getLaunchIntentForPackage(packageName);
+                        */
 
                         Intent i = new Intent(contexto, Impressora.class);
 
@@ -645,9 +656,12 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                                         protocoloNota.getText().toString() + " - {br}" + dataHoraNota.getText().toString()
                         ));
                         i.putExtra("quantidade", qnt.getText().toString());
-                        i.putExtra("valor", "" + cAux.maskMoney(new BigDecimal(String.valueOf(total))).replace("R$", ""));
-                        i.putExtra("valorUnit", "" + cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))).replace("R$", ""));
-                        i.putExtra("tributos", "" + cAux.maskMoney(new BigDecimal(String.valueOf(tributo))).replace("R$", ""));
+                        i.putExtra("valor", cAux.maskMoney(new BigDecimal(String.valueOf(total))));
+                        i.putExtra("valorUnit", cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))));
+                        i.putExtra("tributos", cAux.maskMoney(new BigDecimal(String.valueOf(tributo))));
+                        i.putExtra("tributosN", cAux.maskMoney(new BigDecimal(String.valueOf(tributoN))));
+                        i.putExtra("tributosE", cAux.maskMoney(new BigDecimal(String.valueOf(tributoE))));
+                        i.putExtra("tributosM", cAux.maskMoney(new BigDecimal(String.valueOf(tributoM))));
                         i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
 
                         Log.e(TAG,
@@ -657,9 +671,9 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                                         "produto: " + produto.getText().toString() + "\n" +
                                         "protocolo: " + protocoloNota.getText().toString() + "\n" +
                                         "quantidade: " + qnt.getText().toString() + "\n" +
-                                        "valor: " + "" + cAux.maskMoney(new BigDecimal(String.valueOf(total))) + "\n" +
-                                        "valorUnit: " + "" + cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))) + "\n" +
-                                        "tributos: " + "" + cAux.maskMoney(new BigDecimal(String.valueOf(tributo)))
+                                        "valor: " + cAux.maskMoney(new BigDecimal(String.valueOf(total))) + "\n" +
+                                        "valorUnit: " + cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))) + "\n" +
+                                        "tributos: " + cAux.maskMoney(new BigDecimal(String.valueOf(tributo)))
                         );
 
                         startActivity(i);

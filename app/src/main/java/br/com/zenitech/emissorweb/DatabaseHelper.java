@@ -294,14 +294,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //
-    double getTributosProduto(String Produto) {
+    double getTributosProduto(String Produto, String ValTotal) {
         SQLiteDatabase db = this.getWritableDatabase();
         ClassAuxiliar aux = new ClassAuxiliar();
         String tributo = "";
-
+        String tot = String.valueOf(aux.converterValores(ValTotal));
         //
         Cursor produtos;
-        String query_pos = "SELECT " + TRIBUTOS_PRODUTO + " FROM " + TABELA_PRODUTOS + " WHERE " + NOME_PRODUTO + " = '" + Produto + "' LIMIT 1";
+        String query_pos = "" +
+                "SELECT (((pro.tributose + pro.tributosn + pro.tributosm) / 100) * " + tot + ") as tributos FROM produtos pro " +
+                "WHERE pro.nome = '" + Produto + "' LIMIT 1";
+        Log.e(TAG, query_pos);
         produtos = db.rawQuery(query_pos, null);
         if (produtos.moveToFirst()) {
             do {
@@ -311,9 +314,79 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (produtos.moveToNext());
         }
 
-        String t = String.valueOf(aux.converterValores(tributo));
+        return Double.parseDouble(tributo);
+    }
 
-        return Double.parseDouble(t);
+    //
+    double getTributosNProduto(String Produto, String ValTotal) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ClassAuxiliar aux = new ClassAuxiliar();
+        String tributo = "";
+        String tot = String.valueOf(aux.converterValores(ValTotal));
+        //
+        Cursor produtos;
+        String query_pos = "" +
+                "SELECT (((pro.tributosn) / 100) * " + tot + ") as tributos FROM produtos pro " +
+                "WHERE pro.nome = '" + Produto + "' LIMIT 1";
+        Log.e(TAG, query_pos);
+        produtos = db.rawQuery(query_pos, null);
+        if (produtos.moveToFirst()) {
+            do {
+
+                tributo = produtos.getString(produtos.getColumnIndex(TRIBUTOS_PRODUTO));
+
+            } while (produtos.moveToNext());
+        }
+
+        return Double.parseDouble(tributo);
+    }
+
+    //
+    double getTributosEProduto(String Produto, String ValTotal) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ClassAuxiliar aux = new ClassAuxiliar();
+        String tributo = "";
+        String tot = String.valueOf(aux.converterValores(ValTotal));
+        //
+        Cursor produtos;
+        String query_pos = "" +
+                "SELECT (((pro.tributose) / 100) * " + tot + ") as tributos FROM produtos pro " +
+                "WHERE pro.nome = '" + Produto + "' LIMIT 1";
+        Log.e(TAG, query_pos);
+        produtos = db.rawQuery(query_pos, null);
+        if (produtos.moveToFirst()) {
+            do {
+
+                tributo = produtos.getString(produtos.getColumnIndex(TRIBUTOS_PRODUTO));
+
+            } while (produtos.moveToNext());
+        }
+
+        return Double.parseDouble(tributo);
+    }
+
+    //
+    double getTributosMProduto(String Produto, String ValTotal) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ClassAuxiliar aux = new ClassAuxiliar();
+        String tributo = "";
+        String tot = String.valueOf(aux.converterValores(ValTotal));
+        //
+        Cursor produtos;
+        String query_pos = "" +
+                "SELECT (((pro.tributosm) / 100) * " + tot + ") as tributos FROM produtos pro " +
+                "WHERE pro.nome = '" + Produto + "' LIMIT 1";
+        Log.e(TAG, query_pos);
+        produtos = db.rawQuery(query_pos, null);
+        if (produtos.moveToFirst()) {
+            do {
+
+                tributo = produtos.getString(produtos.getColumnIndex(TRIBUTOS_PRODUTO));
+
+            } while (produtos.moveToNext());
+        }
+
+        return Double.parseDouble(tributo);
     }
 
     //

@@ -307,7 +307,7 @@ public class Principal extends AppCompatActivity
             for (int menuItemIndex = 0; menuItemIndex < menu.size(); menuItemIndex++) {
                 MenuItem menuItem = menu.getItem(menuItemIndex);
                 if (menuItem.getItemId() == R.id.menuStone) {
-                    menuItem.setVisible(true);
+                    //menuItem.setVisible(true);
                 }
             }
         }

@@ -19,8 +19,8 @@ android {
         applicationId "br.com.zenitech.emissorweb"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 31
-        versionName '3.3.1'
+        versionCode 33
+        versionName '3.3.3'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
@@ -63,8 +63,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.navigation:navigation-fragment:2.3.3'
-    implementation 'androidx.navigation:navigation-ui:2.3.3'
+    implementation 'androidx.navigation:navigation-fragment:2.3.4'
+    implementation 'androidx.navigation:navigation-ui:2.3.4'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.3.0', {
@@ -94,16 +94,16 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:3.6.0@aar'
 
     // Stone **
-    //implementation 'br.com.stone:stone-sdk:3.4.3.2'
-    //implementation 'br.com.stone:stone-sdk-posandroid:3.4.3.2'
+    implementation 'br.com.stone:stone-sdk:3.4.3.2'
+    implementation 'br.com.stone:stone-sdk-posandroid:3.4.3.2'
 
-    implementation 'br.com.stone:stone-sdk:3.10.0'
-    implementation 'br.com.stone:stone-sdk-posandroid:3.10.0'
+    //implementation 'br.com.stone:stone-sdk:3.10.0'
+    //implementation 'br.com.stone:stone-sdk-posandroid:3.10.0'
 
     // Terminais Gertec:
     implementation 'br.com.stone:stone-sdk-posandroid-ingenico:3.10.0'
     implementation 'br.com.stone:stone-sdk-posandroid-gertec:3.10.0'
-    /*
+/*
     implementation 'br.com.stone:stone-sdk:3.10.0'
     implementation 'br.com.stone:stone-sdk-posandroid:3.10.0' */
     //

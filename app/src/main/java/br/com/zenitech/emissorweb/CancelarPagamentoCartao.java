@@ -128,7 +128,7 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment((Environment.SANDBOX));
+        Stone.setEnvironment(new Configuracoes().Ambiente());
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);
@@ -169,7 +169,7 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
             ActiveApplicationProvider activeApplicationProvider = new ActiveApplicationProvider(context);
             activeApplicationProvider.setDialogMessage("Ativando o Stone Code");
             activeApplicationProvider.setDialogTitle("Aguarde");
-            activeApplicationProvider.useDefaultUI(true);
+            //activeApplicationProvider.useDefaultUI(true);
             activeApplicationProvider.setConnectionCallback(new StoneCallbackInterface() {
 
                 public void onSuccess() {
@@ -191,7 +191,7 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
 
     void _pinpadAtivado() {
         // O SDK já foi ativado.
-        Toast.makeText(context, "O SDK já foi ativado.", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, "O SDK já foi ativado.", Toast.LENGTH_SHORT).show();
         iniciarTranzacao();
     }
 
@@ -232,7 +232,7 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
                 transactionId = transactionDAO.getLastTransactionId();
                 // Cria o TransactionObject da última transação
                 TransactionObject to = transactionDAO.findTransactionWithId(transactionId);
-                Log.i("Cancelar", to.getCancellationDate().toString());
+                Log.i("Cancelar", Objects.requireNonNull(to).getCancellationDate().toString());
 
                 String dataHora = cAux.exibirData(to.getDate()) + " " + to.getTime();
 

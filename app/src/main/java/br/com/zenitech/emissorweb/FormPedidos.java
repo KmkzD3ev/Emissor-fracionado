@@ -1,6 +1,7 @@
 package br.com.zenitech.emissorweb;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,9 +39,18 @@ import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.Unidades;
+import stone.application.StoneStart;
+import stone.application.interfaces.StoneCallbackInterface;
+import stone.providers.BluetoothConnectionProvider;
+import stone.user.UserModel;
+import stone.utils.PinpadObject;
+import stone.utils.Stone;
+
+import static br.com.zenitech.emissorweb.GerenciarPagamentoCartao.getApplicationName;
 
 public class FormPedidos extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     static final int PAGAMENTO_REQUEST = 1;
@@ -74,7 +84,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     // BTNs **
     Button btnPagamentoCartaoNFCE, btnAvancarNFCE;
-
+    private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -269,6 +279,73 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             //INCIAR INTRODUÇÃO
             //introducao();
         }
+
+        //iniciarStone();
+        //turnBluetoothOn();
+        //pinpadConnection();
+    }
+
+    // Iniciar o Stone
+    void iniciarStone() {
+        // O primeiro passo é inicializar o SDK.
+        StoneStart.init(getApplicationContext());
+        /*Em seguida, é necessário chamar o método setAppName da classe Stone,
+        que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
+        Stone.setAppName(getApplicationName(getApplicationContext()));
+        //Ambiente de Sandbox "Teste"
+        Stone.setEnvironment(new Configuracoes().Ambiente());
+        //Ambiente de Produção
+        //Stone.setEnvironment((Environment.PRODUCTION));
+
+        // Esse método deve ser executado para inicializar o SDK
+        List<UserModel> userList = StoneStart.init(getApplicationContext());
+
+        // Quando é retornado null, o SDK ainda não foi ativado
+        /*if (userList != null) {
+            // O SDK já foi ativado.
+            _pinpadAtivado();
+
+        } else {
+            // Inicia a ativação do SDK
+            ativarStoneCode();
+        }*/
+    }
+
+    public void turnBluetoothOn() {
+        try {
+            mBluetoothAdapter.enable();
+            do {
+            } while (!mBluetoothAdapter.isEnabled());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void pinpadConnection() {
+
+        // Pega o pinpad selecionado do ListView.
+        //String[] pinpadInfo = listView.getAdapter().getItem(position).toString().split("_");
+        //PinpadObject pinpadSelected = new PinpadObject(pinpadInfo[0], pinpadInfo[1], false);
+        PinpadObject pinpadSelected = new PinpadObject("PAX-6A801896", "34:81:F4:04:BF:37", false);
+
+        // Passa o pinpad selecionado para o provider de conexão bluetooth.
+        final BluetoothConnectionProvider bluetoothConnectionProvider = new BluetoothConnectionProvider(FormPedidos.this, pinpadSelected);
+        bluetoothConnectionProvider.setDialogMessage("Criando conexao com o pinpad selecionado"); // Mensagem exibida do dialog.
+        bluetoothConnectionProvider.useDefaultUI(false); // Informa que haverá um feedback para o usuário.
+        bluetoothConnectionProvider.setConnectionCallback(new StoneCallbackInterface() {
+
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), "Pinpad conectado", Toast.LENGTH_SHORT).show();
+                //btConnected = true;
+                //finish();
+            }
+
+            public void onError() {
+                Toast.makeText(getApplicationContext(), "Erro durante a conexao. Verifique a lista de erros do provider para mais informacoes", Toast.LENGTH_SHORT).show();
+                //Timber.e("onError: %s", bluetoothConnectionProvider.getListOfErrors());
+            }
+        });
+        bluetoothConnectionProvider.execute(); // Executa o provider de conexão bluetooth.
     }
 
     private void VerificarCamposIniciarPedido(boolean pagamento) {
@@ -361,9 +438,9 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     private void iniciarPagamento() {
         Intent i;
-
+        Configuracoes configuracoes = new Configuracoes();
         //
-        if (new Configuracoes().GetDevice()) {
+        if (configuracoes.GetDevice()) {
             i = new Intent(getBaseContext(), GerenciarPagamentoCartaoPOS.class);
         } else {
             i = new Intent(getBaseContext(), GerenciarPagamentoCartao.class);

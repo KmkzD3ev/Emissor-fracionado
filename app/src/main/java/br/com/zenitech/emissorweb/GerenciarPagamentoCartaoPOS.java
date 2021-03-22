@@ -471,7 +471,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                         new PosPrintReceiptProvider(this.getApplicationContext(),
                                 transactionObject, ReceiptType.MERCHANT));
 
-        //printMerchant.print();
+        printMerchant.print();
 
         final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         builder.setTitle("Transação aprovada! Deseja imprimir a via do cliente?");
@@ -481,7 +481,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                     new PrintController(GerenciarPagamentoCartaoPOS.this,
                             new PosPrintReceiptProvider(getApplicationContext(),
                                     transactionObject, ReceiptType.CLIENT));
-            //printClient.print();
+            printClient.print();
             _finalizarPagamento();
         });
 
@@ -726,7 +726,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment((Environment.SANDBOX));
+        Stone.setEnvironment(new  Configuracoes().Ambiente());
         //Ambiente de Produção
         //Stone.setEnvironment((Environment.PRODUCTION));
 
