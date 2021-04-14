@@ -70,6 +70,7 @@ public class Sincronizar extends AppCompatActivity {
     boolean erro = false;
     String msgErro = "", msgErroTec;
     FloatingActionButton fabWhatsapp;
+    Configuracoes configuracoes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,8 +125,13 @@ public class Sincronizar extends AppCompatActivity {
             startActivity(i);
             finish();
         }*/
-        if (prefs.getBoolean("mostrar_alerta_versao", true)) {
-            _verificarVersaoAtual();
+
+        configuracoes = new Configuracoes();
+
+        if (!configuracoes.GetDevice()) {
+            if (prefs.getBoolean("mostrar_alerta_versao", true)) {
+                _verificarVersaoAtual();
+            }
         }
     }
 
@@ -359,10 +365,12 @@ public class Sincronizar extends AppCompatActivity {
             ll_sincronizar.setVisibility(View.VISIBLE);
 
             if (erro) {
-                fabWhatsapp.setVisibility(View.VISIBLE);
+                if (!configuracoes.GetDevice()) {
+                    fabWhatsapp.setVisibility(View.VISIBLE);
 
-                if (!prefs.getBoolean("introBtnWhats", false)) {
-                    introducao();
+                    if (!prefs.getBoolean("introBtnWhats", false)) {
+                        introducao();
+                    }
                 }
             }
         }, time);

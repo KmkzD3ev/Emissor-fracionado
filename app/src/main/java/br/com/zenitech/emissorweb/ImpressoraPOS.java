@@ -295,6 +295,8 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         //elementosUnidade = bd.getUnidades();
         AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
 
+        //Log.e("impressora", pinpad.getAid() + " - " + pinpad.getRequestId() + " - " + pinpad.getServiceCode());
+
         //
         String txtCompPag = "Via do Lojista";
         //ppp.addLine(txtCompPag);
@@ -304,9 +306,9 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         String txtCompPag2 = cAux.removerAcentos(pinpad.getNomeEmpresa()) + "\n" +
                 cAux.removerAcentos(pinpad.getEnderecoEmpresa()) + "\n" +
                 cAux.exibirData(pinpad.getDate()) + " " + pinpad.getTime() + " CNPJ:" + pinpad.getCnpjEmpresa() + "\n" +
-                "------------------------------------------\n" +
-                pinpad.getTypeOfTransactionEnum() + "                       RS " + pinpad.getAmount() + "\n" +
-                "------------------------------------------\n" +
+                "--------------------------------------------------------------\n" +
+                pinpad.getTypeOfTransactionEnum() + "                                         RS " + pinpad.getAmount() + "\n" +
+                "--------------------------------------------------------------\n" +
                 pinpad.getCardBrand() + " - " + pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8) + "  AUT: " + pinpad.getAuthorizationCode() + "\n" +
                 pinpad.getCardHolderName() + "\n" +
                 pinpad.getRecipientTransactionIdentification() + "\n" +
@@ -314,8 +316,11 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 "SN: " + prefs.getString("serial_app", "") + " - " + BuildConfig.VERSION_NAME + "\n";
         //ppp.addLine(txtCompPag2);
 
+        TextView txtReimpressao = findViewById(R.id.txtReimpressao);
+        txtReimpressao.setText(txtCompPag2);
+
         LinearLayout impressora1 = findViewById(R.id.printReimpressao);
-        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 180, 150);
+        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 260, 230);
 
 
         ppp.setConnectionCallback(new StoneCallbackInterface() {
