@@ -540,7 +540,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 String.valueOf(id),//ID PEDIDO
                 bd.getIdProduto(produto.getText().toString()),
                 quantidade,
-                cAux.soNumeros(String.valueOf(cAux.converterValores(vlt.getText().toString())))
+                cAux.soNumeros(String.valueOf(cAux.converterValores(vlt.getText().toString()))),
+                null
         ));
     }
 

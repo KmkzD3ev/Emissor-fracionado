@@ -4,18 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.datecs.api.BuildInfo;
+import com.datecs.api.printer.Printer;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -34,27 +32,32 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import br.com.stone.posandroid.providers.PosPrintProvider;
-import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
-import br.com.stonesdk.sdkdemo.controller.PrintController;
+import br.com.stone.posandroid.providers.PosTransactionProvider;
 import br.com.zenitech.emissorweb.controller.PrintViewHelper;
+import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosNFE;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import stone.application.StoneStart;
-import stone.application.enums.ReceiptType;
+import stone.application.enums.Action;
+import stone.application.enums.InstalmentTransactionEnum;
+import stone.application.enums.TypeOfTransactionEnum;
+import stone.application.interfaces.StoneActionCallback;
 import stone.application.interfaces.StoneCallbackInterface;
+import stone.database.transaction.TransactionObject;
 import stone.user.UserModel;
 import stone.utils.Stone;
 
 import static br.com.zenitech.emissorweb.ClassAuxiliar.getSha1Hex;
 
-public class ImpressoraPOS extends AppCompatActivity {
+public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallback {
 
     private static final String LOG_TAG = "Impressora";
 
@@ -102,6 +105,10 @@ public class ImpressoraPOS extends AppCompatActivity {
     //
     String dataHoraCan, codAutCan;
     PrintViewHelper printViewHelper;
+    PosPrintProvider ppp;
+
+    //
+    boolean impressao1 = false, impressao2 = false, impressao3 = false, impressao4 = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,26 +116,6 @@ public class ImpressoraPOS extends AppCompatActivity {
         setContentView(R.layout.activity_impressora);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // **************************** IMPRESSÃO POS **********************************************
-        /*PosPrintProvider customPosPrintProvider = new PosPrintProvider(this);
-        customPosPrintProvider.addLine("TESTE");
-        customPosPrintProvider.addLine("");
-        //customPosPrintProvider.addBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.logo_emissor_web));
-        customPosPrintProvider.setConnectionCallback(new StoneCallbackInterface() {
-            @Override
-            public void onSuccess() {
-                Toast.makeText(context, "Recibo impresso", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError() {
-                Toast.makeText(context, "Erro ao imprimir: " + customPosPrintProvider.getListOfErrors(), Toast.LENGTH_SHORT).show();
-            }
-        });
-        customPosPrintProvider.execute();*/
-
-        // *****************************************************************************************
 
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
 
@@ -140,8 +127,6 @@ public class ImpressoraPOS extends AppCompatActivity {
         imprimindo = findViewById(R.id.imprimindo);
         total = findViewById(R.id.total);
         qrcode = findViewById(R.id.qrcode);
-
-        printViewHelper = new PrintViewHelper();
 
         // Show Android device information and API version.
         final TextView txtVersion = findViewById(R.id.txt_version);
@@ -206,64 +191,35 @@ public class ImpressoraPOS extends AppCompatActivity {
         elementosPedidos = bd.getPedidosRelatorio();
         elementosPedidosNFE = bd.getPedidosRelatorioNFE();
 
+        printViewHelper = new PrintViewHelper();
+        ppp = new PosPrintProvider(this);
 
-        iniciarStone();
-    }
+        try {
+            if (tipoImpressao.equals("relatorio")) {
+                //Log.i(LOG_TAG, "Relatório");
+                printRelatorio();
 
-    public String getApplicationName(Context context) {
-        ApplicationInfo applicationInfo = context.getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
-    }
+            } else if (tipoImpressao.equals("nfe")) {
 
-    // Iniciar o Stone
-    void iniciarStone() {
-        // O primeiro passo é inicializar o SDK.
-        StoneStart.init(context);
-        /*Em seguida, é necessário chamar o método setAppName da classe Stone,
-        que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
-        Stone.setAppName(getApplicationName(context));
-        //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment(new Configuracoes().Ambiente());
-        //Ambiente de Produção
-        //Stone.setEnvironment((Environment.PRODUCTION));
+                //Imprimir nota fiscal eletronica
+                printNFE(linhaProduto);
 
-        // Esse método deve ser executado para inicializar o SDK
-        List<UserModel> userList = StoneStart.init(context);
+            } else if (tipoImpressao.equals("reimpressao_comprovante")) {
 
-        // Quando é retornado null, o SDK ainda não foi ativado
-        if (userList != null) {
-            // O SDK já foi ativado.
+                //Imprimir comprovante do pagamento cartão
+                reimpressaoComprovante();
 
-            try {
-                if (tipoImpressao.equals("relatorio")) {
-                    //Log.i(LOG_TAG, "Relatório");
+            } else if (tipoImpressao.equals("comprovante_cancelamento")) {
 
-                } else if (tipoImpressao.equals("nfe")) {
+                //Imprimir comprovante do pagamento cartão
+            } else {
 
-                    //Imprimir nota fiscal eletronica
-                    printNFE(linhaProduto);
-
-                } else if (tipoImpressao.equals("reimpressao_comprovante")) {
-
-                    //Imprimir comprovante do pagamento cartão
-
-                } else if (tipoImpressao.equals("comprovante_cancelamento")) {
-
-                    //Imprimir comprovante do pagamento cartão
-                } else {
-
-                    //Imprimir nota fiscal eletronica
-                    printNFCE(linhaProduto);
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                //Imprimir nota fiscal eletronica
+                printNFCE(linhaProduto);
             }
-
-        } /*else {
-            // Inicia a ativação do SDK
-            ativarStoneCode();
-        }*/
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void toast(final String text) {
@@ -291,6 +247,91 @@ public class ImpressoraPOS extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    //
+    private void liberarImpressora() {
+        impressao1 = true;
+        impressao2 = true;
+        impressao3 = true;
+        impressao4 = true;
+        finalizarImpressao();
+    }
+
+    // --------------------     REIMPRESSÃO             --------------------------------------------
+    private void reimpressaoComprovante() {
+        PosPrintProvider ppp = new PosPrintProvider(this);
+
+        /*final BitmapFactory.Options optionsStone = new BitmapFactory.Options();
+        optionsStone.inScaled = false;
+
+        // Logo Stone
+        final AssetManager assetManagerStone = getApplicationContext().getAssets();
+        final Bitmap bitmapStone = BitmapFactory.decodeStream(assetManagerStone.open("stone.png"),
+                null, optionsStone);
+        final int widthStone = Objects.requireNonNull(bitmapStone).getWidth();
+        final int heightStone = bitmapStone.getHeight();
+        final int[] argbStone = new int[widthStone * heightStone];
+        bitmapStone.getPixels(argbStone, 0, widthStone, 0, 0, widthStone, heightStone);
+        bitmapStone.recycle();
+
+        //printer.reset();
+        printer.printImage(argbStone, widthStone, heightStone, Printer.ALIGN_CENTER, true);
+        printer.feedPaper(0);*/
+
+        // Reimpressao
+        /*final BitmapFactory.Options optionsReimpressao = new BitmapFactory.Options();
+        optionsReimpressao.inScaled = false;
+        final AssetManager assetManagerReimpressao = getApplicationContext().getAssets();
+        final Bitmap bitmapReimpressao = BitmapFactory.decodeStream(assetManagerReimpressao.open("reimpressao.png"),
+                null, optionsReimpressao);
+        final int widthReimpressao = Objects.requireNonNull(bitmapReimpressao).getWidth();
+        final int heightReimpressao = bitmapReimpressao.getHeight();
+        final int[] argbReimpressao = new int[widthReimpressao * heightReimpressao];
+        bitmapReimpressao.getPixels(argbReimpressao, 0, widthReimpressao, 0, 0, widthReimpressao, heightReimpressao);
+        bitmapReimpressao.recycle();*/
+
+        //Unidades unidades;
+        //elementosUnidade = bd.getUnidades();
+        AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
+
+        //
+        String txtCompPag = "Via do Lojista";
+        //ppp.addLine(txtCompPag);
+        //ppp.addLine("REIMPRESSÃO");
+
+        //
+        String txtCompPag2 = cAux.removerAcentos(pinpad.getNomeEmpresa()) + "\n" +
+                cAux.removerAcentos(pinpad.getEnderecoEmpresa()) + "\n" +
+                cAux.exibirData(pinpad.getDate()) + " " + pinpad.getTime() + " CNPJ:" + pinpad.getCnpjEmpresa() + "\n" +
+                "------------------------------------------\n" +
+                pinpad.getTypeOfTransactionEnum() + "                       RS " + pinpad.getAmount() + "\n" +
+                "------------------------------------------\n" +
+                pinpad.getCardBrand() + " - " + pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8) + "  AUT: " + pinpad.getAuthorizationCode() + "\n" +
+                pinpad.getCardHolderName() + "\n" +
+                pinpad.getRecipientTransactionIdentification() + "\n" +
+                "Aprovado com senha\n" +
+                "SN: " + prefs.getString("serial_app", "") + " - " + BuildConfig.VERSION_NAME + "\n";
+        //ppp.addLine(txtCompPag2);
+
+        LinearLayout impressora1 = findViewById(R.id.printReimpressao);
+        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 180, 150);
+
+
+        ppp.setConnectionCallback(new StoneCallbackInterface() {
+            @Override
+            public void onSuccess() {
+                liberarImpressora();
+            }
+
+            @Override
+            public void onError() {
+                liberarImpressora();
+                Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        ppp.addBitmap(bitmap2);
+        ppp.execute();
     }
 
     // --------------------     IMPRESSÃO DE NFC-e      --------------------------------------------
@@ -362,11 +403,6 @@ public class ImpressoraPOS extends AppCompatActivity {
         ImageView imgQrCode = findViewById(R.id.imgQrCode);
         imgQrCode.setImageBitmap(bitmap);
 
-        //
-        PrintViewHelper printViewHelper = new PrintViewHelper();
-        PosPrintProvider ppp = new PosPrintProvider(this);
-
-
         // ********************** IMPRIMIR CABEÇALHO
         TextView txtCab1 = findViewById(R.id.txtCab1);
         TextView txtCab2 = findViewById(R.id.txtCab2);
@@ -375,13 +411,6 @@ public class ImpressoraPOS extends AppCompatActivity {
         txtCab1.setText(texto[7]);
         txtCab2.setText(texto[8]);
         txtCab3.setText(String.format("%s %s %s", texto[9], texto[10], texto[11]));
-        //ppp.addLine(texto[7]); ppp.addLine(texto[8]); ppp.addLine(texto[9]); ppp.addLine(texto[10]); ppp.addLine(texto[11]);
-
-        /*//DANFE NFC-e
-        ppp.addLine("-----------------------------------------");
-        ppp.addLine("DANFE NFC-e - DOCUMENTO AUXILIAR DA");
-        ppp.addLine("NOTA FISCAL DE CONSUMIDOR ELETRONICA");
-        ppp.addLine("-----------------------------------------");*/
 
         // ********************** INFOR. PEDIDO
         TextView txtDescCod = findViewById(R.id.txtDescCod);
@@ -391,27 +420,10 @@ public class ImpressoraPOS extends AppCompatActivity {
         TextView txtDescValTot = findViewById(R.id.txtDescValTot);
         //
         txtDescCod.setText(texto[16]);
-        ;
         txtDescDesc.setText(texto[17]);
-        ;
         txtDescQuant.setText(texto[18]);
-        ;
         txtDescValUnit.setText(texto[19]);
-        ;
         txtDescValTot.setText(texto[20]);
-        ;
-
-        /*
-        id_produto, // 16
-        produto,    // 17
-        quantidade, // 18
-        valorUnit,  // 19
-        valor       // 20
-
-        ppp.addLine("# COD. DESC. QTDE. UN.  VL.UNIT.  VL.TOTAL");
-        ppp.addLine(texto[0]);
-        ppp.addLine(texto[1]);
-        ppp.addLine("-----------------------------------------");*/
 
         // ********************** INFOR. VALORES
         TextView txtInfoVal1 = findViewById(R.id.txtInfoVal1);
@@ -423,11 +435,6 @@ public class ImpressoraPOS extends AppCompatActivity {
         txtInfoVal2.setText(texto[2]);
         txtInfoVal3.setText(cAux.removerAcentos(texto[12]));
         txtInfoVal4.setText(texto[2]);
-        /*ppp.addLine("Qtde. Total de Itens                  " + quantidade);
-        ppp.addLine("Valor Total                        " + texto[2]);
-        ppp.addLine("FORMA DE PAGAMENTO            VALOR PAGO");
-        ppp.addLine(cAux.removerAcentos(texto[12]) + "                         " + texto[2]);
-        ppp.addLine("-----------------------------------------");*/
 
         // ********************** TRIBUTOS TOTAIS
         TextView txtTributos = findViewById(R.id.txtTributos);
@@ -439,9 +446,6 @@ public class ImpressoraPOS extends AppCompatActivity {
         txtTributosN.setText(texto[13]);
         txtTributosE.setText(texto[14]);
         txtTributosM.setText(texto[15]);
-        /*ppp.addLine("Tributos totais incidentes");
-        ppp.addLine("(Lei Federal 12.741/2012)         " + texto[5]);
-        ppp.addLine("-----------------------------------------");*/
 
         // ********************** EMISSÃO
         TextView txtEmissao1 = findViewById(R.id.txtEmissao1);
@@ -453,9 +457,6 @@ public class ImpressoraPOS extends AppCompatActivity {
         txtEmissao2.setText(serie);
         txtEmissao3.setText(cAux.exibirDataAtual());
         txtEmissao4.setText(cAux.horaAtual());
-        /*ppp.addLine("Numero:" + pedido + " Serie:" + serie);
-        ppp.addLine("Emissao:" + cAux.exibirDataAtual() + " " + cAux.horaAtual());
-        ppp.addLine("-----------------------------------------");*/
 
         // ********************** COSULTA NA RECEITA
         TextView txtConsRec1 = findViewById(R.id.txtConsRec1);
@@ -471,22 +472,9 @@ public class ImpressoraPOS extends AppCompatActivity {
         txtConsRec3.setText(cl2);
         txtConsRec4.setText(texto[3]);
 
-        /*ppp.addLine("Consulte pela Chave de Acesso em");
-        ppp.addLine(urlConsulta);
-        ppp.addLine("");
-        ppp.addLine("Chave de Acesso");
-        ppp.addLine(cl1);
-        ppp.addLine(cl2);
-        ppp.addLine("");
-        ppp.addLine("Protocolo de autorizacao");
-        ppp.addLine(texto[3]);
-        ppp.addLine("-----------------------------------------");*/
-
         //CONSUMIDOR
         TextView txtConsumidor = findViewById(R.id.txtConsumidor);
         txtConsumidor.setText(texto[4]);
-        /*ppp.addLine(texto[4]);
-        ppp.addLine("-----------------------------------------");*/
 
         // GERAR IMAGEM DE IMPRESSÃO
         //
@@ -495,38 +483,26 @@ public class ImpressoraPOS extends AppCompatActivity {
         //
         LinearLayout impressora = findViewById(R.id.teste);
         Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 424);
-        //Bitmap bitmap1 = printViewHelper.generateBitmapFromView(impressora);
         LinearLayout impressora1 = findViewById(R.id.teste1);
         Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 180, 100);
 
-
-        //ppp.addBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.logo_emissor_web));
-        /*ppp.addBitmap(bitmap);
-        ppp.addLine("");*/
         ppp.setConnectionCallback(new StoneCallbackInterface() {
             @Override
             public void onSuccess() {
-                Toast.makeText(context, "Recibo impresso", Toast.LENGTH_SHORT).show();
-                finalizarImpressao();
+                liberarImpressora();
             }
 
             @Override
             public void onError() {
+                liberarImpressora();
                 Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        /*new Handler(Looper.myLooper()).postDelayed(() -> {
-
-        }, 1000);*/
-
         ppp.addBitmap(bitmapCabecalhoNFCe);
         ppp.addBitmap(bitmap1);
         ppp.addBitmap(bitmap2);
-        //ppp.addBitmap(bitmap);
-        //ppp.addLine("");
         ppp.execute();
-
 
         // Apaga a imgem anterior
         File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
@@ -536,48 +512,12 @@ public class ImpressoraPOS extends AppCompatActivity {
     // --------------------     IMPRESSÃO DE NF-e       --------------------------------------------
     private void printNFE(final String[] texto) throws FileNotFoundException {
 
-        String serie = bd.getSeriePOS();
         elementosUnidade = bd.getUnidades();
-
-        String urlConsulta, urlQRCode, idCSC, CSC, hashSHA1;
         unidades = elementosUnidade.get(0);
-
-        urlConsulta = unidades.getUrl_consulta();
-        urlQRCode = unidades.getUrl_qrcode();
-        idCSC = unidades.getIdCSC();
-        CSC = unidades.getCSC();
-
-        String url;
-        if (texto[3].equalsIgnoreCase("EMITIDA EM CONTINGENCIA")) {
-            // Chave de Acesso da NFC-e
-            // Versão do QR Code
-            // Identificação do Ambiente (1 – Produção, 2 – Homologação)
-            // Dia da data de emissão
-            // Valor Total da NFC-e
-            // DigestValue da NFCe
-            // Identificador do CSC (Código de Segurança do Contribuinte no Banco de Dados da SEFAZ)
-            // Código Hash dos Parâmetros
-
-            hashSHA1 = texto[6] + "|" + "2" + "|" + "1" + "|" + idCSC + CSC;
-            hashSHA1 = getSha1Hex(hashSHA1);
-
-            url = urlQRCode + "?p=" + texto[6] + "|2|1|" + idCSC + "|" + hashSHA1;
-        } else {
-            // Chave de Acesso da NFC-e
-            // Versão do QR Code
-            // Identificação do Ambiente (1 – Produção, 2 – Homologação)
-            // Identificador do CSC (Código de Segurança do Contribuinte no Banco de Dados da SEFAZ)
-            // Código Hash dos Parâmetros
-
-            hashSHA1 = texto[6] + "|" + "2" + "|" + "1" + "|" + idCSC + CSC;
-            hashSHA1 = getSha1Hex(hashSHA1);
-
-            url = urlQRCode + "?p=" + texto[6] + "|2|1|" + idCSC + "|" + hashSHA1;
-        }
 
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         try {
-            BitMatrix bitMatrix = multiFormatWriter.encode(url, BarcodeFormat.QR_CODE, 250, 250);
+            BitMatrix bitMatrix = multiFormatWriter.encode(prefs.getString("chave", ""), BarcodeFormat.CODE_128, 300, 80);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
 
@@ -599,155 +539,370 @@ public class ImpressoraPOS extends AppCompatActivity {
         inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
         bufferedInputStream = new BufferedInputStream(inputStream);
         Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);
-        ImageView imgQrCode = findViewById(R.id.imgQrCode);
-        imgQrCode.setImageBitmap(bitmap);
 
         //
-        PrintViewHelper printViewHelper = new PrintViewHelper();
-        PosPrintProvider ppp = new PosPrintProvider(this);
-
+        ImageView imgNfeQrCode = findViewById(R.id.imgNfeQrCode);
+        imgNfeQrCode.setImageBitmap(bitmap);
 
         // ********************** IMPRIMIR CABEÇALHO
-        TextView txtCab1 = findViewById(R.id.txtCab1);
-        TextView txtCab2 = findViewById(R.id.txtCab2);
-        TextView txtCab3 = findViewById(R.id.txtCab3);
+        TextView txtRecebemos = findViewById(R.id.txtRecebemos);
         //
-        txtCab1.setText(texto[7]);
-        txtCab2.setText(texto[8]);
-        txtCab3.setText(String.format("%s %s %s", texto[9], texto[10], texto[11]));
-        //ppp.addLine(texto[7]); ppp.addLine(texto[8]); ppp.addLine(texto[9]); ppp.addLine(texto[10]); ppp.addLine(texto[11]);
-
-        /*//DANFE NFC-e
-        ppp.addLine("-----------------------------------------");
-        ppp.addLine("DANFE NFC-e - DOCUMENTO AUXILIAR DA");
-        ppp.addLine("NOTA FISCAL DE CONSUMIDOR ELETRONICA");
-        ppp.addLine("-----------------------------------------");*/
-
-        //INFOR. PEDIDO
-        /*ppp.addLine("# COD. DESC. QTDE. UN.  VL.UNIT.  VL.TOTAL");
-        ppp.addLine(texto[0]);
-        ppp.addLine(texto[1]);
-        ppp.addLine("-----------------------------------------");*/
+        txtRecebemos.setText(String.format("Recebemos de %s os produtos constantes da NF-e %s Serie %s", prefs.getString("nome", ""), prefs.getString("nnf", ""), prefs.getString("serie", "")));
 
         // ********************** INFOR. VALORES
-        TextView txtInfoVal1 = findViewById(R.id.txtInfoVal1);
-        TextView txtInfoVal2 = findViewById(R.id.txtInfoVal2);
-        TextView txtInfoVal3 = findViewById(R.id.txtInfoVal3);
-        TextView txtInfoVal4 = findViewById(R.id.txtInfoVal4);
-        //
-        txtInfoVal1.setText(quantidade);
-        txtInfoVal2.setText(texto[2]);
-        txtInfoVal3.setText(cAux.removerAcentos(texto[12]));
-        txtInfoVal4.setText(texto[2]);
-        /*ppp.addLine("Qtde. Total de Itens                  " + quantidade);
-        ppp.addLine("Valor Total                        " + texto[2]);
-        ppp.addLine("FORMA DE PAGAMENTO            VALOR PAGO");
-        ppp.addLine(cAux.removerAcentos(texto[12]) + "                         " + texto[2]);
-        ppp.addLine("-----------------------------------------");*/
-
-        // ********************** TRIBUTOS TOTAIS
-        TextView txtTributos = findViewById(R.id.txtTributos);
-        //
-        txtTributos.setText(texto[5]);
-        /*ppp.addLine("Tributos totais incidentes");
-        ppp.addLine("(Lei Federal 12.741/2012)         " + texto[5]);
-        ppp.addLine("-----------------------------------------");*/
-
-        // ********************** EMISSÃO
-        TextView txtEmissao1 = findViewById(R.id.txtEmissao1);
-        TextView txtEmissao2 = findViewById(R.id.txtEmissao2);
-        TextView txtEmissao3 = findViewById(R.id.txtEmissao3);
-        TextView txtEmissao4 = findViewById(R.id.txtEmissao4);
-        //
-        txtEmissao1.setText(pedido);
-        txtEmissao2.setText(serie);
-        txtEmissao3.setText(cAux.exibirDataAtual());
-        txtEmissao4.setText(cAux.horaAtual());
-        /*ppp.addLine("Numero:" + pedido + " Serie:" + serie);
-        ppp.addLine("Emissao:" + cAux.exibirDataAtual() + " " + cAux.horaAtual());
-        ppp.addLine("-----------------------------------------");*/
-
-        // ********************** COSULTA NA RECEITA
-        TextView txtConsRec1 = findViewById(R.id.txtConsRec1);
-        TextView txtConsRec2 = findViewById(R.id.txtConsRec2);
-        TextView txtConsRec3 = findViewById(R.id.txtConsRec3);
-        TextView txtConsRec4 = findViewById(R.id.txtConsRec4);
-        //
-        String c = texto[6];
-        String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
-        String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
-        txtConsRec1.setText(urlConsulta);
-        txtConsRec2.setText(cl1);
-        txtConsRec3.setText(cl2);
-        txtConsRec4.setText(texto[3]);
-
-        /*ppp.addLine("Consulte pela Chave de Acesso em");
-        ppp.addLine(urlConsulta);
-        ppp.addLine("");
-        ppp.addLine("Chave de Acesso");
-        ppp.addLine(cl1);
-        ppp.addLine(cl2);
-        ppp.addLine("");
-        ppp.addLine("Protocolo de autorizacao");
-        ppp.addLine(texto[3]);
-        ppp.addLine("-----------------------------------------");*/
-
-        //CONSUMIDOR
-        TextView txtConsumidor = findViewById(R.id.txtConsumidor);
-        txtConsumidor.setText(texto[4]);
-        /*ppp.addLine(texto[4]);
-        ppp.addLine("-----------------------------------------");*/
+        TextView txtSerie = findViewById(R.id.txtSerie);
+        TextView txtNfeConsRec2 = findViewById(R.id.txtNfeConsRec2);
+        TextView txtNfeConsRec3 = findViewById(R.id.txtNfeConsRec3);
 
         //
-        LinearLayout impressora = findViewById(R.id.teste);
-        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 460);
-        //Bitmap bitmap1 = printViewHelper.generateBitmapFromView(impressora);
-        LinearLayout impressora1 = findViewById(R.id.teste1);
-        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 200, 100);
+        String c = prefs.getString("chave", "");// texto[6];
+        String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20) + " " + c.substring(20, 24);
+        String cl2 = c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36) + " " + c.substring(36, 40) + " " + c.substring(40, 44);
 
+        //
+        txtSerie.setText(String.format("N %s          -          SERIE %s", prefs.getString("nnf", ""), prefs.getString("serie", "")));
+        txtNfeConsRec2.setText(cl1);
+        txtNfeConsRec3.setText(cl2);
 
-        //ppp.addBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.logo_emissor_web));
-        /*ppp.addBitmap(bitmap);
-        ppp.addLine("");*/
+        // ********************** DADOS DO EMITENTE
+        TextView txtNfeCab1 = findViewById(R.id.txtNfeCab1);
+        TextView txtNfeCab2 = findViewById(R.id.txtNfeCab2);
+        TextView txtNfeCab50 = findViewById(R.id.txtNfeCab50);
+        TextView txtNfeCab51 = findViewById(R.id.txtNfeCab51);
+        //
+        txtNfeCab1.setText(texto[7]);
+        txtNfeCab2.setText(texto[8]);
+        txtNfeCab50.setText(String.format("%s %s", texto[9], texto[10]));
+        txtNfeCab51.setText(texto[11]);
+
+        // ********************** DADOS DO DESTINATARIO
+        TextView txtNfeCab3 = findViewById(R.id.txtNfeCab3);
+        TextView txtNfeCab4 = findViewById(R.id.txtNfeCab4);
+        TextView txtNfeCab5 = findViewById(R.id.txtNfeCab5);
+        //
+        txtNfeCab3.setText(prefs.getString("nome", ""));
+        txtNfeCab4.setText(String.format("CNPJ: %s   IE: %s", prefs.getString("cnpj_dest", ""), prefs.getString("ie_dest", "")));
+        txtNfeCab5.setText(prefs.getString("endereco_dest", ""));
+
+        // ********************** PRODUTOS
+        TextView txtNFeDescProduto = findViewById(R.id.txtNFeDescProduto);
+        TextView txtNfeInfoVal2 = findViewById(R.id.txtNfeInfoVal2);
+        //
+        txtNFeDescProduto.setText(prefs.getString("prods_nota", ""));
+        txtNfeInfoVal2.setText(prefs.getString("total_nota", ""));
+
+        // ********************** DADOS ADICIONAIS
+        TextView txtNFeDadosAdd = findViewById(R.id.txtNFeDadosAdd);
+        //
+        txtNFeDadosAdd.setText("( DECLARAMOS QUE OS PRODUTOS ESTAO ADEQUADAMENTE " +
+                "ACONDICIONADOS E ESTIVADOS PARA SUPORTAR OS RISCOS NORMAIS DAS ETAPAS NECESSARIAS A OPERACAO " +
+                "DE TRANSPORTE (CARREGAMENTO, DESCARREGAMENTO, TRANSBORDO E TRANSPORTE) E QUE ATENDEM A REGULAMENTACAO " +
+                "EM VIGOR. DATA: " + cAux.exibirDataAtual() + " .. . .. DECLARAMOS QUE A EXPEDICAO NAO CONTEM EMBALAGENS VAZIAS E " +
+                "NAO LIMPAS DE PRODUTOS PERIGOSOS QUE APRESENTAM VALOR DE QUANTIDADE LIMITADA POR VEICULO (" +
+                "COLUNA 8 DA RELACAO DE PRODUTOS PERIGOSOS) IGUAL A ZERO. DATA: " + cAux.exibirDataAtual() + " .. . .. /nASSINATURA: " +
+                "____________________________________________________________________ " +
+                prefs.getString("inf_cpl", "") + ")");
+
+        //
+        LinearLayout impressora = findViewById(R.id.printNfe);
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 380, 150);
+        //
+        LinearLayout impressora1 = findViewById(R.id.printNfe1);
+        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 280, 50);
+        //
+        LinearLayout impressora2 = findViewById(R.id.printNfe2);
+        Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressora2, 280, 350);
+        //
+        LinearLayout impressora3 = findViewById(R.id.printNfe3);
+        Bitmap bitmap4 = printViewHelper.createBitmapFromView(impressora3, 280, 250);
+
         ppp.setConnectionCallback(new StoneCallbackInterface() {
             @Override
             public void onSuccess() {
-                Toast.makeText(context, "Recibo impresso", Toast.LENGTH_SHORT).show();
-                finalizarImpressao();
+                liberarImpressora();
             }
 
             @Override
             public void onError() {
+                liberarImpressora();
                 Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        /*new Handler(Looper.myLooper()).postDelayed(() -> {
-
-        }, 1000);*/
-
         ppp.addBitmap(bitmap1);
         ppp.addBitmap(bitmap2);
-        //ppp.addBitmap(bitmap);
-        //ppp.addLine("");
+        ppp.addBitmap(bitmap3);
+        ppp.addBitmap(bitmap4);
         ppp.execute();
-
 
         // Apaga a imgem anterior
         File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
         imgQrC.delete();
     }
 
-
     // --------------------     IMPRESSÃO DE RELATÓRIOS     ----------------------------------------
+    private void printRelatorio() {
+
+        PosPrintProvider pppCab = new PosPrintProvider(this);
+        PosPrintProvider pppCor = new PosPrintProvider(this);
+        PosPrintProvider pppCorNfe = new PosPrintProvider(this);
+        PosPrintProvider pppTotal = new PosPrintProvider(this);
+
+        String serie = bd.getSeriePOS();
+        elementosUnidade = bd.getUnidades();
+        unidades = elementosUnidade.get(0);
+
+        //IMPRIMIR CABEÇALHO
+        TextView txtCabRel1 = findViewById(R.id.txtCabRel1);
+        TextView txtCabRel2 = findViewById(R.id.txtCabRel2);
+        TextView txtCabRel3 = findViewById(R.id.txtCabRel3);
+        TextView txtCabRel4 = findViewById(R.id.txtCabRel4);
+        TextView txtCabRel5 = findViewById(R.id.txtCabRel5);
+        //
+        txtCabRel1.setText(unidades.getRazao_social());
+        txtCabRel2.setText(String.format("CNPJ: %s I.E.: %s", unidades.getCnpj(), unidades.getIe()));
+        txtCabRel3.setText(String.format("%s, %s%s, %s, %s", unidades.getEndereco(), unidades.getNumero(), unidades.getBairro(), unidades.getCidade(), unidades.getUf()));
+        txtCabRel4.setText(String.format("CEP: %s  %s", unidades.getCep(), unidades.getTelefone()));
+
+        //
+        txtCabRel5.setText(String.format("Serie: %s  %s", serie, unidades.getTelefone()));
+        //
+        LinearLayout impressora = findViewById(R.id.printCabRel);
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 110);
+
+        //
+        pppCab.setConnectionCallback(new StoneCallbackInterface() {
+            @Override
+            public void onSuccess() {
+                impressao1 = true;
+                finalizarImpressao();
+            }
+
+            @Override
+            public void onError() {
+                impressao1 = true;
+                finalizarImpressao();
+                Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        pppCab.addBitmap(bitmap1);
+        pppCab.execute();
+
+        // TOTAL DE PRODUTOS
+        int totalProdutos = 0;
+        int totalProdutosNFE = 0;
+
+        //DADOS DAS NOTAS NFC-e
+        if (elementosPedidos.size() > 0) {
+            //
+            TextView txtCorpoRel1 = findViewById(R.id.txtCorpoRel1);
+            TextView txtCorpoRel2 = findViewById(R.id.txtCorpoRel2);
+            TextView txtCorpoRel3 = findViewById(R.id.txtCorpoRel3);
+            TextView txtCorpoRel4 = findViewById(R.id.txtCorpoRel4);
+            TextView txtCorpoRel5 = findViewById(R.id.txtCorpoRel5);
+            TextView txtCorpoRel6 = findViewById(R.id.txtCorpoRel6);
+
+            //
+            for (int n = 0; n < elementosPedidos.size(); n++) {
+
+                //DADOS DOS PEDIDO
+                pedidos = elementosPedidos.get(n);
+                elementosItens = bd.getItensPedido(pedidos.getId());
+                itensPedidos = elementosItens.get(0);
+
+                String dataEmissao = cAux.exibirData(pedidos.getData());
+                String horaEmissao = pedidos.getHora();
+
+                //
+                txtCorpoRel1.setText(String.format("Numero:%s      Emissao:%s %s", pedidos.getId(), dataEmissao, horaEmissao));
+                txtCorpoRel2.setText(String.format("Protocolo: %s", pedidos.getProtocolo().equals(" ") ? "EMITIDA EM CONTIGENCIA" : pedidos.getProtocolo()));
+
+                String c = bd.gerarChave(Integer.parseInt(pedidos.getId()));
+                String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
+                String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
+                //
+                txtCorpoRel3.setText(cl1);
+                txtCorpoRel4.setText(cl2);
+
+                //
+                /*linhaProduto = new String[]{
+                        itensPedidos.getProduto() + "         " + bd.getProduto(itensPedidos.getProduto()),
+                        "" + itensPedidos.getQuantidade() + "     " + "UN     " + cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))) + "   " +
+                                cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(pedidos.getValor_total()))))
+                };*/
+
+                //IMPRIMIR TEXTO
+                txtCorpoRel5.setText(String.format("%s               %s", itensPedidos.getProduto(), bd.getProduto(itensPedidos.getProduto())));
+                txtCorpoRel6.setText(String.format("%s          UN          %s          %s", itensPedidos.getQuantidade(), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getTotal()))))));
+
+                LinearLayout impressora1 = findViewById(R.id.printRel2);
+                Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 260, 120);
+
+                pppCor.addBitmap(bitmap2);
+
+                try {
+                    String[] sum = {String.valueOf(n), "1"};
+                    imprimindo.setText(String.valueOf(cAux.somar(sum)));
+                } catch (Exception ignored) {
+
+                }
+                totalProdutos += Integer.parseInt(itensPedidos.getQuantidade());
+            }
+
+            pppCor.setConnectionCallback(new StoneCallbackInterface() {
+                @Override
+                public void onSuccess() {
+                    impressao2 = true;
+                    finalizarImpressao();
+                }
+
+                @Override
+                public void onError() {
+                    impressao2 = true;
+                    finalizarImpressao();
+                    Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            pppCor.execute();
+        } else {
+            impressao2 = true;
+            finalizarImpressao();
+        }
+
+        // NF-e
+        if (elementosPedidosNFE.size() > 0) {
+            //
+            LinearLayout impressoraTxtNFe = findViewById(R.id.printRelNFe);
+            Bitmap bitmapTxtNFe = printViewHelper.createBitmapFromView(impressoraTxtNFe, 260, 20);
+
+            pppTotal.addBitmap(bitmapTxtNFe);
+            //
+            TextView txtCorpoRelNfe1 = findViewById(R.id.txtCorpoRelNfe1);
+            TextView txtCorpoRelNfe2 = findViewById(R.id.txtCorpoRelNfe2);
+            TextView txtCorpoRelNfe3 = findViewById(R.id.txtCorpoRelNfe3);
+            TextView txtCorpoRelNfe4 = findViewById(R.id.txtCorpoRelNfe4);
+            TextView txtCorpoRelNfe5 = findViewById(R.id.txtCorpoRelNfe5);
+            TextView txtCorpoRelNfe6 = findViewById(R.id.txtCorpoRelNfe6);
+
+            //DADOS DAS NOTAS NF-e
+            for (int n = 0; n < elementosPedidosNFE.size(); n++) {
+
+                //DADOS DOS PEDIDO
+                pedidosNFE = elementosPedidosNFE.get(n);
+                elementosItens = bd.getItensPedidoNFE(pedidosNFE.getId());
+                itensPedidos = elementosItens.get(0);
+
+                String dataEmissao = pedidosNFE.getData();
+                String horaEmissao = pedidosNFE.getHora();
+
+                //
+                txtCorpoRelNfe1.setText(String.format("Numero:%s      Emissao:%s %s", pedidosNFE.getId(), dataEmissao, horaEmissao));
+                txtCorpoRelNfe2.setText(String.format("Protocolo: %s", pedidosNFE.getProtocolo()));
+
+                String c = bd.gerarChave(Integer.parseInt(pedidosNFE.getId()));
+                String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
+                String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
+                txtCorpoRelNfe3.setText(cl1);
+                txtCorpoRelNfe4.setText(cl2);
+
+                //IMPRIMIR TEXTO
+                txtCorpoRelNfe5.setText(String.format("%s               %s", itensPedidos.getProduto(), bd.getProduto(itensPedidos.getProduto())));
+                txtCorpoRelNfe6.setText(String.format("%s          UN          %s          %s", itensPedidos.getQuantidade(), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(pedidosNFE.getValor_total()))))));
+
+                //
+                LinearLayout impressoraNFe = findViewById(R.id.printRel3);
+                Bitmap bitmapNFe = printViewHelper.createBitmapFromView(impressoraNFe, 260, 120);
+
+                pppCorNfe.addBitmap(bitmapNFe);
+
+                try {
+                    String[] sum = {String.valueOf(n), "1"};
+                    imprimindo.setText(String.valueOf(cAux.somar(sum)));
+                } catch (Exception ignored) {
+
+                }
+                totalProdutosNFE += Integer.parseInt(itensPedidos.getQuantidade());
+            }
+
+            //
+            pppCorNfe.setConnectionCallback(new StoneCallbackInterface() {
+                @Override
+                public void onSuccess() {
+                    impressao3 = true;
+                    finalizarImpressao();
+                }
+
+                @Override
+                public void onError() {
+                    impressao3 = true;
+                    finalizarImpressao();
+                    Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            pppCorNfe.execute();
+        } else {
+            impressao3 = true;
+            finalizarImpressao();
+        }
+
+        //
+        TextView txtTotNfce = findViewById(R.id.txtTotNfce);
+        TextView txtTotNfe = findViewById(R.id.txtTotNfe);
+        TextView txtTotal = findViewById(R.id.txtTotal);
+        //
+        txtTotNfce.setText(String.valueOf(totalProdutos));
+        txtTotNfe.setText(String.valueOf(totalProdutosNFE));
+        String[] somar = {String.valueOf(totalProdutos), String.valueOf(totalProdutosNFE)};
+        txtTotal.setText(String.valueOf(Math.round(Float.parseFloat(String.valueOf(cAux.somar(somar))))));
+
+        pppTotal.setConnectionCallback(new StoneCallbackInterface() {
+            @Override
+            public void onSuccess() {
+                impressao4 = true;
+                finalizarImpressao();
+            }
+
+            @Override
+            public void onError() {
+                impressao4 = true;
+                finalizarImpressao();
+                Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        LinearLayout impressoraTot = findViewById(R.id.printTotais);
+        Bitmap bitmapTot = printViewHelper.createBitmapFromView(impressoraTot, 260, 120);
+
+        pppTotal.addBitmap(bitmapTot);
+        pppTotal.execute();
+    }
 
     //
     private void finalizarImpressao() {
+        //
+        if (!impressao1 || !impressao2 || !impressao3 || !impressao4) return;
+
+        //
         Intent i = new Intent(ImpressoraPOS.this, Principal.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.putExtra("nomeImpressoraBlt", enderecoBlt);
         i.putExtra("enderecoBlt", enderecoBlt);
         startActivity(i);
         finish();
+    }
+
+    @Override
+    public void onStatusChanged(Action action) {
+
+    }
+
+    @Override
+    public void onSuccess() {
+
+    }
+
+    @Override
+    public void onError() {
+
     }
 }

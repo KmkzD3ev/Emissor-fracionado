@@ -498,12 +498,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private ItensPedidos cursorToItensPedidos(Cursor cursor) {
-        ItensPedidos itensPedidos = new ItensPedidos(null, null, null, null);
+        ItensPedidos itensPedidos = new ItensPedidos(null, null, null, null, null);
         //
         itensPedidos.setPedido(cursor.getString(0));
         itensPedidos.setProduto(cursor.getString(1));
         itensPedidos.setQuantidade(cursor.getString(2));
         itensPedidos.setValor(cursor.getString(3));
+        itensPedidos.setTotal(cursor.getString(4));
         return itensPedidos;
     }
 
@@ -513,7 +514,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ArrayList<ItensPedidos> listaItensPedidos = new ArrayList<>();
 
-        String query = "SELECT * FROM itens_pedidosNFE WHERE pedido = '" + nPedido + "'";
+        String query = "SELECT *, (valor * quantidade) AS total FROM itens_pedidosNFE WHERE pedido = '" + nPedido + "'";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -534,7 +535,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ArrayList<ItensPedidos> listaItensPedidos = new ArrayList<>();
 
-        String query = "SELECT * FROM itens_pedidos WHERE pedido = '" + nPedido + "'";
+        String query = "SELECT *, (valor * quantidade) AS total FROM itens_pedidos WHERE pedido = '" + nPedido + "'";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);

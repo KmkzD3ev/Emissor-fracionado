@@ -48,11 +48,10 @@ import com.getkeepsafe.taptargetview.TapTargetView;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-import br.com.stone.posandroid.providers.PosPrintProvider;
 import br.com.zenitech.emissorweb.adapters.PedidosAdapter;
-import br.com.zenitech.emissorweb.controller.PrintViewHelper;
 import br.com.zenitech.emissorweb.domains.DomainPrincipal;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
@@ -65,7 +64,12 @@ import br.com.zenitech.emissorweb.interfaces.ISincronizar;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import stone.application.StoneStart;
+import stone.application.enums.ReceiptType;
 import stone.application.interfaces.StoneCallbackInterface;
+import stone.database.transaction.TransactionDAO;
+import stone.database.transaction.TransactionObject;
+import stone.user.UserModel;
 
 public class Principal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -106,6 +110,9 @@ public class Principal extends AppCompatActivity
     TextView txtNFCeVinculada, txtTotMemoria;
 
     RelativeLayout LLlistaPedidos;
+
+
+    List<UserModel> userList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +159,8 @@ public class Principal extends AppCompatActivity
         //
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         ed = prefs.edit();
+
+        Log.e("NameApp", new Configuracoes().getApplicationName(context));
 
         //
         bd = new DatabaseHelper(this);
@@ -300,7 +309,6 @@ public class Principal extends AppCompatActivity
         }
 
 
-
         // ATIVAR O MENU DA STONE
         if (!unidades.getCodloja().equalsIgnoreCase("")) {
             Menu menu = navigationView.getMenu();
@@ -311,8 +319,9 @@ public class Principal extends AppCompatActivity
                 }
             }
         }
-    }
 
+        userList = StoneStart.init(context);
+    }
 
 
     @Override
@@ -552,15 +561,27 @@ public class Principal extends AppCompatActivity
         }
         // Reimprimir comprovante pagamento logista
         else if (id == R.id.nav_reimprimir) {
-            //
-            Intent i = new Intent(context, Impressora.class);
-            i.putExtra("imprimir", "reimpressao_comprovante");
-            startActivity(i);
+            Configuracoes configuracoes = new Configuracoes();
+            if (configuracoes.GetDevice()) {
+                Intent i = new Intent(context, ImpressoraPOS.class);
+                i.putExtra("imprimir", "reimpressao_comprovante");
+                startActivity(i);
+            } else {
+                //
+                Intent i = new Intent(context, Impressora.class);
+                i.putExtra("imprimir", "reimpressao_comprovante");
+                startActivity(i);
+            }
         }
         // Cancelar pagamento cartão
         else if (id == R.id.nav_cancelar_pag) {
-            //
-            Intent i = new Intent(context, CancelarPagamentoCartao.class);
+            Intent i;
+            Configuracoes configuracoes = new Configuracoes();
+            if (configuracoes.GetDevice())
+                i = new Intent(context, CancelarPagamentoCartaoPOS.class);
+            else
+                i = new Intent(context, CancelarPagamentoCartao.class);
+
             startActivity(i);
         }
 

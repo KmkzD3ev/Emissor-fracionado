@@ -21,24 +21,21 @@ import java.util.Objects;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PosApp;
 import br.com.zenitech.emissorweb.domains.Unidades;
+import stone.application.StoneStart;
 
 public class Relatorios extends AppCompatActivity {
-
     FloatingActionButton fab;
     Context context;
     DatabaseHelper bd;
     ClassAuxiliar cAux;
     SharedPreferences prefs;
     AlertDialog alerta;
-
     ArrayList<Unidades> elementos;
     Unidades unidades;
-
     ArrayList<PosApp> elementosPos;
     PosApp posApp;
-
     ArrayList<Pedidos> elementosPedidos;
-    Pedidos pedidos;
+    Configuracoes configuracoes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +49,7 @@ public class Relatorios extends AppCompatActivity {
         context = this;
         cAux = new ClassAuxiliar();
         bd = new DatabaseHelper(this);
+        configuracoes = new Configuracoes();
 
         elementos = bd.getUnidades();
         unidades = elementos.get(0);
@@ -64,17 +62,32 @@ public class Relatorios extends AppCompatActivity {
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             if (elementosPedidos.size() != 0) {
-                if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("")) {
-                    selectTamPapImpressora();
-                } else {
+                if (new Configuracoes().GetDevice()) {
                     imprimir();
+                } else {
+                    if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("")) {
+                        selectTamPapImpressora();
+                    } else {
+                        imprimir();
+                    }
                 }
             } else {
                 Toast.makeText(context, "Não tem nada para imprimir!", Toast.LENGTH_LONG).show();
             }
         });
 
-        new AtivarDesativarBluetooth().enableBT();
+
+        // SE O APARELHO FOR UM POS
+        if (configuracoes.GetDevice()) {
+            //
+            iniciarStone();
+        } else new AtivarDesativarBluetooth().enableBT();
+    }
+
+    // Iniciar o Stone
+    void iniciarStone() {
+        // O primeiro passo é inicializar o SDK.
+        StoneStart.init(getApplicationContext());
     }
 
     private void selectTamPapImpressora() {
@@ -106,7 +119,12 @@ public class Relatorios extends AppCompatActivity {
     }
 
     public void imprimir() {
-        Intent i = new Intent(context, Impressora.class);
+        Intent i;
+        if (new Configuracoes().GetDevice()) {
+            i = new Intent(context, ImpressoraPOS.class);
+        } else {
+            i = new Intent(context, Impressora.class);
+        }
         i.setFlags(0);
         i.putExtra("imprimir", "relatorio");
         startActivityForResult(i, 1);

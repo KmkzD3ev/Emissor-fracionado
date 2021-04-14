@@ -1980,6 +1980,7 @@ public class Impressora extends AppCompatActivity {
             inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
             bufferedInputStream = new BufferedInputStream(inputStream);
             Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);
+
             final int width = Objects.requireNonNull(bitmap).getWidth();
             final int height = bitmap.getHeight();
             final int[] argb = new int[width * height];

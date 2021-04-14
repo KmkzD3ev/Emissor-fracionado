@@ -60,7 +60,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             "FORMA PAGAMENTO",
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
-            "CARTÃO DE DÉBITO"
+            "CARTÃO DE DÉBITO",
+            "DUPLICATA MERCANTIL"
     };
 
     private Spinner spProduto, spFormasPagamento, spDescricaoCredenciadora, spBandeiraCredenciadora;
@@ -245,7 +246,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                         btnAvancarNFCE.setVisibility(View.VISIBLE);
                     }
                 }
-
 
             }
 

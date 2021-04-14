@@ -347,7 +347,8 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                 idPed,//ID PEDIDO
                 bd.getIdProduto(produto.getText().toString()),
                 quantidade + "",
-                cAux.soNumeros(String.valueOf(cAux.converterValores(vlt.getText().toString())))
+                cAux.soNumeros(String.valueOf(cAux.converterValores(vlt.getText().toString()))),
+                null
         ));
     }
 

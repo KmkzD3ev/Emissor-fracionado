@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.PosApp;
@@ -26,6 +27,9 @@ import br.com.zenitech.emissorweb.interfaces.IValidarNFE;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import stone.application.StoneStart;
+import stone.user.UserModel;
+import stone.utils.Stone;
 
 public class ConsultarNFE extends AppCompatActivity {
 
@@ -39,6 +43,7 @@ public class ConsultarNFE extends AppCompatActivity {
     Unidades unidades;
     ArrayList<PosApp> elementosPos;
     PosApp posApp;
+    Configuracoes configuracoes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class ConsultarNFE extends AppCompatActivity {
         context = this;
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         ed = prefs.edit();
+        configuracoes = new Configuracoes();
 
         //
         bd = new DatabaseHelper(this);
@@ -59,6 +65,17 @@ public class ConsultarNFE extends AppCompatActivity {
         nNota = findViewById(R.id.nNota);
         findViewById(R.id.btnConsultarNFE).setOnClickListener(v -> VerificarCampos());
 
+        // SE O APARELHO FOR UM POS
+        if(configuracoes.GetDevice()) {
+            //
+            iniciarStone();
+        }
+    }
+
+    // Iniciar o Stone
+    void iniciarStone() {
+        // O primeiro passo é inicializar o SDK.
+        StoneStart.init(getApplicationContext());
     }
 
     private void VerificarCampos() {

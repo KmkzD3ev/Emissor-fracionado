@@ -539,7 +539,8 @@ public class ConfirmarDadosPedidoCopiaDeSeguranca extends AppCompatActivity impl
                 String.valueOf(id),//ID PEDIDO
                 bd.getIdProduto(produto.getText().toString()),
                 qnt.getText().toString(),
-                classAuxiliar.soNumeros(String.valueOf(classAuxiliar.converterValores(vlt.getText().toString())))
+                classAuxiliar.soNumeros(String.valueOf(classAuxiliar.converterValores(vlt.getText().toString()))),
+                null
         ));
 
         //Toast.makeText(getBaseContext(), classAuxiliar.soNumeros(vlTotal), Toast.LENGTH_LONG).show();

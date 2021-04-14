@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import br.com.stone.posandroid.providers.PosPrintProvider;
 import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
 import br.com.stone.posandroid.providers.PosTransactionProvider;
 import br.com.stonesdk.sdkdemo.controller.PrintController;
@@ -121,6 +120,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     String valorUnit;
     String total;
     int transactionId;
+    TextView txtFalha;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,11 +139,13 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         elementos = bd.getUnidades();
         unidades = elementos.get(0);
         STONE_CODE = unidades.getCodloja();
+        //STONE_CODE = "111111111";
 
         // **
         txtTotalPagar = findViewById(R.id.txtTotalPagarCartao);
         txtStatusPagamento = findViewById(R.id.txtStatusPagamento);
         txtMsgCausaErro = findViewById(R.id.txtMsgCausaErro);
+        txtFalha = findViewById(R.id.txtFalha);
         llDebito = findViewById(R.id.llDebito);
         llCredito = findViewById(R.id.llCredito);
         llPagamentoImprimir = findViewById(R.id.llPagamentoImprimir);
@@ -270,7 +272,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         }
     }
 
-    // INICIAR UMA CAPTURA DE PAGAMENTO COM O PINPAD
+    // INICIAR UMA CAPTURA DE PAGAMENTO COM O POS
     private void iniciarCaptura() {
         transactionObject = new TransactionObject();
         //Definir o valor da transação em centavos
@@ -338,7 +340,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
         //Processo para envio da transação
         // Stone.getUserModel(0) é o usuário atual do aplicativo, que está na posição zero.
-        Log.i("PinPad_Teste", String.valueOf(Stone.getUserModel(0)));
+        //Log.i("PinPad_Teste", String.valueOf(Stone.getUserModel(0)));
         Posprovider = new PosTransactionProvider(context, transactionObject, Stone.getUserModel(0));
         /*provider.setConnectionCallback(new StoneCallbackInterface() {
             public void onSuccess() {
@@ -726,7 +728,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment(new  Configuracoes().Ambiente());
+        Stone.setEnvironment(new Configuracoes().Ambiente());
         //Ambiente de Produção
         //Stone.setEnvironment((Environment.PRODUCTION));
 
@@ -759,12 +761,12 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
                 public void onSuccess() {
                     // SDK ativado com sucesso
+                    //Toast.makeText(context, "Stone Code:" + STONE_CODE + " ativado com sucesso!", Toast.LENGTH_SHORT).show();
                     _pinpadAtivado();
                 }
 
                 public void onError() {
-                    // Ocorreu algum erro na ativação
-                    Toast.makeText(context, "Ocorreu algum erro na ativação", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Não foi possível ativar o Stone Code:" + STONE_CODE, Toast.LENGTH_SHORT).show();
                 }
             });
             activeApplicationProvider.activate(STONE_CODE);
@@ -816,7 +818,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                 llPagamentoPedirCartao.setVisibility(View.VISIBLE);
             } else if (action == Action.TRANSACTION_WAITING_PASSWORD) {
                 llPagamentoPedirCartao.setVisibility(View.GONE);
-            }else{
+            } else {
                 llProcessandoPagamento.setVisibility(View.VISIBLE);
             }
         });

@@ -54,6 +54,11 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_cancelar_pagamento_cartao"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CancelarPagamentoCartaoPOS"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_cancelar_pagamento_cartao"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".DevicesActivityPinPad" />
         <activity
             android:name=".GerenciarPagamentoCartao"
