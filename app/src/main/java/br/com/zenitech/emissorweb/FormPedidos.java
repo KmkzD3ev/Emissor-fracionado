@@ -61,7 +61,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
             "CARTÃO DE DÉBITO",
-            "DUPLICATA MERCANTIL"
+            "DUPLICATA MERCANTIL",
+            "_______________________________________________________________________________________",
+            "CART. DE CRÉDITO E DINHEIRO",
+            "CART. DE DÉBITO E DINHEIRO"
     };
 
     private Spinner spProduto, spFormasPagamento, spDescricaoCredenciadora, spBandeiraCredenciadora;
@@ -196,7 +199,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 if (!unidades.getCodloja().equalsIgnoreCase("")) {
                     if (
                             (parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE CRÉDITO") ||
-                                    parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE DÉBITO")) && !unidades.getCodloja().equalsIgnoreCase("")
+                                    parent.getItemAtPosition(position).toString().equalsIgnoreCase("CARTÃO DE DÉBITO"))
+                                    && !unidades.getCodloja().equalsIgnoreCase("")
                     ) {
                         llCredenciadora.setVisibility(View.GONE);
                         /*if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
@@ -366,7 +370,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         }
 
         //
-        if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
+        if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO") || spFormasPagamento.getSelectedItem().toString().equals("_______________________________________________________________________________________")) {
             ShowMsgToast("Selecione a forma de pagamento.");
         } else if (spProduto.getSelectedItem().toString().equals("PRODUTO")) {
             ShowMsgToast("Selecione um produto.");

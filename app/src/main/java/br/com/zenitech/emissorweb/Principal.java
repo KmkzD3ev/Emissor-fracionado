@@ -97,22 +97,17 @@ public class Principal extends AppCompatActivity
     //
     ArrayList<Pedidos> elementosPedidos;
     ArrayList<ItensPedidos> elementosItens;
-
     ArrayList<PosApp> elementosPos;
     PosApp posApp;
-
     ArrayList<Unidades> elementosUnidades;
     Unidades unidades;
-
     LinearLayout btnSincronizarNotasPrincipal;
-
     ImageView imgEmissor;
     TextView txtNFCeVinculada, txtTotMemoria;
-
     RelativeLayout LLlistaPedidos;
-
-
     List<UserModel> userList;
+
+    TextView textView, txtTransmitida, txtContigencia, txtStatusTransmissao, txtVersao, txtEmpresa, txtCodUnidade;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,12 +140,7 @@ public class Principal extends AppCompatActivity
         txtTotMemoria = findViewById(R.id.txtTotMemoria);
         StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
         long bytesAvailable;
-        if (android.os.Build.VERSION.SDK_INT >=
-                android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            bytesAvailable = stat.getBlockSizeLong() * stat.getAvailableBlocksLong();
-        } else {
-            bytesAvailable = (long) stat.getBlockSize() * (long) stat.getAvailableBlocks();
-        }
+        bytesAvailable = stat.getBlockSizeLong() * stat.getAvailableBlocksLong();
         long megAvailable = bytesAvailable / (1024 * 1024);
         if (megAvailable < 50) {
             txtTotMemoria.setText("Atenção:\nSeu aparelho está com pouca memória! \nPara um bom funcionamento do App Emissor, libere mais espaço na memória interna o quanto antes.");
@@ -202,11 +192,11 @@ public class Principal extends AppCompatActivity
         adapter = new PedidosAdapter(this, pedidos);
         recyclerView.setAdapter(adapter);
 
-        fabNovoPedido = findViewById(R.id.fabNovoPedido);
+        /*fabNovoPedido = findViewById(R.id.fabNovoPedido);
         fabNovoPedido.setOnClickListener(v -> {
             startActivity(new Intent(getBaseContext(), FormPedidos.class));
             //startActivity(new Intent(getBaseContext(), Impressora.class));
-        });
+        });*/
 
         // NAVIGATION DRAWER
         drawer = findViewById(R.id.drawer_layout);
@@ -262,13 +252,14 @@ public class Principal extends AppCompatActivity
 
         elementosUnidades = bd.getUnidades();
         unidades = elementosUnidades.get(0);
-        if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
+        Objects.requireNonNull(getSupportActionBar()).setTitle("PRINCIPAL");
+        /*if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
             Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " não transmitida(s)");
         } else {
             Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " contigências");
-        }
+        }*/
         //Log.i("Serial => ", posApp.getSerial());
-        getSupportActionBar().setSubtitle(String.format("Serial: %s", posApp.getSerial()));
+        //getSupportActionBar().setSubtitle(String.format("Serial: %s", posApp.getSerial()));
 
         btnSincronizarNotasPrincipal = findViewById(R.id.btnSincronizarNotasPrincipal);
 
@@ -320,6 +311,38 @@ public class Principal extends AppCompatActivity
             }
         }
 
+        //
+        findViewById(R.id.btnNovaNfcePrinc).setOnClickListener(view -> NovaNFCe());
+        txtEmpresa = findViewById(R.id.txtEmpresa);
+        txtCodUnidade = findViewById(R.id.txtCodUnidade);
+        txtEmpresa.setText(unidades.getRazao_social());
+        txtCodUnidade.setText(posApp.getUnidade());
+        //
+        textView = findViewById(R.id.text_home);
+        txtTransmitida = findViewById(R.id.txtTransmitida);
+        txtContigencia = findViewById(R.id.txtContigencia);
+        txtStatusTransmissao = findViewById(R.id.txtStatusTransmissao);
+        textView.setText(posApp.getSerial());
+        txtVersao = findViewById(R.id.txtVersao);
+        //txtVersao.setText(String.format("Versão %s", BuildConfig.VERSION_NAME));
+        txtVersao.setText(String.format("%s", BuildConfig.VERSION_NAME));
+        //
+        /*elementosPedidos = bd.getPedidosTransmitirFecharDia();
+
+        elementosUnidades = bd.getUnidades();
+        unidades = elementosUnidades.get(0);*/
+
+        txtTransmitida.setText(String.valueOf(pedidos.size() - elementosPedidos.size()));
+        txtContigencia.setText(String.valueOf(elementosPedidos.size()));
+        if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
+            txtStatusTransmissao.setText("Não Transmitida(s)");
+            //Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " não transmitida(s)");
+        } else {
+            txtStatusTransmissao.setText("Contigências");
+            //Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " contigências");
+        }
+
+        //
         userList = StoneStart.init(context);
     }
 
@@ -329,6 +352,11 @@ public class Principal extends AppCompatActivity
         super.onResume();
         totNFE();
         atualizar();
+    }
+
+    // GRAVAR NOVO PEDIDO NO BANCO DE DADOS
+    private void NovaNFCe() {
+        startActivity(new Intent(getBaseContext(), FormPedidos.class));
     }
 
     private void totNFE() {
@@ -461,7 +489,7 @@ public class Principal extends AppCompatActivity
 
                         //
                         TapTarget.forToolbarOverflow(toolbar, "Toque", "Abre outras opções")
-                                .id(2),
+                                .id(2)/*,
 
                         // BOTAO NOVO PEDIDO
                         TapTarget.forView(findViewById(R.id.fabNovoPedido), "Novo Pedido", "Toque para iniciar um novo pedido!")
@@ -470,7 +498,7 @@ public class Principal extends AppCompatActivity
                                 .targetCircleColor(android.R.color.black)
                                 .textColor(android.R.color.white)
                                 .transparentTarget(true)
-                                .id(3)
+                                .id(3)*/
                 )
                 .listener(new TapTargetSequence.Listener() {
                     @Override

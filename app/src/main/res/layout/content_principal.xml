@@ -17,64 +17,21 @@
         android:scaleType="centerCrop"
         android:src="@drawable/bgtopo" />
 
-    <LinearLayout
-        android:id="@+id/btnSincronizarNotasPrincipal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#f3214b"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:id="@+id/btnSincronizarNotasNFC"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/existe_nfc_e_emitida_em_contig_ncia_lembre_se_de_sincronizar_antes_de_fazer_o_fechamento_do_dia"
-                android:textAlignment="center"
-                android:textColor="@android:color/white" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.8dp"
-            android:background="#994d52" />
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/imgEmissor"
-        android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:layout_marginTop="90dp"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/logo_emissor_web"
-        android:visibility="visible" />
-
     <TextView
         android:id="@+id/txtNFCeVinculada"
         android:layout_width="match_parent"
-        android:gravity="center"
         android:layout_height="wrap_content"
+        android:layout_marginTop="210dp"
+        android:gravity="center"
         android:padding="20dp"
-        android:textSize="16sp"
-        android:layout_marginTop="210dp" />
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/txtTotMemoria"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp"
         android:layout_marginTop="210dp"
+        android:padding="20dp"
         android:textColor="@android:color/holo_red_dark" />
 
     <TextView
@@ -92,5 +49,239 @@
         android:layout_weight="1"
         android:scrollbars="vertical"
         android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgEmissor"
+                android:layout_width="150dp"
+                android:layout_height="70dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/logo_emissor_web"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="end|bottom"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="Versão do App" />
+
+                <TextView
+                    android:id="@+id/txtVersao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="0.0.0"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/txtEmpresa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@drawable/bg_btn" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Serial:"
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/text_home"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="000000000"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="24sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cód. Unidade:"
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/txtCodUnidade"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="24sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Transmitidas"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/txtTransmitida"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="30sp" />
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtStatusTransmissao"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Em Contigência"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/txtContigencia"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/colorErro"
+                        android:textFontWeight="700"
+                        android:textSize="30sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp">
+
+            <LinearLayout
+                android:id="@+id/btnSincronizarNotasPrincipal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#f3214b"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/btnSincronizarNotasNFC"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/existe_nfc_e_emitida_em_contig_ncia_lembre_se_de_sincronizar_antes_de_fazer_o_fechamento_do_dia"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.8dp"
+                    android:background="#994d52" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
 </RelativeLayout>

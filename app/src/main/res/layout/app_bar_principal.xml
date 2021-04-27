@@ -23,20 +23,69 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <include
-        layout="@layout/content_principal" />
+        layout="@layout/content_principal"
+        android:visibility="visible" />
 
-    <include layout="@layout/activity_main_principal"
+    <include
+        layout="@layout/activity_main_principal"
         android:visibility="gone" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabNovoPedido"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:tint="@android:color/white"
-        android:visibility="visible"
-        app:fabSize="normal"
-        app:srcCompat="@drawable/ic_add" />
+    <LinearLayout
+        android:id="@+id/btnNovaNfcePrinc"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
+        android:clickable="true"
+        android:elevation="4dp"
+        android:focusable="true"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_btn_nova_nfce"
+            android:gravity="center"
+            android:padding="4dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/nfce" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_nova_nfce_direta">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:gravity="center|start"
+                android:text="Nova NFC-e"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_baseline_arrow_forward"
+                    app:tint="@android:color/white" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
