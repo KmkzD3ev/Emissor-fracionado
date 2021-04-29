@@ -27,6 +27,11 @@ public interface ISincronizar {
     @POST("ativar_desativa_pos_app.php")
     Call<Sincronizador> verificarSerial(@Field("opcao") String opcao, @Field("serial") String serial);
 
+    //RESETAR APP
+    @FormUrlEncoded
+    @POST("ativar_desativa_pos_app.php")
+    Call<Sincronizador> resetApp(@Field("opcao") String opcao, @Field("serial") String serial, @Field("codigo") String codigo);
+
     //SINCRONIZAR
     @FormUrlEncoded
     @POST("ativar_desativa_pos_app.php")

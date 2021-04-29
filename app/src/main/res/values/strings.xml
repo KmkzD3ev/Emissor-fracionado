@@ -2,6 +2,7 @@
     <string name="app_name">EmissorWeb</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_confirmar_dados_pedido">Confirmar Dados</string>
+    <string name="copy">©</string>
 
 
     <string name="testprinterbt2">Test Printer BT 2.0</string>
@@ -152,4 +153,6 @@
     <string name="rs">R$</string>
     <string name="title_activity_cancelar_pagamento_cartao">Cancelar Pagamento</string>
     <string name="retire_o_cartao">Retire o Cartão</string>
+    <string name="title_activity_reset_app">Reset App</string>
+    <string name="mensagem_reset">Insira o código que você recebeu</string>
 </resources>

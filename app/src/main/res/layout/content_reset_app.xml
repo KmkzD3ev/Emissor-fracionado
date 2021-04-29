@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <ImageView
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo"
+        android:visibility="visible" />
+
+
+    <LinearLayout
+        android:id="@+id/formReset"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/cod"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text=""
+            android:textSize="30sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Atenção, \nPara resetar o App, entre encontato com o suporte.\nEsta ação apagará todos os dados!"
+            android:textColor="#FFF3214B" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/serial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/serial"
+                android:imeActionLabel="Entrar"
+                android:imeOptions="actionSend"
+                android:inputType="number"
+                android:maxLength="9"
+                android:maxLines="1"
+                tools:ignore="Autofill" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/mensagem_reset" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <EditText
+                android:id="@+id/codA"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:gravity="center"
+                android:hint="@string/_0"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:maxLength="1"
+                android:maxLines="1"
+                tools:targetApi="o" />
+
+            <EditText
+                android:id="@+id/codB"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:gravity="center"
+                android:hint="@string/_0"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:maxLength="1"
+                android:maxLines="1"
+                tools:targetApi="o" />
+
+            <EditText
+                android:id="@+id/codC"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:gravity="center"
+                android:hint="@string/_0"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:maxLength="1"
+                android:maxLines="1"
+                tools:targetApi="o" />
+
+            <EditText
+                android:id="@+id/codD"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:gravity="center"
+                android:hint="@string/_0"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:maxLength="1"
+                android:maxLines="1"
+                tools:targetApi="o" />
+
+            <EditText
+                android:id="@+id/codE"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:gravity="center"
+                android:hint="@string/_0"
+                android:imeOptions="actionNext"
+                android:inputType="phone"
+                android:maxLength="1"
+                android:maxLines="1"
+                tools:targetApi="o" />
+
+            <EditText
+                android:id="@+id/codF"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:gravity="center"
+                android:hint="@string/_0"
+                android:imeOptions="actionSend"
+                android:inputType="phone"
+                android:maxLength="1"
+                android:maxLines="1"
+                tools:targetApi="o" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <Button
+                android:id="@+id/btnConfirmarCodigo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_esquerdo"
+                android:focusable="true"
+                android:text="RESETAR"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnReenviarCodigo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_nova_nfce_direta"
+                android:focusable="true"
+                android:text="CANCELAR"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                tools:ignore="ButtonStyle" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/msgReset"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/txtMsgReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Validando o reset, aguarde..."
+            android:textColor="#FFF3214B" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="30dp">
+
+        <TextView
+            android:id="@+id/copyright"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/zenitech" />
+
+    </LinearLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

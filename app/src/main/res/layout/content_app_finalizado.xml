@@ -35,7 +35,16 @@
         android:id="@+id/btnFecharApp"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
         android:background="@drawable/bg_btn_red"
         android:text="Fechar App"
+        android:textColor="@android:color/white" />
+
+    <Button
+        android:id="@+id/btnResetApp"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_btn_red"
+        android:text="Resetar App"
         android:textColor="@android:color/white" />
 </LinearLayout>

@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.multidex.BuildConfig;
 
 import android.os.StatFs;
 import android.text.SpannableString;
@@ -133,6 +134,14 @@ public class Sincronizar extends AppCompatActivity {
                 _verificarVersaoAtual();
             }
         }
+
+        findViewById(R.id.btnResetApp).setOnClickListener(view -> {
+            prefs.edit().putBoolean("reset", true).apply();
+            //
+            Intent i = new Intent(this, SplashScreen.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+        });
     }
 
     @Override

@@ -56,8 +56,8 @@
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:contentDescription="@string/app_name"
-                        android:tint="#EF5350"
-                        app:srcCompat="@drawable/ic_sentiment_dissatisfied" />
+                        app:srcCompat="@drawable/ic_sentiment_dissatisfied"
+                        app:tint="#EF5350" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -103,9 +103,9 @@
                             android:layout_marginEnd="16dp"
                             android:layout_marginRight="16dp"
                             android:contentDescription="@string/app_name"
-                            android:tint="@color/colorPrimary"
                             android:visibility="gone"
-                            app:srcCompat="@drawable/ic_vpn_key" />
+                            app:srcCompat="@drawable/ic_vpn_key"
+                            app:tint="@color/colorPrimary" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
@@ -135,6 +135,15 @@
                         android:layout_marginBottom="20dp"
                         android:background="@drawable/bg_btn"
                         android:text="@string/sincronizar"
+                        android:textColor="@android:color/white" />
+
+                    <Button
+                        android:id="@+id/btnResetApp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="30dp"
+                        android:background="@drawable/bg_btn_red"
+                        android:text="Resetar App"
                         android:textColor="@android:color/white" />
                 </LinearLayout>
 
@@ -180,8 +189,8 @@
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:contentDescription="@string/app_name"
-                        android:tint="@color/colorPrimary"
-                        app:srcCompat="@drawable/ic_sentiment_very_satisfied" />
+                        app:srcCompat="@drawable/ic_sentiment_very_satisfied"
+                        app:tint="@color/colorPrimary" />
 
                     <TextView
                         android:layout_width="wrap_content"

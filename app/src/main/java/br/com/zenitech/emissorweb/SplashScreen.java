@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.widget.Toast;
 
 import java.io.File;
@@ -31,6 +32,15 @@ public class SplashScreen extends AppCompatActivity {
         //
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         ed = prefs.edit();
+
+        if (prefs.getBoolean("reset", false)) {
+            //
+            Intent i = new Intent(this, ResetApp.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            finish();
+            return;
+        }
 
         //
         //bd = new DatabaseHelper(this);

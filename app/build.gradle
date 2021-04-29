@@ -19,8 +19,8 @@ android {
         applicationId "br.com.zenitech.emissorweb"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 34
-        versionName '3.3.4'
+        versionCode 35
+        versionName '3.3.5'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
@@ -63,8 +63,8 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.navigation:navigation-fragment:2.3.4'
-    implementation 'androidx.navigation:navigation-ui:2.3.4'
+    implementation 'androidx.navigation:navigation-fragment:2.3.5'
+    implementation 'androidx.navigation:navigation-ui:2.3.5'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.3.0', {

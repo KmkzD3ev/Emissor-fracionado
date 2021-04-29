@@ -61,10 +61,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
             "CARTÃO DE DÉBITO",
-            "DUPLICATA MERCANTIL",
-            "_______________________________________________________________________________________",
-            "CART. DE CRÉDITO E DINHEIRO",
-            "CART. DE DÉBITO E DINHEIRO"
+            "DUPLICATA MERCANTIL"
     };
 
     private Spinner spProduto, spFormasPagamento, spDescricaoCredenciadora, spBandeiraCredenciadora;

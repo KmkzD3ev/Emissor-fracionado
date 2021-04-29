@@ -1,5 +1,6 @@
 package br.com.zenitech.emissorweb;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -35,6 +36,14 @@ public class ConfiguracoesApp extends AppCompatActivity {
 
             Snackbar.make(view, "Impressora redefinida com sucesso!", Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
+        });
+
+        findViewById(R.id.btnReset).setOnClickListener(view -> {
+            prefs.edit().putBoolean("reset", true).apply();
+            //
+            Intent i = new Intent(this, SplashScreen.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
         });
     }
 
