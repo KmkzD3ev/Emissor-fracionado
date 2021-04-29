@@ -164,7 +164,7 @@
                     android:layout_marginTop="16dp"
                     android:paddingStart="16dp"
                     android:paddingLeft="16dp"
-                    android:text="Status da tranzação:"
+                    android:text="Status da transação:"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="20sp"
                     android:visibility="gone"
@@ -388,7 +388,7 @@
             android:layout_height="56dp"
             android:layout_alignParentBottom="true"
             android:background="@color/colorPrimary"
-            android:text="Enviar Tranzação"
+            android:text="Enviar Transação"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:visibility="gone" />

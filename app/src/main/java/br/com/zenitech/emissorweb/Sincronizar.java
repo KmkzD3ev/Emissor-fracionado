@@ -258,7 +258,7 @@ public class Sincronizar extends AppCompatActivity {
 
         final ISincronizar iSincronizar = ISincronizar.retrofit.create(ISincronizar.class);
 
-        final Call<Sincronizador> call = iSincronizar.verificarSerial("verificar_serial", serial.getText().toString());
+        final Call<Sincronizador> call = iSincronizar.verificarSerial("verificar_serial_emissor", serial.getText().toString());
 
         call.enqueue(new Callback<Sincronizador>() {
             @Override
@@ -271,7 +271,7 @@ public class Sincronizar extends AppCompatActivity {
                 } else {
                     //
                     erro = true;
-                    msgErro = "Serial inválido! Verifique o serial e tente novamente.";
+                    msgErro = "O serial é inválido ou já está sendo usado em outro aparelho! \nVerifique o serial e tente novamente.";
                     _limparDadosSincronizacao(false);
                     _resetarSincronismo(5000, true);
                 }
