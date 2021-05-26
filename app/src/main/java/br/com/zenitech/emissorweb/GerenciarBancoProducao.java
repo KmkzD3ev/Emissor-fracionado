@@ -254,6 +254,9 @@ public class GerenciarBancoProducao extends AppCompatActivity {
                         pedidos.getCpf_cliente(),
                         "",
                         "",
+                        "",
+                        "",
+                        "",
                         ""
                 );
 

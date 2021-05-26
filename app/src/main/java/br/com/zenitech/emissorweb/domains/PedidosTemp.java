@@ -1,7 +1,7 @@
 package br.com.zenitech.emissorweb.domains;
 
 
-public class Pedidos {
+public class PedidosTemp {
     private String id;
     private String situacao;
     private String protocolo;
@@ -12,10 +12,8 @@ public class Pedidos {
     private String hora_protocolo;
     private String cpf_cliente;
     private String forma_pagamento;
-    private String id_pedido_temp;
-    private String fracionado;
 
-    public Pedidos(String id, String situacao, String protocolo, String data, String hora, String valor_total, String data_protocolo, String hora_protocolo, String cpf_cliente, String forma_pagamento, String id_pedido_temp, String fracionado) {
+    public PedidosTemp(String id, String situacao, String protocolo, String data, String hora, String valor_total, String data_protocolo, String hora_protocolo, String cpf_cliente, String forma_pagamento) {
         this.id = id;
         this.situacao = situacao;
         this.protocolo = protocolo;
@@ -26,8 +24,6 @@ public class Pedidos {
         this.hora_protocolo = hora_protocolo;
         this.cpf_cliente = cpf_cliente;
         this.forma_pagamento = forma_pagamento;
-        this.id_pedido_temp = id_pedido_temp;
-        this.fracionado = fracionado;
     }
 
     public String getId() {
@@ -108,21 +104,5 @@ public class Pedidos {
 
     public void setForma_pagamento(String forma_pagamento) {
         this.forma_pagamento = forma_pagamento;
-    }
-
-    public String getId_pedido_temp() {
-        return id_pedido_temp;
-    }
-
-    public void setId_pedido_temp(String id_pedido_temp) {
-        this.id_pedido_temp = id_pedido_temp;
-    }
-
-    public String getFracionado() {
-        return fracionado;
-    }
-
-    public void setFracionado(String fracionado) {
-        this.fracionado = fracionado;
     }
 }

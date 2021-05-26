@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 public class ClassAuxiliar {
 
@@ -490,5 +491,83 @@ public class ClassAuxiliar {
         }
 
         return mascara.toString();
+    }
+
+    public String getIdFormaPagamento(String s) {
+        s = this.removerAcentos(s);
+        String idFormaPagamento = "";
+        if (Objects.requireNonNull(s).equalsIgnoreCase("DINHEIRO")) {
+            idFormaPagamento = "1";
+
+        } else if (s.equalsIgnoreCase("CHEQUE")) {
+            idFormaPagamento = "2";
+
+        } else if (s.equalsIgnoreCase("CARTAO DE CREDITO")) {
+            idFormaPagamento = "3";
+
+        } else if (s.equalsIgnoreCase("CARTAO DE DEBITO")) {
+            idFormaPagamento = "4";
+
+        } else if (s.equalsIgnoreCase("CREDITO LOJA")) {
+            idFormaPagamento = "5";
+
+        } else if (s.equalsIgnoreCase("VALE ALIMENTACAO")) {
+            idFormaPagamento = "6";
+
+        } else if (s.equalsIgnoreCase("VALE REFEICAO")) {
+            idFormaPagamento = "7";
+
+        } else if (s.equalsIgnoreCase("VALE PRESENTE")) {
+            idFormaPagamento = "8";
+
+        } else if (s.equalsIgnoreCase("VALE COMBUSTIVEL")) {
+            idFormaPagamento = "9";
+
+        } else if (s.equalsIgnoreCase("OUTROS")) {
+            idFormaPagamento = "10";
+        } else if (s.equalsIgnoreCase("DUPLICATA MERCANTIL")) {
+            idFormaPagamento = "11";
+        }
+
+        return idFormaPagamento;
+    }
+
+    public String getNomeFormaPagamento(String s) {
+        s = this.removerAcentos(s);
+        String nomeGPG = "";
+        if (Objects.requireNonNull(s).equalsIgnoreCase("1")) {
+            nomeGPG = "DINHEIRO";
+
+        } else if (s.equalsIgnoreCase("2")) {
+            nomeGPG = "CHEQUE";
+
+        } else if (s.equalsIgnoreCase("3")) {
+            nomeGPG = "CARTAO DE CREDITO";
+
+        } else if (s.equalsIgnoreCase("4")) {
+            nomeGPG = "CARTAO DE DEBITO";
+
+        } else if (s.equalsIgnoreCase("5")) {
+            nomeGPG = "CREDITO LOJA";
+
+        } else if (s.equalsIgnoreCase("6")) {
+            nomeGPG = "VALE ALIMENTACAO";
+
+        } else if (s.equalsIgnoreCase("7")) {
+            nomeGPG = "VALE REFEICAO";
+
+        } else if (s.equalsIgnoreCase("8")) {
+            nomeGPG = "VALE PRESENTE";
+
+        } else if (s.equalsIgnoreCase("9")) {
+            nomeGPG = "VALE COMBUSTIVEL";
+
+        } else if (s.equalsIgnoreCase("10")) {
+            nomeGPG = "OUTROS";
+        } else if (s.equalsIgnoreCase("11")) {
+            nomeGPG = "DUPLICATA MERCANTIL";
+        }
+
+        return nomeGPG;
     }
 }

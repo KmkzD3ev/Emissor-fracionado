@@ -5,4 +5,6 @@
     <color name="colorAccent">#009688</color>
 
     <color name="colorErro">#E57373</color>
+    <color name="transparente">#00ffffff</color>
+    <color name="erro">#ffd2d2</color>
 </resources>

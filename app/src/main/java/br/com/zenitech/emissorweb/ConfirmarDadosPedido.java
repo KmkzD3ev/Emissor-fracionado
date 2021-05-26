@@ -83,6 +83,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
     // INFORMAR ERRO
     private boolean erroTransmitir = false;
+    // SE 1 INFORMA QUE A NOTA FOI FRACIONADA
+    String NotaFracionada = "0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +147,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 //ed.putInt("id_pedido", (prefs.getInt("id_pedido", 0) + 1)).apply();
                 //id = prefs.getInt("id_pedido", 1);
 
+                //id = Integer.parseInt(bd.getUltimoIdPedido());
+
                 boolean siac = false;
 
                 try {
@@ -173,41 +177,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     produto.setText(params.getString("produto"));
                     qnt.setText(params.getString("qnt"));
                     vlt.setText(params.getString("vlt"));
-
-                    //FORMAS DE PAGAMENTO
-                    String s = removerAcentos(params.getString("formaPagamento"));
-                    Log.i(TAG + " removerAcentos - ", s);
-                    if (Objects.requireNonNull(s).equalsIgnoreCase("DINHEIRO")) {
-                        idFormaPagamento = "1";
-
-                    } else if (s.equalsIgnoreCase("CHEQUE")) {
-                        idFormaPagamento = "2";
-
-                    } else if (s.equalsIgnoreCase("CARTAO DE CREDITO")) {
-                        idFormaPagamento = "3";
-                        Log.i(TAG + " ID Form Pag - ", idFormaPagamento);
-
-                    } else if (s.equalsIgnoreCase("CARTAO DE DEBITO")) {
-                        idFormaPagamento = "4";
-
-                    } else if (s.equalsIgnoreCase("CREDITO LOJA")) {
-                        idFormaPagamento = "5";
-
-                    } else if (s.equalsIgnoreCase("VALE ALIMENTACAO")) {
-                        idFormaPagamento = "6";
-
-                    } else if (s.equalsIgnoreCase("VALE REFEICAO")) {
-                        idFormaPagamento = "7";
-
-                    } else if (s.equalsIgnoreCase("VALE PRESENTE")) {
-                        idFormaPagamento = "8";
-
-                    } else if (s.equalsIgnoreCase("VALE COMBUSTIVEL")) {
-                        idFormaPagamento = "9";
-
-                    } else if (s.equalsIgnoreCase("OUTROS")) {
-                        idFormaPagamento = "10";
-                    }
+                    //idFormaPagamento = cAux.getIdFormaPagamento(params.getString("formaPagamento"));
+                    idFormaPagamento = bd.getFormasPagamentoPedido(bd.getUltimoIdPedido());
 
                     credenciadora = params.getString("credenciadora");
                     cod_aut = params.getString("cod_aut");
@@ -241,7 +212,13 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 }
 
                 //SE A QUANTIDADE FOR MAIOR QUE 5 FRACIONA EM NOTAS DE ATÉ 5 UNIDADES
-                fracionar();
+                //fracionar();
+
+                elementosPedidos = bd.getPedidosTransmitirFecharDia();
+                transmitir = elementosPedidos.size();
+                transmitindo = elementosPedidos.size();
+
+                Log.i(TAG, String.valueOf(elementosPedidos.size()));
 
             }
         }
@@ -266,14 +243,11 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         });
     }
 
-    public static String removerAcentos(String str) {
-        return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-    }
-
     public void fracionar() {
         if (quantidade > 5) {
             Random r = new Random();
             random = r.nextInt(6 - 1) + 1;
+            NotaFracionada = "1";
         } else {
             random = quantidade;
         }
@@ -293,8 +267,11 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         dataHoraNota.setText(String.format("%s %s", data, hora));
 
         //-------CRIA UM ID PARA O PEDIDO------//
-        ed.putInt("id_pedido", (prefs.getInt("id_pedido", 0) + 1)).apply();
+        ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedido()) + prefs.getInt("id_pedido", 0) + 1)).apply();
         id = prefs.getInt("id_pedido", 1);
+
+        //id = Integer.parseInt(bd.getUltimoIdPedido());
+
 
         //INSERI O PEDIDO NO BANCO DE DADOS
         addPedido(
@@ -320,6 +297,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
             Log.i(TAG, String.valueOf(elementosPedidos.size()));
         }
+
+        id += 1;
     }
 
     int count = 1;
@@ -364,6 +343,24 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
                     //
                     final IValidarNFCe iValidarNFCe = IValidarNFCe.retrofit.create(IValidarNFCe.class);
+                    //
+                    valorUnit = String.valueOf(cAux.converterValores(vlt.getText().toString()));
+                    //MULTIPLICA O VALOR PELA QUANTIDADE
+                    String[] multiplicar = {valorUnit, qnt.getText().toString()};
+
+                    /*if (pedidos.getFracionado().equalsIgnoreCase("1")) {
+                        valorFormaPGPedido = String.valueOf(cAux.multiplicar(multiplicar));
+                    } else {
+                        valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                        idFormaPGPedido = bd.getIdFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    }*/
+                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, fracionada;
+
+                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    //fracionada = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+
 
                     //Toast.makeText(contexto, valorUnit, Toast.LENGTH_LONG).show();
                     final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
@@ -372,11 +369,14 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                             posApp.getSerial(),
                             itensPedidos.getProduto(),
                             itensPedidos.getValor().replace(".", ""),
-                            pedidos.getForma_pagamento(),
+                            idFormaPGPedido,
                             pedidos.getCpf_cliente(),
                             credenciadora,
                             cod_aut,
-                            nsu
+                            nsu,
+                            valorFormaPGPedido,
+                            nAutoCartao,
+                            pedidos.getFracionado()
                     );
 
                     call.enqueue(new Callback<ValidarNFCe>() {
@@ -532,7 +532,9 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 dataProtocolo,//DATA PROTOCOLO - "28042017"
                 horaProtocolo,//HORA PROTOCOLO - "151540"
                 cpf,//CPF/CNPJ CLIENTE
-                FPagamento//FORMA PAGAMENTO
+                FPagamento,//FORMA PAGAMENTO
+                bd.getUltimoIdPedido(),
+                NotaFracionada
         ));
 
         //
@@ -581,7 +583,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
                     //NOTA
                     i.putExtra("imprimir", "nota");
-                    i.putExtra("pedido", "" + id);
+                    i.putExtra("pedido", "" + bd.getUltimoIdPedido());// id
                     i.putExtra("cliente", (!cpfCnpj_cliente.getText().toString().equals("") ? cpfCnpj_cliente.getText().toString() : "CONSUMIDOR NAO IDENTIFICADO"));
                     i.putExtra("id_produto", "" + bd.getIdProduto(produto.getText().toString()));
                     i.putExtra("produto", produto.getText().toString());
@@ -598,7 +600,9 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     i.putExtra("tributosN", cAux.maskMoney(new BigDecimal(String.valueOf(tributoN))));
                     i.putExtra("tributosE", cAux.maskMoney(new BigDecimal(String.valueOf(tributoE))));
                     i.putExtra("tributosM", cAux.maskMoney(new BigDecimal(String.valueOf(tributoM))));
-                    i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
+                    //i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
+                    i.putExtra("form_pagamento", bd.getFormasPagamentoPedidoPrint(bd.getUltimoIdPedido()));
+                    //bd.getFormasPagamentoPedidoPrint(String.valueOf(id));
 
                     Log.e(TAG,
                             "pedido: " + id + "\n" +
@@ -646,7 +650,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
                         //NOTA
                         i.putExtra("imprimir", "nota");
-                        i.putExtra("pedido", "" + id);
+                        i.putExtra("pedido", "" + bd.getUltimoIdPedido());// id
                         i.putExtra("cliente", (!cpfCnpj_cliente.getText().toString().equals("") ? cpfCnpj_cliente.getText().toString() : "CONSUMIDOR NAO IDENTIFICADO"));
                         i.putExtra("id_produto", "" + bd.getIdProduto(produto.getText().toString()));
                         i.putExtra("produto", produto.getText().toString());
@@ -663,7 +667,9 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                         i.putExtra("tributosN", cAux.maskMoney(new BigDecimal(String.valueOf(tributoN))));
                         i.putExtra("tributosE", cAux.maskMoney(new BigDecimal(String.valueOf(tributoE))));
                         i.putExtra("tributosM", cAux.maskMoney(new BigDecimal(String.valueOf(tributoM))));
-                        i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
+                        //i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
+
+                        i.putExtra("form_pagamento", bd.getFormasPagamentoPedidoPrint(bd.getUltimoIdPedido()));
 
                         Log.e(TAG,
                                 "pedido: " + id + "\n" +
@@ -695,7 +701,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                         " ",
                         "",
                         "",
-                        String.valueOf(id)
+                        bd.getUltimoIdPedido()// idString.valueOf(id)
                 );
 
                 if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {

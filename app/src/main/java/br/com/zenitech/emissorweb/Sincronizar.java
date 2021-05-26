@@ -23,7 +23,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.multidex.BuildConfig;
 
 import android.os.StatFs;
 import android.text.SpannableString;

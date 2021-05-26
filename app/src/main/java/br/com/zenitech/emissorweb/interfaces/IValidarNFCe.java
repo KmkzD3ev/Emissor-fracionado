@@ -13,7 +13,7 @@ public interface IValidarNFCe {
 
     // TRANSMITIR NOTAS NFC-E
     @FormUrlEncoded
-    @POST("autorizador_app_novo.php")
+    @POST("autorizador_app_novo_v1.php")
     Call<ValidarNFCe> validarNota(
             @Field("PEDIDO") String pedido,
             @Field("QTD") String qtd,
@@ -24,7 +24,10 @@ public interface IValidarNFCe {
             @Field("CPFCLI") String cpfcli,
             @Field("CREDENCIADORA") String credenciadora,
             @Field("CAUTS") String codaut,
-            @Field("NSU") String nsu
+            @Field("NSU") String nsu,
+            @Field("VLRFORMAP") String vlrformap,
+            @Field("NAUTOCARTAO") String nautocartao,
+            @Field("FRACIONADA") String fracionada
     );
 
     Retrofit retrofit = new Retrofit.Builder()

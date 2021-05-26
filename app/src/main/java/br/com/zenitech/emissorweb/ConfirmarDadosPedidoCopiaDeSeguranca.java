@@ -18,9 +18,12 @@ import android.graphics.Paint;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -146,7 +149,7 @@ public class ConfirmarDadosPedidoCopiaDeSeguranca extends AppCompatActivity impl
                 break;
         }
 
-		/* 启动蓝牙 */
+        /* 启动蓝牙 */
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         if (null != adapter) {
             if (!adapter.isEnabled()) {
@@ -383,6 +386,9 @@ public class ConfirmarDadosPedidoCopiaDeSeguranca extends AppCompatActivity impl
                 cpfCnpj_cliente.getText().toString(),
                 "",
                 "",
+                "",
+                "",
+                "",
                 ""
         );
 
@@ -531,7 +537,9 @@ public class ConfirmarDadosPedidoCopiaDeSeguranca extends AppCompatActivity impl
                 dataProtocolo,//DATA PROTOCOLO - "28042017"
                 horaProtocolo,//HORA PROTOCOLO - "151540"
                 cpf,//CPF/CNPJ CLIENTE
-                FPagamento//FORMA PAGAMENTO
+                FPagamento,//FORMA PAGAMENTO
+                bd.getUltimoIdPedido(),
+                ""
         ));
 
         //
