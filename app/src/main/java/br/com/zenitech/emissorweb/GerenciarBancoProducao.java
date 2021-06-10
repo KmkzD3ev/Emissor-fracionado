@@ -96,7 +96,7 @@ public class GerenciarBancoProducao extends AppCompatActivity {
         posApp = elementosPos.get(0);
 
         // SE O SERIAL FOR DE TESTE ATIVA O MODO TESTE
-        if (posApp.getSerial().equals("410000002")) {
+        if (posApp.getSerial().equals("005000002")) {
             modo_teste = true;
         }
 
@@ -235,53 +235,61 @@ public class GerenciarBancoProducao extends AppCompatActivity {
             pedidos = elementosPedidos.get(linhaPed);
             //
             elementosItens = bd.getItensPedido(pedidos.getId());
-            if (elementosItens.size() != 0) {
-                itensPedidos = elementosItens.get(0);
 
-                transmitindo = linhaPed;
+            try {
+                if (elementosItens.size() != 0) {
+                    itensPedidos = elementosItens.get(0);
+
+                    transmitindo = linhaPed;
 
 
-                //
-                final IValidarNFCe iValidarNFCe = IValidarNFCe.retrofit.create(IValidarNFCe.class);
+                    //
+                    final IValidarNFCe iValidarNFCe = IValidarNFCe.retrofit.create(IValidarNFCe.class);
 
-                final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
-                        pedidos.getId(),
-                        itensPedidos.getQuantidade(),
-                        posApp.getSerial(),//"123456780",
-                        itensPedidos.getProduto(),
-                        itensPedidos.getValor().replace(".", ""),
-                        pedidos.getForma_pagamento(),
-                        pedidos.getCpf_cliente(),
-                        "",
-                        "",
-                        "",
-                        "",
-                        "",
-                        ""
-                );
+                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, fracionada;
 
-                call.enqueue(new Callback<ValidarNFCe>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ValidarNFCe> call, @NonNull Response<ValidarNFCe> response) {
+                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
 
-                        //
-                        final ValidarNFCe sincronizacao = response.body();
-                        if (sincronizacao != null) {
+                    final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
+                            pedidos.getId(),
+                            itensPedidos.getQuantidade(),
+                            posApp.getSerial(),//"123456780",
+                            itensPedidos.getProduto(),
+                            itensPedidos.getValor().replace(".", ""),
+                            idFormaPGPedido,
+                            pedidos.getCpf_cliente(),
+                            "",
+                            "",
+                            "",
+                            valorFormaPGPedido,
+                            nAutoCartao,
+                            pedidos.getFracionado()
+                    );
 
-                            Log.i(TAG, sincronizacao.getProtocolo());
-                            Log.i(TAG, sincronizacao.getErro());
+                    call.enqueue(new Callback<ValidarNFCe>() {
+                        @Override
+                        public void onResponse(@NonNull Call<ValidarNFCe> call, @NonNull Response<ValidarNFCe> response) {
 
                             //
-                            runOnUiThread(() -> {
+                            final ValidarNFCe sincronizacao = response.body();
+                            if (sincronizacao != null) {
 
-                                //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
-                                if (pd != null && pd.isShowing()) {
-                                    pd.dismiss();
-                                }
+                                Log.i(TAG, sincronizacao.getProtocolo());
+                                Log.i(TAG, sincronizacao.getErro());
 
-                                // MODO TESTE SERIAL 123456780
-                                // CASO O MODO TESTE ESTEJA ATIVO, FAZ O UPDATE PARA "ON" MESMO SEM PROTOCOLO
-                                if (!modo_teste) {
+                                //
+                                runOnUiThread(() -> {
+
+                                    //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
+                                    if (pd != null && pd.isShowing()) {
+                                        pd.dismiss();
+                                    }
+
+                                    // MODO TESTE SERIAL 123456780
+                                    // CASO O MODO TESTE ESTEJA ATIVO, FAZ O UPDATE PARA "ON" MESMO SEM PROTOCOLO
+                                    if (!modo_teste) {
 
                                     /*// SE O PROTOCOLO FOR IGUAL A 0000000000 EXCLUIR DO BANCO DE DADOS - NOTA INUTILIZADA
                                     if (!sincronizacao.getProtocolo().isEmpty() && sincronizacao.getProtocolo().equalsIgnoreCase("0000000000")) {
@@ -290,90 +298,101 @@ public class GerenciarBancoProducao extends AppCompatActivity {
 
 
                                     }*/
-                                    if (!sincronizacao.getProtocolo().isEmpty() && sincronizacao.getProtocolo().length() >= 10) {
+                                        if (!sincronizacao.getProtocolo().isEmpty() && sincronizacao.getProtocolo().length() >= 10) {
 
-                                        //INSERI O PEDIDO NO BANCO DE DADOS
+                                            //INSERI O PEDIDO NO BANCO DE DADOS
+                                            bd.upadtePedidosTransmissao(
+                                                    "ON",
+                                                    sincronizacao.getProtocolo(),
+                                                    cAux.soNumeros(cAux.inserirDataAtual()),
+                                                    cAux.soNumeros(cAux.horaAtual()),
+                                                    pedidos.getId()
+                                            );
+
+                                        } else {
+
+                                            //
+                                            erroSinc++;
+
+                                            //
+                                            bd.upadtePedidosTransmissao(
+                                                    "OFF",
+                                                    " ",
+                                                    "",
+                                                    "",
+                                                    pedidos.getId()
+                                            );
+
+                                        }
+                                    } else {
+                                        //
                                         bd.upadtePedidosTransmissao(
                                                 "ON",
-                                                sincronizacao.getProtocolo(),
-                                                cAux.soNumeros(cAux.inserirDataAtual()),
-                                                cAux.soNumeros(cAux.horaAtual()),
-                                                pedidos.getId()
-                                        );
-
-                                    } else {
-
-                                        //
-                                        erroSinc++;
-
-                                        //
-                                        bd.upadtePedidosTransmissao(
-                                                "OFF",
                                                 " ",
                                                 "",
                                                 "",
                                                 pedidos.getId()
                                         );
-
                                     }
-                                } else {
-                                    //
-                                    bd.upadtePedidosTransmissao(
-                                            "ON",
-                                            " ",
-                                            "",
-                                            "",
-                                            pedidos.getId()
-                                    );
-                                }
 
+                                    transmitirNota();
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<ValidarNFCe> call, @NonNull Throwable t) {
+
+                            //NSdadosNFCeCont.setVisibility(View.VISIBLE);
+                            //NSdadosNFCe.setVisibility(View.GONE);
+
+                            Log.i("ERRO", "" + t);
+
+                            //
+                            bd.upadtePedidosTransmissao(
+                                    "OFF",
+                                    " ",
+                                    "",
+                                    "",
+                                    pedidos.getId()
+                            );
+
+                            //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
+                            if (pd != null && pd.isShowing()) {
+                                pd.dismiss();
+                            }
+
+                            // VERIFICA A QUANTIDADE DE ERROS
+                            if (erro > 3) {
+                                erro++;
                                 transmitirNota();
-                            });
+                            } else {
+                                Log.i(TAG, "Mais de 3 erros");
+                            }
                         }
-                    }
+                    });
+                }
+            } catch (Exception e) {
+                //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
+                /*if (pd != null && pd.isShowing()) {
+                    pd.dismiss();
+                }*/
 
-                    @Override
-                    public void onFailure(@NonNull Call<ValidarNFCe> call, @NonNull Throwable t) {
+                Log.i(TAG, Objects.requireNonNull(e.getMessage()));
 
-                        //NSdadosNFCeCont.setVisibility(View.VISIBLE);
-                        //NSdadosNFCe.setVisibility(View.GONE);
+                //erroTransmitir = true;
 
-                        Log.i("ERRO", "" + t);
-
-                        //
-                        bd.upadtePedidosTransmissao(
-                                "OFF",
-                                " ",
-                                "",
-                                "",
-                                pedidos.getId()
-                        );
-
-                        //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
-                        if (pd != null && pd.isShowing()) {
-                            pd.dismiss();
-                        }
-
-                        // VERIFICA A QUANTIDADE DE ERROS
-                        if (erro > 3) {
-                            erro++;
-                            transmitirNota();
-                        } else {
-                            Log.i(TAG, "Mais de 3 erros");
-                        }
-                    }
-                });
             }
         } else {
             //Toast.makeText(context, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
 
-            if(erroSinc > 0){
+            if (erroSinc > 0) {
                 runOnUiThread(() -> {
                     imgSincronizarNotas.setImageDrawable(getResources().getDrawable(R.drawable.ic_sentiment_dissatisfied));
                     txtSincronizarNotas.setText("1 ou mais notas não foram sincronizadas. Contate um atendente!");
                     btnSincronizarNotas.setVisibility(View.VISIBLE);
                 });
-            }else {
+            } else {
                 //
                 runOnUiThread(() -> {
                     imgSincronizarNotas.setImageDrawable(getResources().getDrawable(R.drawable.ic_sentiment_very_satisfied));
