@@ -178,10 +178,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         btnAvancarNFCE.setOnClickListener(v -> VerificarCamposIniciarPedido(false));
 
         //
-        btnAddFormPag = findViewById(R.id.btnAddFormPag);
-        btnAddFormPag.setOnClickListener(v -> AddFormaPagamento(""));
-
-        //
         llCredenciadora = findViewById(R.id.llCredenciadora);
         formDadosPedido = findViewById(R.id.formDadosPedido);
         formFinanceiroPedido = findViewById(R.id.formFinanceiroPedido);
@@ -205,6 +201,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //
         etPreco = findViewById(R.id.etPreco);
         etPreco.addTextChangedListener(new FormPedidos.MoneyTextWatcher(etPreco));
+
+        //
+        btnAddFormPag = findViewById(R.id.btnAddFormPag);
+        btnAddFormPag.setOnClickListener(v -> AddFormaPagamento(etCodAutorizacao.getText().toString()));
 
         //
         txtCpfCnpjCli = findViewById(R.id.txtCpfCnpjCli);
@@ -376,7 +376,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 Toast.makeText(this, "Adicione uma valor para esta forma de pagamento.", Toast.LENGTH_LONG).show();
             } else {
 
-                AddFormaPagamento("");
+                AddFormaPagamento(etCodAutorizacao.getText().toString());
             }
         });
         btnPagCartao = findViewById(R.id.btnPagCartao);
@@ -400,7 +400,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void AddFormaPagamento(String authorizationCode) {
-        if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO") || spFormasPagamento.getSelectedItem().toString().equals("_______________________________________________________________________________________")) {
+        if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             ShowMsgToast("Selecione a forma de pagamento.");
         } else {
             bd.addFormasPagamentoPedidosTemp(new FormaPagamentoPedido(
@@ -413,7 +413,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
             //
             listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
-            adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente);
+            adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos);
             rvFinanceiro.setAdapter(adapter);
 
             //
@@ -445,6 +445,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             /*txtDocumentoFormaPagamento.setText("");
             tilDocumento.setVisibility(View.VISIBLE);*/
             spFormasPagamento.setSelection(0);
+            etCodAutorizacao.setText("");
 
             //ESCONDER O TECLADO
             // TODO Auto-generated method stub

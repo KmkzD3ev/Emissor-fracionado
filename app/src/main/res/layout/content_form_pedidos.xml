@@ -186,72 +186,6 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
-                        <LinearLayout
-                            android:id="@+id/llCredenciadora"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:visibility="gone">
-
-                            <Spinner
-                                android:id="@+id/spDescricaoCredenciadora"
-                                android:layout_width="match_parent"
-                                android:layout_height="45dp"
-                                android:dropDownWidth="match_parent" />
-
-                            <!--<View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:layout_margin="4dp"
-                                android:background="#747474" />
-
-                            <Spinner
-                                android:id="@+id/spBandeiraCredenciadora"
-                                android:layout_width="match_parent"
-                                android:layout_height="45dp"
-                                android:dropDownWidth="match_parent" />-->
-
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:layout_margin="4dp"
-                                android:background="#747474" />
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1">
-
-                                <EditText
-                                    android:id="@+id/etCodAutorizacao"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:hint="Cod. Autorização"
-                                    android:imeActionLabel="ADD"
-                                    android:imeOptions="actionNext"
-                                    android:maxLines="1" />
-
-                            </com.google.android.material.textfield.TextInputLayout>
-
-                            <com.google.android.material.textfield.TextInputLayout
-                                android:id="@+id/TiNsuCeara"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:visibility="gone">
-
-                                <EditText
-                                    android:id="@+id/etNsuCeara"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:hint="NSU"
-                                    android:imeActionLabel="ADD"
-                                    android:imeOptions="actionNext"
-                                    android:maxLines="1" />
-
-                            </com.google.android.material.textfield.TextInputLayout>
-                        </LinearLayout>
-
                         <Spinner
                             android:id="@+id/spProdutos"
                             android:layout_width="match_parent"
@@ -501,6 +435,83 @@
                     android:layout_height="0.8dp"
                     android:background="#e2e2e2" />
 
+                <LinearLayout
+                    android:id="@+id/llCredenciadora"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <Spinner
+                        android:id="@+id/spDescricaoCredenciadora"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="1dp"
+                        android:dropDownWidth="match_parent" />
+
+                    <!--<View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_margin="4dp"
+                        android:background="#747474" />
+
+                    <Spinner
+                        android:id="@+id/spBandeiraCredenciadora"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:dropDownWidth="match_parent" />-->
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.8dp"
+                        android:layout_margin="4dp"
+                        android:background="#e2e2e2" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1">
+
+                        <EditText
+                            android:id="@+id/etCodAutorizacao"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Cod. Autorização"
+                            android:imeActionLabel="ADD"
+                            android:imeOptions="actionNext"
+                            android:maxLines="1" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/TiNsuCeara"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:visibility="gone">
+
+                        <EditText
+                            android:id="@+id/etNsuCeara"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="NSU"
+                            android:imeActionLabel="ADD"
+                            android:imeOptions="actionNext"
+                            android:maxLines="1" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.8dp"
+                    android:background="#e2e2e2" />
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilDocumento"
                     android:layout_width="match_parent"
@@ -596,9 +607,9 @@
                     android:layout_weight="1"
                     android:background="?android:attr/selectableItemBackground"
                     android:padding="5dp"
-                    android:visibility="gone"
                     android:text="INICIAR PAGAMENTO"
-                    android:textColor="@color/colorPrimary" />
+                    android:textColor="@color/colorPrimary"
+                    android:visibility="gone" />
 
                 <View
                     android:layout_width="0.8dp"

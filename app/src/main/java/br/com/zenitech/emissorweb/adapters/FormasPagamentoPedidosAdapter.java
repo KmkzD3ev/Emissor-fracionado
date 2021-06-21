@@ -45,15 +45,19 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
     private Context context;
     private ArrayList<FormaPagamentoPedido> elementos;
 
+    ArrayList<Unidades> elementosUnidades;
+    Unidades unidades;
+
     /*String getId;
     String getId_pedido;
     String getValor;
     String codigoAutorizacao;
     int positionItem;*/
 
-    public FormasPagamentoPedidosAdapter(Context context, ArrayList<FormaPagamentoPedido> elementos) {
+    public FormasPagamentoPedidosAdapter(Context context, ArrayList<FormaPagamentoPedido> elementos, ArrayList<Unidades> elementosUnidades) {
         this.context = context;
         this.elementos = elementos;
+        this.elementosUnidades = elementosUnidades;
     }
 
     // Easy access to the context object in the recyclerview
@@ -98,10 +102,14 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
             final String codigoAutorizacao = formaPagamentoPedido.getCodigo_autorizacao();
             final int positionItem = position;
 
-            if (nomeFPG.equalsIgnoreCase("CARTAO DE CREDITO") ||
-                    nomeFPG.equalsIgnoreCase("CARTAO DE DEBITO")
+
+            unidades = elementosUnidades.get(0);
+
+            if ((nomeFPG.equalsIgnoreCase("CARTAO DE CREDITO") ||
+                    nomeFPG.equalsIgnoreCase("CARTAO DE DEBITO"))
+                    && !unidades.getCodloja().equalsIgnoreCase("")
             ) {
-                Log.e("Cancel", formaPagamentoPedido.getCodigo_autorizacao());
+                //Log.e("Cancel", formaPagamentoPedido.getCodigo_autorizacao());
                 iniciarTranzacao(codigoAutorizacao, getId, getId_pedido, getValor, positionItem);
             } else {
                 _excluirFpg(getId, getId_pedido, getValor, positionItem);
