@@ -961,6 +961,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(FORMA_PAGAMENTO_PEDIDOS, pedidos.getForma_pagamento());
         values.put("id_pedido_temp", pedidos.getId_pedido_temp());
         values.put("fracionado", pedidos.getFracionado());
+        values.put("credenciadora", pedidos.getCredenciadora());
         db.insert(TABELA_PEDIDOS, null, values);
         db.close();
     }
@@ -993,6 +994,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("id_forma_pagamento", formaPagamentoPedido.id_forma_pagamento);
         values.put("valor", formaPagamentoPedido.valor);
         values.put("codigo_autorizacao", formaPagamentoPedido.codigo_autorizacao);
+        values.put("bandeira", formaPagamentoPedido.cardBrand);
+        values.put("nsu", formaPagamentoPedido.codigo_autorizacao);
         db.insert("formas_pagamento_pedidos", null, values);
         db.close();
     }
@@ -1173,7 +1176,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private Pedidos cursorToPedidos(Cursor cursor) {
-        Pedidos pedidos = new Pedidos(null, null,null, null, null, null, null, null, null, null, null, null);
+        Pedidos pedidos = new Pedidos(null, null, null,null, null, null, null, null, null, null, null, null, null, null);
         //
         pedidos.setId(cursor.getString(0));
         pedidos.setSituacao(cursor.getString(1));
@@ -1185,8 +1188,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         pedidos.setHora_protocolo(cursor.getString(7));
         pedidos.setCpf_cliente(cursor.getString(8));
         pedidos.setForma_pagamento(cursor.getString(9));
-        pedidos.setId_pedido_temp(cursor.getString(10));
+        pedidos.setAutorizacao(cursor.getString(10));
+        pedidos.setId_pedido_temp(cursor.getString(11));
         pedidos.setFracionado(cursor.getString(12));
+        pedidos.setCredenciadora(cursor.getString(13));
         return pedidos;
     }
 
@@ -1194,7 +1199,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<Pedidos> getPedidos() {
         ArrayList<Pedidos> listaPedidos = new ArrayList<>();
 
-        String query = "SELECT * FROM " + TABELA_PEDIDOS + " ORDER BY " + ID_PEDIDOS + " DESC";
+        String query = "SELECT * FROM pedidos ORDER BY id DESC";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -1567,7 +1572,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<Pedidos> getPedidosTransmitirFecharDia() {
         ArrayList<Pedidos> listaPedidos = new ArrayList<>();
 
-        String query = "SELECT * FROM " + TABELA_PEDIDOS + " WHERE " + SITUACAO_PEDIDOS + " = 'OFF' OR " + SITUACAO_PEDIDOS + " = ''  ORDER BY " + ID_PEDIDOS + " DESC";
+        //String query = "SELECT * FROM pedidos WHERE situacao = 'OFF' OR situacao = ''  ORDER BY id DESC";
+        String query = "SELECT * " +
+                "FROM pedidos ped " +
+                "inner join formas_pagamento_pedidos fpp on fpp.id_pedido = ped.id_pedido_temp " +
+                "WHERE situacao = 'OFF' OR situacao = '' " +
+                "ORDER BY id DESC";
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
@@ -1839,7 +1849,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<String> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         db.beginTransaction();
-        String selectQuery = "Select * From credenciadoras";
+        String selectQuery = "SELECT * From credenciadoras GROUP BY cnpj_credenciadora";
         Cursor cursor = db.rawQuery(selectQuery, null);
         list.add("CREDENCIADORA");
         try {
@@ -1860,9 +1870,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
+    ArrayList<String> getIdCredenciadora() {
+        ArrayList<String> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction();
+        String selectQuery = "SELECT codigo_credenciadora From credenciadoras GROUP BY cnpj_credenciadora";
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        list.add("CREDENCIADORA");
+        try {
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    String nome = cursor.getString(cursor.getColumnIndex("codigo_credenciadora"));
+                    list.add(nome);
+                }
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return list;
+    }
+
     //CURSOR POS
     private FormaPagamentoPedido cursorFormaPagamentoPedido(Cursor cursor) {
-        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(null, null, null, null, null);
+        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(null, null, null, null, null, null, null);
 
         //
         formaPagamentoPedido.setId(cursor.getString(0));
@@ -1870,6 +1905,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         formaPagamentoPedido.setId_forma_pagamento(cursor.getString(2));
         formaPagamentoPedido.setValor(cursor.getString(3));
         formaPagamentoPedido.setCodigo_autorizacao(cursor.getString(4));
+        formaPagamentoPedido.setCardBrand(cursor.getString(5));
+        formaPagamentoPedido.setNsu(cursor.getString(6));
         return formaPagamentoPedido;
     }
 
@@ -1978,6 +2015,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         StringBuilder formasPag = new StringBuilder();
 
         String query = "SELECT codigo_autorizacao FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                formasPag.append(cursor.getString(0)).append(",");
+            } while (cursor.moveToNext());
+        }
+        return formasPag.toString();
+    }
+
+    //LISTAR TODOS OS ITENS DO FINANCEIRO
+    public String getBandeiraFormasPagamentoPedido(String id_pedido) {
+        StringBuilder formasPag = new StringBuilder();
+
+        String query = "SELECT bandeira FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                formasPag.append(cursor.getString(0)).append(",");
+            } while (cursor.moveToNext());
+        }
+        return formasPag.toString();
+    }
+
+    //LISTAR TODOS OS ITENS DO FINANCEIRO
+    public String getNSUFormasPagamentoPedido(String id_pedido) {
+        StringBuilder formasPag = new StringBuilder();
+
+        String query = "SELECT nsu FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
         myDataBase = this.getReadableDatabase();
         Cursor cursor = myDataBase.rawQuery(query, null);
 

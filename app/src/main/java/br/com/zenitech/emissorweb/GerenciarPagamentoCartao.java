@@ -612,7 +612,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
         builder.setNegativeButton("NÃO", (arg0, arg1) -> {
 
             // **
-            msg(true);
+            //msg(true);
         });
         //cria o AlertDialog
         alerta = builder.create();

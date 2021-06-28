@@ -141,7 +141,7 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
     }
 
     public void excluirItem(String codigo, String codigo_financeiro_app, String totalVenda, int position) {
-        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, null, null, null, null);
+        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, null, null, null, null, null, null);
         DatabaseHelper bd;
         bd = new DatabaseHelper(context);
         bd.deleteItemFormPagPedido(formaPagamentoPedido);

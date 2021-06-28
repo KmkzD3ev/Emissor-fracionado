@@ -81,6 +81,22 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             "DINHEIRO"
     };
     ArrayAdapter<String> adapterFormasPagamentoDinheiro;
+    ArrayList<String> listaCredenciadoras;
+    ArrayList<String> idCredenciadoras;
+    //"FORMA PAGAMENTO",
+    String[] listaBandeirasCredenciadoras = {
+            "BANDEIRA",
+            "Visa",
+            "Mastercard",
+            "American Express",
+            "Sorocred",
+            "Diners Club",
+            "Elo",
+            "Hipercard",
+            "Aura",
+            "Cabal",
+            "Outros"
+    };
 
 
     private ArrayList<FormaPagamentoPedido> listaFinanceiroCliente;
@@ -97,7 +113,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     AlertDialog alerta;
 
     private String precoMinimo, precoMaximo;
-    private ClassAuxiliar aux;
+    ClassAuxiliar aux;
 
     private int quant = 0;
 
@@ -204,7 +220,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         //
         btnAddFormPag = findViewById(R.id.btnAddFormPag);
-        btnAddFormPag.setOnClickListener(v -> AddFormaPagamento(etCodAutorizacao.getText().toString()));
+        btnAddFormPag.setOnClickListener(v -> AddFormaPagamento(etCodAutorizacao.getText().toString(), aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()), etNsuCeara.getText().toString()));
 
         //
         txtCpfCnpjCli = findViewById(R.id.txtCpfCnpjCli);
@@ -334,16 +350,20 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             }
         });
 
-        //LISTA DE PRODUTOS
-        ArrayList<String> listaCredenciadoras = bd.getCredenciadora();
+
+        idCredenciadoras = bd.getIdCredenciadora();
+        listaCredenciadoras = bd.getCredenciadora();
+        listaCredenciadoras.add("");
         ArrayAdapter adapterCredenciadora = new ArrayAdapter(this, android.R.layout.simple_spinner_item, listaCredenciadoras);
         adapterCredenciadora.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spDescricaoCredenciadora = findViewById(R.id.spDescricaoCredenciadora);
         spDescricaoCredenciadora.setAdapter(adapterCredenciadora);
 
         //
-        /*spBandeiraCredenciadora = findViewById(R.id.spBandeiraCredenciadora);
-        spBandeiraCredenciadora.setAdapter(adapterFormasPagamento);*/
+        ArrayAdapter adapterBandeiraCredenciadora = new ArrayAdapter(this, android.R.layout.simple_spinner_item, listaBandeirasCredenciadoras);
+        adapterBandeiraCredenciadora.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spBandeiraCredenciadora = findViewById(R.id.spBandeiraCredenciadora);
+        spBandeiraCredenciadora.setAdapter(adapterBandeiraCredenciadora);
 
         findViewById(R.id.btn_finalizar).setOnClickListener(v -> VerificarCamposIniciarPedido(false));
 
@@ -376,7 +396,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 Toast.makeText(this, "Adicione uma valor para esta forma de pagamento.", Toast.LENGTH_LONG).show();
             } else {
 
-                AddFormaPagamento(etCodAutorizacao.getText().toString());
+                AddFormaPagamento(etCodAutorizacao.getText().toString(), aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()), etNsuCeara.getText().toString());
             }
         });
         btnPagCartao = findViewById(R.id.btnPagCartao);
@@ -399,16 +419,35 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         });
     }
 
-    private void AddFormaPagamento(String authorizationCode) {
+    private void AddFormaPagamento(String authorizationCode, String cardBrand, String nsu) {
         if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             ShowMsgToast("Selecione a forma de pagamento.");
         } else {
+            if (unidades.getCodloja().equalsIgnoreCase("")) {
+                //
+                if (spFormasPagamento.getSelectedItem().toString().equals("CARTÃO DE CRÉDITO") || spFormasPagamento.getSelectedItem().toString().equals("CARTÃO DE DÉBITO")) {
+
+                    if (spDescricaoCredenciadora.getSelectedItem().toString().equals("CREDENCIADORA")) {
+                        ShowMsgToast("Selecione a credenciadora.");
+                        return;
+                    } else if (spBandeiraCredenciadora.getSelectedItem().toString().equals("BANDEIRA")) {
+                        ShowMsgToast("Selecione a bandeira.");
+                        return;
+                    } else if (etCodAutorizacao.getText().toString().equals("")) {
+                        ShowMsgToast("Informe o código de autorização.");
+                        return;
+                    }
+                }
+            }
+
             bd.addFormasPagamentoPedidosTemp(new FormaPagamentoPedido(
                     "",
                     String.valueOf(idTemp), //ID PEDIDO
                     aux.getIdFormaPagamento(spFormasPagamento.getSelectedItem().toString()),
                     "" + aux.converterValores(aux.soNumeros(txtValorFormaPagamento.getText().toString())),
-                    authorizationCode
+                    authorizationCode,
+                    cardBrand,
+                    nsu
             ));
 
             //
@@ -678,7 +717,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         }
 
         //
-        if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO") || spFormasPagamento.getSelectedItem().toString().equals("_______________________________________________________________________________________")) {
+        if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             ShowMsgToast("Selecione a forma de pagamento.");
         } else if (spProduto.getSelectedItem().toString().equals("PRODUTO")) {
             ShowMsgToast("Selecione um produto.");
@@ -692,6 +731,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 || valEtPreco.equals("0.00")) {
             ShowMsgToast("Informe o valor unitário.");
         } else {
+
 
             String[] ars = {precoMinimo, String.valueOf(aux.converterValores(etPreco.getText().toString()))};
             int vComp = aux.comparar(ars);
@@ -740,7 +780,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         i.putExtra("produto", spProduto.getSelectedItem().toString());
         i.putExtra("qnt", etQuantidade.getText().toString());
         i.putExtra("vlt", etPreco.getText().toString());
-        i.putExtra("credenciadora", spDescricaoCredenciadora.getSelectedItem().toString());
+        i.putExtra("credenciadora", idCredenciadoras.get(spDescricaoCredenciadora.getSelectedItemPosition()));//spDescricaoCredenciadora.getSelectedItem().toString()
+        i.putExtra("bandeira", aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()));
         i.putExtra("cod_aut", etCodAutorizacao.getText().toString());
         i.putExtra("nsu", etNsuCeara.getText().toString());
 
@@ -998,7 +1039,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
                 //confirmar();
                 ShowMsgToast(data.getStringExtra("result"));
-                AddFormaPagamento(data.getStringExtra("authorizationCode"));
+                AddFormaPagamento(data.getStringExtra("authorizationCode"), aux.getIdBandeira(data.getStringExtra("cardBrand")), data.getStringExtra("nsu"));
                 //Timber.tag("Stone").i(Objects.requireNonNull(data.getStringExtra("authorizationCode")));
             }
             if (resultCode == Activity.RESULT_CANCELED) {
@@ -1160,8 +1201,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 horaProtocolo,//HORA PROTOCOLO - "151540"
                 cpf,//CPF/CNPJ CLIENTE
                 FPagamento,//FORMA PAGAMENTO
+                "",
                 bd.getUltimoIdPedido(),
-                NotaFracionada
+                NotaFracionada,
+                spDescricaoCredenciadora.getSelectedItem().toString()
         ));
 
         //

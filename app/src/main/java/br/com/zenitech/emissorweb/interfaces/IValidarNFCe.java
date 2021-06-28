@@ -27,6 +27,7 @@ public interface IValidarNFCe {
             @Field("NSU") String nsu,
             @Field("VLRFORMAP") String vlrformap,
             @Field("NAUTOCARTAO") String nautocartao,
+            @Field("BANDEIRA") String bandeira,
             @Field("FRACIONADA") String fracionada
     );
 

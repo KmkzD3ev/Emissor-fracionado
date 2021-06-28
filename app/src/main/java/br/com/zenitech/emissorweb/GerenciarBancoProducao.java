@@ -73,6 +73,8 @@ public class GerenciarBancoProducao extends AppCompatActivity {
     LinearLayout btnSincronizarNotas;
     LinearLayout btnSincronizarNotasFinalizar;
 
+    String credenciadora, cod_aut, nsu, bandeira;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -246,25 +248,33 @@ public class GerenciarBancoProducao extends AppCompatActivity {
                     //
                     final IValidarNFCe iValidarNFCe = IValidarNFCe.retrofit.create(IValidarNFCe.class);
 
-                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, fracionada;
+                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, bandeiraFPG, nsuFPG, fracionada;
 
-                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    nsuFPG = bd.getNSUFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+
+                    // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
+                    if (!unidades.getCodloja().equalsIgnoreCase("")) {
+                        credenciadora = "STONE";
+                    }
 
                     final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
                             pedidos.getId(),
                             itensPedidos.getQuantidade(),
-                            posApp.getSerial(),//"123456780",
+                            posApp.getSerial(),
                             itensPedidos.getProduto(),
                             itensPedidos.getValor().replace(".", ""),
                             idFormaPGPedido,
                             pedidos.getCpf_cliente(),
-                            "",
-                            "",
-                            "",
+                            credenciadora,
+                            cod_aut,
+                            nsuFPG,
                             valorFormaPGPedido,
                             nAutoCartao,
+                            bandeiraFPG,
                             pedidos.getFracionado()
                     );
 

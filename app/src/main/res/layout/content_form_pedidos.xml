@@ -423,7 +423,7 @@
                 <Spinner
                     android:id="@+id/spFormasPagamentoCliente"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="40dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginEnd="10dp"
@@ -445,7 +445,7 @@
                     <Spinner
                         android:id="@+id/spDescricaoCredenciadora"
                         android:layout_width="match_parent"
-                        android:layout_height="45dp"
+                        android:layout_height="40dp"
                         android:layout_marginStart="10dp"
                         android:layout_marginLeft="10dp"
                         android:layout_marginEnd="10dp"
@@ -453,17 +453,22 @@
                         android:layout_marginBottom="1dp"
                         android:dropDownWidth="match_parent" />
 
-                    <!--<View
+                    <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_margin="4dp"
-                        android:background="#747474" />
+                        android:background="#e2e2e2" />
 
                     <Spinner
                         android:id="@+id/spBandeiraCredenciadora"
                         android:layout_width="match_parent"
-                        android:layout_height="45dp"
-                        android:dropDownWidth="match_parent" />-->
+                        android:layout_height="40dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="1dp"
+                        android:dropDownWidth="match_parent" />
 
                     <View
                         android:layout_width="match_parent"

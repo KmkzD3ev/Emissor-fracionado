@@ -570,4 +570,41 @@ public class ClassAuxiliar {
 
         return nomeGPG;
     }
+
+    public String getIdBandeira(String s) {
+        s = this.removerAcentos(s);
+        String idFormaPagamento = "";
+        if (Objects.requireNonNull(s).equalsIgnoreCase("Visa")) {
+            idFormaPagamento = "1";
+
+        } else if (s.equalsIgnoreCase("Mastercard")) {
+            idFormaPagamento = "2";
+
+        } else if (s.equalsIgnoreCase("American Express")) {
+            idFormaPagamento = "3";
+
+        } else if (s.equalsIgnoreCase("Sorocred")) {
+            idFormaPagamento = "4";
+
+        } else if (s.equalsIgnoreCase("Diners Club")) {
+            idFormaPagamento = "5";
+
+        } else if (s.equalsIgnoreCase("Elo")) {
+            idFormaPagamento = "6";
+
+        } else if (s.equalsIgnoreCase("Hipercard")) {
+            idFormaPagamento = "7";
+
+        } else if (s.equalsIgnoreCase("Aura")) {
+            idFormaPagamento = "8";
+
+        } else if (s.equalsIgnoreCase("Cabal")) {
+            idFormaPagamento = "9";
+
+        } else if (s.equalsIgnoreCase("Outros")) {
+            idFormaPagamento = "99";
+        }
+
+        return idFormaPagamento;
+    }
 }

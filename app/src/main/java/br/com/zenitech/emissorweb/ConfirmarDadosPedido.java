@@ -73,7 +73,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
     ArrayList<ItensPedidos> elementosItens;
     ItensPedidos itensPedidos;
 
-    String idFormaPagamento, credenciadora, cod_aut, nsu;
+    String idFormaPagamento, credenciadora, cod_aut, nsu, bandeira;
 
     //QUANTIDADE FRAGMENTADA
     int quantidade = 0;
@@ -183,6 +183,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     credenciadora = params.getString("credenciadora");
                     cod_aut = params.getString("cod_aut");
                     nsu = params.getString("nsu");
+                    //sdfsd
                 }
 
                 //
@@ -284,7 +285,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 "",
                 cpfCnpj_cliente.getText().toString(),
                 idFormaPagamento,
-                String.valueOf(random)
+                String.valueOf(random),
+                credenciadora
         );
 
         if (quantidade > 0) {
@@ -354,15 +356,30 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                         valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
                         idFormaPGPedido = bd.getIdFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
                     }*/
-                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, fracionada;
+                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, bandeiraFPG, nsuFPG, fracionada;
 
-                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    /*valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    nsuFPG = bd.getNSUFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
                     idFormaPGPedido = bd.getIdFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
+                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");*/
                     //fracionada = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
 
+                    Log.e("IDTEMP", "" + pedidos.getId_pedido_temp());
+
+                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    nsuFPG = bd.getNSUFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
 
                     //Toast.makeText(contexto, valorUnit, Toast.LENGTH_LONG).show();
+
+                    // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
+                    if (!unidades.getCodloja().equalsIgnoreCase("")) {
+                        credenciadora = "STONE";
+                    }
+
                     final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
                             pedidos.getId(),
                             itensPedidos.getQuantidade(),
@@ -373,9 +390,10 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                             pedidos.getCpf_cliente(),
                             credenciadora,
                             cod_aut,
-                            nsu,
+                            nsuFPG,
                             valorFormaPGPedido,
                             nAutoCartao,
+                            bandeiraFPG,
                             pedidos.getFracionado()
                     );
 
@@ -509,7 +527,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
             String horaProtocolo,
             String cpf,
             String FPagamento,
-            String quantidade
+            String quantidade,
+            String credenciadora
     ) {
 
 
@@ -533,8 +552,10 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 horaProtocolo,//HORA PROTOCOLO - "151540"
                 cpf,//CPF/CNPJ CLIENTE
                 FPagamento,//FORMA PAGAMENTO
+                "",
                 bd.getUltimoIdPedido(),
-                NotaFracionada
+                NotaFracionada,
+                credenciadora
         ));
 
         //

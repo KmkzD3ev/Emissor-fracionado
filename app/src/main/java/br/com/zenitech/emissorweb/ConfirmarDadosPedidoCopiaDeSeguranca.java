@@ -389,6 +389,7 @@ public class ConfirmarDadosPedidoCopiaDeSeguranca extends AppCompatActivity impl
                 "",
                 "",
                 "",
+                "",
                 ""
         );
 
@@ -538,7 +539,9 @@ public class ConfirmarDadosPedidoCopiaDeSeguranca extends AppCompatActivity impl
                 horaProtocolo,//HORA PROTOCOLO - "151540"
                 cpf,//CPF/CNPJ CLIENTE
                 FPagamento,//FORMA PAGAMENTO
+                "",
                 bd.getUltimoIdPedido(),
+                "",
                 ""
         ));
 
