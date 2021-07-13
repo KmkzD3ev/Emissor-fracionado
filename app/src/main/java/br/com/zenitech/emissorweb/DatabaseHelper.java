@@ -3,6 +3,7 @@ package br.com.zenitech.emissorweb;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -32,6 +33,8 @@ import br.com.zenitech.emissorweb.domains.StatusPedidos;
 import br.com.zenitech.emissorweb.domains.StatusPedidosNFE;
 import br.com.zenitech.emissorweb.domains.Unidades;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -40,12 +43,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static String DB_NAME = "emissorwebDB";
     private SQLiteDatabase myDataBase;
     final Context context;
+    SharedPreferences prefs;
 
 
     @SuppressLint("SdCardPath")
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, 11);
         this.context = context;
+        prefs = context.getSharedPreferences("preferencias", MODE_PRIVATE);
         //this.DB_PATH = context.getFilesDir().getPath() + "/" + context.getPackageName() + "/" + "databases/";
         //this.DB_PATH = "/data/data/" + context.getPackageName() + "/" + "databases/";
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -1176,7 +1181,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private Pedidos cursorToPedidos(Cursor cursor) {
-        Pedidos pedidos = new Pedidos(null, null, null,null, null, null, null, null, null, null, null, null, null, null);
+        Pedidos pedidos = new Pedidos(null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         //
         pedidos.setId(cursor.getString(0));
         pedidos.setSituacao(cursor.getString(1));
@@ -1640,13 +1645,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String chave;
 
         //CONTANTES CHAVE
-        String chave_cUF = null;                    // Código da UF do emitente do Documento Fiscal
+        String chave_cUF = null;                // Código da UF do emitente do Documento Fiscal
         String chave_AAMM = aux.anoMesAtual();  // Ano e Mês de emissão da NF-e
         String chave_CNPJ = null;               // CNPJ do emitente
         String chave_mod = "65";                // Modelo do Documento Fiscal
         String chave_serie = null;              // Série do Documento Fiscal
         String chave_nNF = null;                // Número do Documento Fiscal
-        String chave_tpEmis = "1";             // Forma de emissão da NF-e
+        String chave_tpEmis = "1";              // Forma de emissão da NF-e
         String chave_cNF = null;                // Código Numérico que compõe a Chave de Acesso
         String chave_cDV = null;                // Dígito Verificador da Chave de Acesso
 
@@ -2103,7 +2108,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         db.beginTransaction();
-
+        //pedidos_temp
         String selectQuery = "SELECT ped.id FROM pedidos_temp ped ORDER BY  ped.id DESC LIMIT 1";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -2123,6 +2128,118 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return total;
+    }
+
+    //PEGA O ULTIMO ID DA TABELA DE PEDIDOS
+    public String getUltimoIdPedidos() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction();
+        //pedidos_temp
+        String selectQuery = "SELECT ped.id FROM pedidos ped ORDER BY  ped.id DESC LIMIT 1";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        String total = "";
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                total = cursor.getString(0);
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return total;
+    }
+
+    //SOMAR O VALOR DO FINANCEIRO
+    public String getUltimaNotaPOS() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.beginTransaction();
+
+        String selectQuery = "SELECT ultnfce FROM pos LIMIT 1";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        String total = "";
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                total = cursor.getString(0);
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+
+        return total;
+    }
+
+    //LISTAR TODOS OS PEDIDOS A TRANSMITIR
+    public void listPedidosSemPagamento() {
+
+        String query = "SELECT ped.id, fpp.id " +
+                "FROM pedidos ped " +
+                "LEFT JOIN formas_pagamento_pedidos fpp ON fpp.id_pedido = ped.id_pedido_temp " +
+                "WHERE ped.situacao = 'OFF' OR ped.situacao = '' " +
+                "ORDER BY ped.id DESC";
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getCount() > 0) {
+                    if (cursor.getString(1) == null) {
+                        apagarPedidoSemPagamento(cursor.getString(0));
+                        prefs.edit().putInt("id_pedido", prefs.getInt("id_pedido", 0) - 1).apply();
+                    }
+                }
+            } while (cursor.moveToNext());
+        }
+    }
+
+    private void apagarPedidoSemPagamento(String idPedido) {
+        myDataBase = this.getWritableDatabase();
+
+        //
+        myDataBase.delete(
+                "itens_pedidos",
+                "pedido = ?",
+                new String[]{idPedido}
+        );
+
+        //
+        myDataBase.delete(
+                "pedidos_temp",
+                "id = ?",
+                new String[]{idPedido}
+        );
+
+        //
+        myDataBase.delete(
+                "pedidos",
+                "id = ?",
+                new String[]{idPedido}
+        );
+
+
+        /*int i = myDataBase.delete(
+                "pedidos",
+                ID_PEDIDOS + " = ?",
+                new String[]{idPedido}
+        );
+        db.close();
+        return i;*/
     }
 
 }

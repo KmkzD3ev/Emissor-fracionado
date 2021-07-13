@@ -1,6 +1,7 @@
 package br.com.zenitech.emissorweb;
 
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -8,12 +9,20 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
 import java.util.Objects;
+
+import br.com.zenitech.emissorweb.domains.Sincronizador;
+import br.com.zenitech.emissorweb.interfaces.ISincronizar;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SplashScreen extends AppCompatActivity {
     //
@@ -63,6 +72,72 @@ public class SplashScreen extends AppCompatActivity {
         }
 
 
+        // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
+        /*new Handler().postDelayed(() -> {
+
+            avancar();
+
+        }, time);*/
+
+        final ISincronizar iSincronizar = ISincronizar.retrofit.create(ISincronizar.class);
+
+        final Call<Sincronizador> call = iSincronizar.forcarResetApp(
+                "forcar_reset_app",
+                prefs.getString("serial_app", "")
+        );
+
+        call.enqueue(new Callback<Sincronizador>() {
+            @Override
+            public void onResponse(@NonNull Call<Sincronizador> call, @NonNull Response<Sincronizador> response) {
+                final Sincronizador sincronizacao = response.body();
+                if (Objects.requireNonNull(sincronizacao).getErro().equalsIgnoreCase("ok")) {
+                    resetarApp();
+                } else {
+                    /*txtMsgReset.setText("Não foi possível resetar o App, verifique as informações e tente novamente.");
+                    erro();*/
+                    avancar();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Sincronizador> call, @NonNull Throwable t) {
+                Log.i("ResetApp", Objects.requireNonNull(t.getMessage()));
+                avancar();
+            }
+        });
+
+    }
+
+    private void clearAppData() {
+        try {
+            // clearing app data
+            if (Build.VERSION_CODES.KITKAT <= Build.VERSION.SDK_INT) {
+                ((ActivityManager) getSystemService(ACTIVITY_SERVICE)).clearApplicationUserData(); // note: it has a return value!
+            } else {
+                String packageName = getApplicationContext().getPackageName();
+                Runtime runtime = Runtime.getRuntime();
+                runtime.exec("pm clear " + packageName);
+
+                Toast.makeText(getBaseContext(), "O App foi resetado com sucesso!", Toast.LENGTH_LONG);
+            }
+
+            //prefs.edit().putBoolean("reset", false).apply();
+            Intent i = new Intent(getBaseContext(), SplashScreen.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+
+            finish();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void resetarApp() {
+        clearAppData();
+    }
+
+    void avancar() {
         // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
         new Handler().postDelayed(() -> {
 
@@ -121,8 +196,8 @@ public class SplashScreen extends AppCompatActivity {
 
 
             finish();
-        }, time);
 
+        }, time);
     }
 
     @Override

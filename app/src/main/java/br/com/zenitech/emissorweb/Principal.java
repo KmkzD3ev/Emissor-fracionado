@@ -150,6 +150,8 @@ public class Principal extends AppCompatActivity
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         ed = prefs.edit();
 
+        //prefs.edit().putInt("id_pedido", 0).apply();
+
         Log.e("NameApp", new Configuracoes().getApplicationName(context));
 
         //
@@ -344,6 +346,8 @@ public class Principal extends AppCompatActivity
 
         //
         userList = StoneStart.init(context);
+
+        atualizar();
     }
 
 
@@ -366,6 +370,8 @@ public class Principal extends AppCompatActivity
     }
 
     private void atualizar() {
+        bd.listPedidosSemPagamento();
+
         //
         elementosPedidos = bd.getPedidosTransmitirFecharDia();
 
@@ -380,8 +386,10 @@ public class Principal extends AppCompatActivity
         btnSincronizarNotasPrincipal = findViewById(R.id.btnSincronizarNotasPrincipal);
 
         if (elementosPedidos.size() != 0) {
+            txtContigencia.setText(String.valueOf(elementosPedidos.size()));
             btnSincronizarNotasPrincipal.setVisibility(View.VISIBLE);
         } else {
+            txtContigencia.setText(String.valueOf(elementosPedidos.size()));
             btnSincronizarNotasPrincipal.setVisibility(View.GONE);
         }
     }
@@ -567,7 +575,6 @@ public class Principal extends AppCompatActivity
         } else if (id == R.id.nav_finalizar) {
             // VERIFICA SE EXISTE NFC-e PENDENTE
             if (_verificarNotasPendentes()) {
-
                 //
                 alertaNotasPendentes();
             } else {
@@ -725,6 +732,8 @@ public class Principal extends AppCompatActivity
                         runOnUiThread(() -> {
 
                             prefs.edit().putBoolean("sincronizado", false).apply();
+                            prefs.edit().putInt("id_pedido", 0).apply();
+
                             Toast.makeText(context, "Remessa finalizada com sucesso!", Toast.LENGTH_LONG).show();
 
                             //APAGA O BANCO DE DADOS E VAI PARA TELA INICIAL DE SINCRONIZAÇÃO

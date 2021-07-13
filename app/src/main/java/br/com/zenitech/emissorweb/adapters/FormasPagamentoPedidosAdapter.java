@@ -110,7 +110,8 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
                     && !unidades.getCodloja().equalsIgnoreCase("")
             ) {
                 //Log.e("Cancel", formaPagamentoPedido.getCodigo_autorizacao());
-                iniciarTranzacao(codigoAutorizacao, getId, getId_pedido, getValor, positionItem);
+                //iniciarTranzacao(codigoAutorizacao, getId, getId_pedido, getValor, positionItem);
+                makeText(context, "Não é possível excluir esta forma de pagamento!", LENGTH_SHORT).show();
             } else {
                 _excluirFpg(getId, getId_pedido, getValor, positionItem);
             }

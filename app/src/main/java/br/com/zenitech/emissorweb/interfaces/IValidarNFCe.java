@@ -11,7 +11,7 @@ import retrofit2.http.POST;
 
 public interface IValidarNFCe {
 
-    // TRANSMITIR NOTAS NFC-E
+    // TRANSMITIR NOTAS NFC-E autorizador_app_novo_v1.php
     @FormUrlEncoded
     @POST("autorizador_app_novo_v1.php")
     Call<ValidarNFCe> validarNota(

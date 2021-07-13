@@ -1408,7 +1408,7 @@ public class Impressora extends AppCompatActivity {
             File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
             imgQrC.delete();
 
-            if ((cAux.removerAcentos(texto[12]).equalsIgnoreCase("CARTAO DE CREDITO") || cAux.removerAcentos(texto[12]).equalsIgnoreCase("CARTAO DE DEBITO")) && !unidades.getCodloja().equalsIgnoreCase("")) {
+            if ((cAux.removerAcentos(texto[12]).contains("CARTAO DE CREDITO") || cAux.removerAcentos(texto[12]).contains("CARTAO DE DEBITO")) && !unidades.getCodloja().equalsIgnoreCase("")) {
                 //
                 impComPagViaCliente = true;
             } else {

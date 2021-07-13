@@ -166,8 +166,20 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         bgTotal = findViewById(R.id.bgTotal);
 
         //-------CRIA UM ID PARA O PEDIDO------//
-        ed.putInt("id_pedido_temp", (prefs.getInt("id_pedido_temp", 0) + 1)).apply();
-        idTemp = prefs.getInt("id_pedido_temp", 1);
+        //ed.putInt("id_pedido_temp", (prefs.getInt("id_pedido_temp", 0) + 1)).apply();
+
+        //ShowMsgToast(String.valueOf(prefs.getInt("id_pedido", 0)));
+
+        /*if (prefs.getInt("id_pedido", 0) == 0) {
+            ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimaNotaPOS()) + 1)).apply();
+        } else {
+            //ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedido()) + 1)).apply();
+        }*/
+
+        //idTemp = prefs.getInt("id_pedido_temp", 1);
+        ed.putInt("id_pedido", (prefs.getInt("id_pedido", 0) + 1)).apply();
+        idTemp = prefs.getInt("id_pedido", 1);
+
         //
         bd.addPedidosTemp(new PedidosTemp(
                 String.valueOf(idTemp),//ID PEDIDO
@@ -1113,6 +1125,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     }
 
     // Fracionar o pedido caso a quantidade seja maior que 5
+    boolean dd = false;
     public void fracionar() {
         if (quantidade > 5) {
             Random r = new Random();
@@ -1134,8 +1147,20 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //dataHoraNota.setText(String.format("%s %s", data, hora));
 
         //-------CRIA UM ID PARA O PEDIDO------//
-        ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedido()) + prefs.getInt("id_pedido", 0) + 1)).apply();
-        id = prefs.getInt("id_pedido", 1);
+        /*if(prefs.getInt("id_pedido", 0) == 0){
+            ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedido()) + 1)).apply();
+        }else{
+            ed.putInt("id_pedido", (prefs.getInt("id_pedido", 0) + 1)).apply();
+        }
+        dhfghgdg*/
+        if (!dd) {
+            id = prefs.getInt("id_pedido", 1);
+            dd = true;
+        } else {
+            ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedidos()) + 1)).apply();
+            id = prefs.getInt("id_pedido", 1);
+        }
+
 
         //id = Integer.parseInt(bd.getUltimoIdPedido());
 

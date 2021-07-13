@@ -51,6 +51,7 @@
                 android:icon="@drawable/ic_print"
                 android:title="Reimprimir Comprovante" />
             <item
+                android:visible="false"
                 android:id="@+id/nav_cancelar_pag"
                 android:icon="@drawable/ic_credit_card"
                 android:title="Cancelar Pagamento" />
