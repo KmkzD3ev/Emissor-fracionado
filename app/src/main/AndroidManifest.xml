@@ -50,10 +50,16 @@
         tools:replace="allowBackup"
         tools:targetApi="q">
         <activity
+            android:name=".EditarPedido"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="Editar Pedido"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ResetApp"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_reset_app"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CancelarPagamentoCartao"

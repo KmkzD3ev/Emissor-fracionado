@@ -210,13 +210,13 @@ public class Principal extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        if (prefs.getInt("introPrincipal", 0) == 0) {
+        /*if (prefs.getInt("introPrincipal", 0) == 0) {
             //
             ed.putInt("introPrincipal", 1).apply();
 
             //INCIAR INTRODUÇÃO
             //introducao();
-        }
+        }*/
 
         // BOTTOM NAVIGATION
 
@@ -302,13 +302,13 @@ public class Principal extends AppCompatActivity
         }
 
 
-        // ATIVAR O MENU DA STONE
-        if (!unidades.getCodloja().equalsIgnoreCase("")) {
+        // DESATIVAR O MENU DA STONE CASO NÃO TENHA STONE CODE
+        if (unidades.getCodloja().equalsIgnoreCase("")) {
             Menu menu = navigationView.getMenu();
             for (int menuItemIndex = 0; menuItemIndex < menu.size(); menuItemIndex++) {
                 MenuItem menuItem = menu.getItem(menuItemIndex);
                 if (menuItem.getItemId() == R.id.menuStone) {
-                    //menuItem.setVisible(true);
+                    menuItem.setVisible(false);
                 }
             }
         }
@@ -324,7 +324,7 @@ public class Principal extends AppCompatActivity
         txtTransmitida = findViewById(R.id.txtTransmitida);
         txtContigencia = findViewById(R.id.txtContigencia);
         txtStatusTransmissao = findViewById(R.id.txtStatusTransmissao);
-        textView.setText(posApp.getSerial());
+        textView.setText(String.format("%s | %s", posApp.getSerial(), posApp.getSerie()));
         txtVersao = findViewById(R.id.txtVersao);
         //txtVersao.setText(String.format("Versão %s", BuildConfig.VERSION_NAME));
         txtVersao.setText(String.format("%s", BuildConfig.VERSION_NAME));
@@ -334,8 +334,7 @@ public class Principal extends AppCompatActivity
         elementosUnidades = bd.getUnidades();
         unidades = elementosUnidades.get(0);*/
 
-        txtTransmitida.setText(String.valueOf(pedidos.size() - elementosPedidos.size()));
-        txtContigencia.setText(String.valueOf(elementosPedidos.size()));
+
         if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
             txtStatusTransmissao.setText("Não Transmitida(s)");
             //Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " não transmitida(s)");
@@ -373,6 +372,7 @@ public class Principal extends AppCompatActivity
         bd.listPedidosSemPagamento();
 
         //
+        pedidos = bd.getPedidos();
         elementosPedidos = bd.getPedidosTransmitirFecharDia();
 
         /*if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
@@ -384,6 +384,8 @@ public class Principal extends AppCompatActivity
         getSupportActionBar().setSubtitle("Serial: " + posApp.getSerial());*/
 
         btnSincronizarNotasPrincipal = findViewById(R.id.btnSincronizarNotasPrincipal);
+        txtTransmitida.setText(String.valueOf(pedidos.size() - elementosPedidos.size()));
+        //txtContigencia.setText(String.valueOf(elementosPedidos.size()));
 
         if (elementosPedidos.size() != 0) {
             txtContigencia.setText(String.valueOf(elementosPedidos.size()));
@@ -392,12 +394,72 @@ public class Principal extends AppCompatActivity
             txtContigencia.setText(String.valueOf(elementosPedidos.size()));
             btnSincronizarNotasPrincipal.setVisibility(View.GONE);
         }
+
+        _pedidoFinaceiroDiferente();
+    }
+
+    private void pedidoNaoFinalizadoDialog() {
+
+        //
+        //Cria o gerador do AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.logo_emissor_web);
+        builder.setCancelable(false);
+        //define o titulo
+        builder.setTitle("Atenção!");
+        //define a mensagem
+        builder.setMessage("Econtramos um pedido não finalizado!");
+
+        //define um botão como positivo
+        builder.setPositiveButton("Finalizar Pedido", (arg0, arg1) -> {
+            Intent i = new Intent(Principal.this, EditarPedido.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+        });
+
+        //define um botão como negativo.
+        /*builder.setNegativeButton("Não", (arg0, arg1) -> {
+            //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
+            prefs.edit().putBoolean("naoPerguntarImpressora", true).apply();
+        });*/
+
+        //define um botão como negativo.
+        /*builder.setNeutralButton("Depois", (arg0, arg1) -> {
+            //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
+            //prefs.edit().putBoolean("naoPerguntarImpressora", true).apply();
+        });*/
+
+        //cria o AlertDialog
+        alerta = builder.create();
+
+        //Exibe
+        alerta.show();
+    }
+
+    private void _pedidoFinaceiroDiferente() {
+        //ABRI A TELA DE SINCRONIZAR
+        if (bd.getVerificarFinanceiroUltimoPedido()) {
+            pedidoNaoFinalizadoDialog();
+        }
     }
 
     // VERIFICA SE EXISTE NOTA PENDENTE DE SINCRONISMO
     private boolean _verificarNotasPendentes() {
         //
         elementosPedidos = bd.getPedidosTransmitirFecharDia();
+
+        if (elementosPedidos.size() == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    // VERIFICA SE EXISTE PEDIDOS COM FINANCEIRO DIFERENTE PARA FINALIZAR
+    // KLEILSON
+    private boolean _verificarFinanceiroUltimoPedido() {
+        //
+        //elementosPedidos = bd.getVerificarFinanceiroUltimoPedido();
 
         if (elementosPedidos.size() == 0) {
             return false;

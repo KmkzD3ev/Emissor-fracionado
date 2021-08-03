@@ -2,6 +2,7 @@ package br.com.zenitech.emissorweb;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -107,8 +108,22 @@ public class Status extends AppCompatActivity {
         }
 
         //
-        txtTotal.setText(bd.getValorTotal());
-        txtQuant.setText(bd.getQuantTotal());
+        //txtTotal.setText(bd.getValorTotal());
+        //txtQuant.setText(bd.getQuantTotal());
+
+        at();
+    }
+
+    void at(){
+        Handler  handler = new Handler();
+
+        final Runnable r = () -> {
+            txtTotal.setText(bd.getValorTotal());
+            txtQuant.setText(bd.getQuantTotal());
+            //handler.postDelayed(this, 1000);
+        };
+
+        handler.postDelayed(r, 1000);
     }
 
     @Override

@@ -249,9 +249,9 @@
                         android:id="@+id/btnEscolheFP"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="20dp"
                         android:background="@drawable/bg_btn"
-                        android:text="ESCOLHER FORMA DE PAGAMENTO"
+                        android:text="AVANÇAR PARA O FINANCEIRO"
                         android:textColor="@android:color/white" />
 
                 </LinearLayout>

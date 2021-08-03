@@ -185,34 +185,35 @@
             android:id="@+id/llPagamentoPedirCartao"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#2196F3"
+            android:layout_marginTop="110dp"
+            android:background="#DFDFDF"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
 
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="wrap_content"
+                android:layout_height="150dp"
                 android:contentDescription="@string/app_name"
-                app:srcCompat="@drawable/ic_credit_card"
-                app:tint="@android:color/white" />
+                app:srcCompat="@drawable/pg_aprox" />
 
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:text="Insira ou passe o cartão"
-                android:textColor="#FFFFFF"
-                android:textSize="40sp" />
+                android:text="Aproxime, insira ou passe o cartão"
+                android:textColor="#001D35"
+                android:textSize="30sp" />
 
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginTop="50dp"
                 android:contentDescription="@string/app_name"
-                app:srcCompat="@drawable/ic_baseline_arrow_downward"
-                app:tint="@android:color/white" />
+                app:srcCompat="@drawable/ic_stone_logo"
+                app:tint="#1B5E20" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <!-- Painel processando Pagamento -->
@@ -220,24 +221,24 @@
             android:id="@+id/llProcessandoPagamento"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#2196F3"
+            android:background="#DFDFDF"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="gone">
 
             <ProgressBar
                 android:layout_width="50dp"
-                android:layout_height="50dp" />
-
+                android:layout_height="50dp"
+                app:tint="#FF000219" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:padding="20dp"
                 android:text="Aguarde, Processando Pagamento..."
-                android:textColor="#FFFFFF"
-                android:textSize="40sp" />
+                android:textColor="#FF000219"
+                android:textSize="30sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <!-- Painel Sucesso -->

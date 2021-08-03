@@ -62,7 +62,11 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
         TextView txtValUni = holder.txtValUni;
         TextView txtTotal = holder.txtTotal;
 
-        txtProduto.setText(pedidos.getNome());
+        if (pedidos.getSituacao().equalsIgnoreCase("") || pedidos.getSituacao().equalsIgnoreCase("OFF")) {
+            txtProduto.setText(String.format("* %s  |  %s", pedidos.getPedido(), pedidos.getNome()));
+        } else {
+            txtProduto.setText(String.format("%s  |  %s", pedidos.getPedido(), pedidos.getNome()));
+        }
         txtQuant.setText(pedidos.getQuantidade());
 
         //

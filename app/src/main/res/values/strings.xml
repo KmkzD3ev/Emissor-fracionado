@@ -116,7 +116,7 @@
     <string name="n_de_serie">Nº de Serie:</string>
     <string name="cnpj">CNPJ:</string>
     <string name="resumo_de_vendas">Resumo de vendas</string>
-    <string name="produto">Produto</string>
+    <string name="produto">Cód. | \nProduto</string>
     <string name="quant">Quant.</string>
     <string name="val_uni_m_dio">Val. uni. médio</string>
     <string name="valor_total">Valor total</string>

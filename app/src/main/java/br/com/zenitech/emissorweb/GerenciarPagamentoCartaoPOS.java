@@ -476,9 +476,10 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         printMerchant.print();
 
         final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setCancelable(false);
         builder.setTitle("Transação aprovada! Deseja imprimir a via do cliente?");
 
-        builder.setPositiveButton(android.R.string.yes, (dialog, which) -> {
+        builder.setPositiveButton("Sim", (dialog, which) -> {
             final PrintController printClient =
                     new PrintController(GerenciarPagamentoCartaoPOS.this,
                             new PosPrintReceiptProvider(getApplicationContext(),
@@ -487,9 +488,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
             _finalizarPagamento();
         });
 
-        builder.setNegativeButton(android.R.string.no, (dialog, which) -> {
-            _finalizarPagamento();
-        });
+        builder.setNegativeButton("Não", (dialog, which) -> _finalizarPagamento());
 
         runOnUiThread(builder::show);
 
@@ -684,6 +683,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
         //Cria o gerador do AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
         builder.setIcon(R.drawable.logo_emissor_web);
         //define o titulo
         builder.setTitle("Atenção");

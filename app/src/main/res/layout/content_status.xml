@@ -124,6 +124,27 @@
             android:layout_marginEnd="16dp"
             android:background="#ccc" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="* NFC-e pendente de sincronismo" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="#ccc" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
