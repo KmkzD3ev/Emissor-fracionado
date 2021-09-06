@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="Atenção, \nPara resetar o App, entre encontato com o suporte.\nEsta ação apagará todos os dados!"
+            android:text="Atenção, \nPara resetar o POS, entre encontato com o suporte.\nEsta ação apagará todos os dados!"
             android:textColor="#FFF3214B" />
 
         <com.google.android.material.textfield.TextInputLayout

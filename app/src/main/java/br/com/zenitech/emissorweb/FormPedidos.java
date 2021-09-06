@@ -75,7 +75,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
             "CARTÃO DE DÉBITO",
-            "DUPLICATA MERCANTIL"
+            "OUTROS"
     };
     String[] listaFormasPagamentoDinheiro = {
             "DINHEIRO"
@@ -438,6 +438,19 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void AddFormaPagamento(String authorizationCode, String cardBrand, String nsu) {
+
+        //ESCONDER O TECLADO
+        // TODO Auto-generated method stub
+        try {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+        //
+        if (!compararValorRestante()) return;
+
         if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             ShowMsgToast("Selecione a forma de pagamento.");
         } else {
@@ -503,15 +516,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             tilDocumento.setVisibility(View.VISIBLE);*/
             spFormasPagamento.setSelection(0);
             etCodAutorizacao.setText("");
-
-            //ESCONDER O TECLADO
-            // TODO Auto-generated method stub
-            try {
-                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
         }
     }
 
@@ -522,7 +526,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         BigDecimal valorFinanceiro = new BigDecimal(String.valueOf(aux.converterValores(txtTotalFinanceiro.getText().toString())));
         BigDecimal valorFinanceiroAdd = new BigDecimal(String.valueOf(aux.converterValores(txtTotalItemFinanceiro.getText().toString())));
 
-        if (valorFinanceiroAdd.compareTo(valorFinanceiro) == 1) {
+        if (valorFinanceiroAdd.compareTo(valorFinanceiro) > 0) {
             //
             if (valorFinanceiro.toString().equals(valorFinanceiroAdd.toString())) {
 
@@ -533,6 +537,45 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         } else {
             return false;
         }
+
+    }
+
+    //COMPARAR O VALOR DO FINANCEIRO COM O VALOR ADICIONADO
+    private boolean compararValorRestante() {
+
+
+        // txtValorFormaPagamento txtTotalPago
+        Integer valFormPag = Integer.parseInt(aux.soNumeros(txtValorFormaPagamento.getText().toString()));
+        Integer valTotPago = Integer.parseInt(aux.soNumeros(txtTotalItemFinanceiro.getText().toString()));
+        Integer valTotPagar = Integer.parseInt(aux.soNumeros(txtTotalFinanceiro.getText().toString()));
+
+        int tot = (valFormPag + valTotPago);
+
+        Log.d("Comparar1", String.valueOf(valFormPag));
+        Log.d("Comparar2", String.valueOf(valTotPago));
+        Log.d("Comparar3", String.valueOf(valTotPagar));
+        Log.d("Comparar4", String.valueOf(tot));
+
+        if (tot > valTotPagar) {
+            return false;
+        }
+
+        return true;
+
+        /*BigDecimal valorFinanceiro = new BigDecimal(String.valueOf(aux.converterValores(txtTotalFinanceiro.getText().toString())));
+        BigDecimal valorFinanceiroAdd = new BigDecimal(String.valueOf(aux.converterValores(txtTotalItemFinanceiro.getText().toString())));
+
+        if (valorFinanceiroAdd.compareTo(valorFinanceiro) > 0) {
+            //
+            if (valorFinanceiro.toString().equals(valorFinanceiroAdd.toString())) {
+
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }*/
 
     }
 
@@ -719,6 +762,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void VerificarCamposIniciarPedido(boolean pagamento) {
+
         //ESCODER O TECLADO
         // TODO Auto-generated method stub
         try {
@@ -727,6 +771,9 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         } catch (Exception e) {
             // TODO: handle exception
         }
+
+        //
+        if (!compararValorRestante()) return;
 
         //Log.i("Valor", String.valueOf(aux.converterValores(etPreco.getText().toString())));
 

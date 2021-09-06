@@ -325,9 +325,7 @@ public class ClassAuxiliar {
 
     //RETORNA O ID DO ESTADO
     String idEstado(String uf) {
-
         String id = null;
-
         //Codificação da UF definida pelo IBGE:
         switch (uf) {
             //11-Rondônia
@@ -512,21 +510,21 @@ public class ClassAuxiliar {
             idFormaPagamento = "5";
 
         } else if (s.equalsIgnoreCase("VALE ALIMENTACAO")) {
-            idFormaPagamento = "6";
+            idFormaPagamento = "10";
 
         } else if (s.equalsIgnoreCase("VALE REFEICAO")) {
-            idFormaPagamento = "7";
+            idFormaPagamento = "11";
 
         } else if (s.equalsIgnoreCase("VALE PRESENTE")) {
-            idFormaPagamento = "8";
+            idFormaPagamento = "12";
 
         } else if (s.equalsIgnoreCase("VALE COMBUSTIVEL")) {
-            idFormaPagamento = "9";
+            idFormaPagamento = "13";
 
         } else if (s.equalsIgnoreCase("OUTROS")) {
-            idFormaPagamento = "10";
+            idFormaPagamento = "99";
         } else if (s.equalsIgnoreCase("DUPLICATA MERCANTIL")) {
-            idFormaPagamento = "11";
+            idFormaPagamento = "00";
         }
 
         return idFormaPagamento;
@@ -550,21 +548,21 @@ public class ClassAuxiliar {
         } else if (s.equalsIgnoreCase("5")) {
             nomeGPG = "CREDITO LOJA";
 
-        } else if (s.equalsIgnoreCase("6")) {
+        } else if (s.equalsIgnoreCase("10")) {
             nomeGPG = "VALE ALIMENTACAO";
 
-        } else if (s.equalsIgnoreCase("7")) {
+        } else if (s.equalsIgnoreCase("11")) {
             nomeGPG = "VALE REFEICAO";
 
-        } else if (s.equalsIgnoreCase("8")) {
+        } else if (s.equalsIgnoreCase("12")) {
             nomeGPG = "VALE PRESENTE";
 
-        } else if (s.equalsIgnoreCase("9")) {
+        } else if (s.equalsIgnoreCase("13")) {
             nomeGPG = "VALE COMBUSTIVEL";
 
-        } else if (s.equalsIgnoreCase("10")) {
+        } else if (s.equalsIgnoreCase("99")) {
             nomeGPG = "OUTROS";
-        } else if (s.equalsIgnoreCase("11")) {
+        } else if (s.equalsIgnoreCase("00")) {
             nomeGPG = "DUPLICATA MERCANTIL";
         }
 

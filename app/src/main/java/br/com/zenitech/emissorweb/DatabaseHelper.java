@@ -1696,9 +1696,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String chave_CNPJ = null;               // CNPJ do emitente
         String chave_mod = "65";                // Modelo do Documento Fiscal
         String chave_serie = null;              // Série do Documento Fiscal
-        String chave_nNF = null;                // Número do Documento Fiscal
+        String chave_nNF;                       // Número do Documento Fiscal
         String chave_tpEmis = "1";              // Forma de emissão da NF-e
-        String chave_cNF = null;                // Código Numérico que compõe a Chave de Acesso
+        String chave_cNF;                       // Código Numérico que compõe a Chave de Acesso
         String chave_cDV = null;                // Dígito Verificador da Chave de Acesso
 
         //Código da UF - 2 caracteres
@@ -1724,11 +1724,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         pos = db.rawQuery(query_pos, null);
         if (pos.moveToFirst()) {
             do {
-
                 if (pos.getColumnIndex("serie") == 3) {
                     chave_serie = aux.soNumeros(pos.getString(pos.getColumnIndex("serie")));
                 }
-
             } while (pos.moveToNext());
         }
 
@@ -1746,11 +1744,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         chave_nNF = String.format("%09d", numeroNota);
 
         //ACRESENTA ZEROS NA FRENTE DO NÚMERO DA NOTA PARA COMPLETAR 9 CARACTERES
-        chave_cNF = String.format("%08d", numeroNota);
+        int NF = (numeroNota * 13001);
+        //NF = String.format("%08d", NF);
+        //NF = NF.substring(0, 8);
+        Log.e("CHAVE", String.valueOf(NF));
+        Log.e("CHAVE", String.format("%08d", NF));
+        Log.e("CHAVE", String.format("%08d", NF).substring(0, 8));
+        chave_cNF = String.format("%08d", NF).substring(0, 8);// String.format("%08d", numeroNota);
 
         String chaveSD = chave_cUF + chave_AAMM + chave_CNPJ + chave_mod + chave_serie + chave_nNF + chave_tpEmis + chave_cNF;
         chave = aux.digitoVerificado(aux.soNumeros(chaveSD));
-        return chave;
+        //chave_cDV = aux.digitoVerificado(aux.soNumeros(chaveSD));
+
+        StringBuilder chaveCompleta = new StringBuilder(chave);
+        chaveCompleta.insert(chave.length() - 4, "  ");
+        chaveCompleta.insert(chave.length() - 8, "  ");
+        chaveCompleta.insert(chave.length() - 12, "  ");
+        chaveCompleta.insert(chave.length() - 16, "  ");
+        chaveCompleta.insert(chave.length() - 20, "  ");
+        chaveCompleta.insert(chave.length() - 24, "  ");
+        chaveCompleta.insert(chave.length() - 28, "  ");
+        chaveCompleta.insert(chave.length() - 32, "  ");
+        chaveCompleta.insert(chave.length() - 36, "  ");
+        chaveCompleta.insert(chave.length() - 40, "  ");
+        return chaveCompleta.toString();
     }
 
     //
@@ -2346,6 +2363,55 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return pedidos;
+    }
+
+    // ADICIONA FINANCEIRO PARA OS PEDIDOS FRACIONADOS
+    public void PedidoFracionadosSemFinanceiro() {
+
+        String query = "SELECT ped.id, ped.valor_total, fpp.id_pedido" +
+                "    FROM Pedidos ped" +
+                "    LEFT JOIN" +
+                "    formas_pagamento_pedidos fpp ON fpp.id_pedido = ped.id" +
+                "    WHERE ped.fracionado = 1" +
+                "    ORDER BY ped.id DESC";
+
+        String queryInsert = "INSERT INTO formas_pagamento_pedidos " +
+                "(id_pedido, id_forma_pagamento, valor) VALUES('%s','1','%s')";
+
+        String queryUpdate = "UPDATE formas_pagamento_pedidos" +
+                " SET valor = '%s' WHERE id_pedido = '%s'";
+
+        myDataBase = this.getReadableDatabase();
+        //SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getCount() > 0) {
+                    //myDataBase.close();
+                    //myDataBase = this.getWritableDatabase();
+                    SQLiteDatabase db = this.getWritableDatabase();
+                    ContentValues values = new ContentValues();
+                    if (cursor.getString(2) == null) {
+                        values.put("id_pedido", cursor.getString(0));
+                        values.put("id_forma_pagamento", "1");
+                        values.put("valor", cursor.getString(1));
+                        db.insert("formas_pagamento_pedidos", null, values);
+                    } else {
+                        values.put("valor", cursor.getString(1));
+                        db.update("formas_pagamento_pedidos", values, "id_pedido=" + cursor.getString(0), null);
+                    }
+                    db.close();
+                }
+            } while (cursor.moveToNext());
+        }
+    }
+
+    public void FecharConexao() {
+        if (myDataBase.isOpen()) {
+            myDataBase.close();
+        }
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.close();
     }
 
 }

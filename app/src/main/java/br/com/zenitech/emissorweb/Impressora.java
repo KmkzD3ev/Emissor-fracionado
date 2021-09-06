@@ -1130,19 +1130,21 @@ public class Impressora extends AppCompatActivity {
                 url = urlQRCode + "?p=" + texto[6] + "|2|1|" + idCSC + "|" + hashSHA1;
             }
 
+            Bitmap bp = null;
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
             try {
                 BitMatrix bitMatrix = multiFormatWriter.encode(url, BarcodeFormat.QR_CODE, 250, 250);
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
+                bp = barcodeEncoder.createBitmap(bitMatrix);
+                //Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
 
-                SaveImage(bp);
+                //SaveImage(bp);
             } catch (WriterException e) {
                 e.printStackTrace();
             }
 
             // Retorna o caminho da imagem do qrcode
-            File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
+            /*File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
             File dir = new File(sdcard, "Emissor_Web/");
 
             final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1153,7 +1155,7 @@ public class Impressora extends AppCompatActivity {
 
             inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
             bufferedInputStream = new BufferedInputStream(inputStream);
-            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);
+            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);*/
 
             StringBuilder textBuffer = new StringBuilder();
 
@@ -1202,11 +1204,13 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append("{reset}").append(tamFont).append(" {br}");
             textBuffer.append("{reset}{center}").append(tamFont).append("Chave de Acesso{br}");
             //textBuffer.append("{reset}{center}").append(tamFont).append(texto[6]).append("{br}");
-            String c = texto[6];
+            String chaveNota = bd.gerarChave(Integer.parseInt(pedido));
+            textBuffer.append(tamFont).append(chaveNota).append("{br}");
+            /*String c = texto[6];
             String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
             String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
             textBuffer.append(tamFont).append(cl1).append("{br}");
-            textBuffer.append(tamFont).append(cl2).append("{br}");
+            textBuffer.append(tamFont).append(cl2).append("{br}");*/
             textBuffer.append("{reset}{center}").append(tamFont).append("Protocolo de autorizacao{br}");
             textBuffer.append("{reset}{center}").append(tamFont).append(texto[3]).append("{br}");
             textBuffer.append("{reset}").append(tamFont).append("------------------------------------------------{br}");
@@ -1220,11 +1224,11 @@ public class Impressora extends AppCompatActivity {
             printer.feedPaper(38);
 
             //---------------
-            final int width = Objects.requireNonNull(bitmap).getWidth();
-            final int height = bitmap.getHeight();
+            final int width = Objects.requireNonNull(bp).getWidth();
+            final int height = bp.getHeight();
             final int[] argb = new int[width * height];
-            bitmap.getPixels(argb, 0, width, 0, 0, width, height);
-            bitmap.recycle();
+            bp.getPixels(argb, 0, width, 0, 0, width, height);
+            bp.recycle();
 
             printer.reset();
             printer.printImage(argb, width, height, Printer.ALIGN_CENTER, true);
@@ -1232,8 +1236,8 @@ public class Impressora extends AppCompatActivity {
             printer.flush();
 
             // Apaga a imgem anterior
-            File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();
+            /*File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
+            imgQrC.delete();*/
 
             //IMPRIMIR COMPROVANTE DE PAGAMENTO CARTÃO
             StringBuilder textBuffer2 = new StringBuilder();
@@ -1299,19 +1303,20 @@ public class Impressora extends AppCompatActivity {
                 url = urlQRCode + "?p=" + texto[6] + "|2|1|" + idCSC + "|" + hashSHA1;
             }
 
+            Bitmap bp = null;
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
             try {
                 BitMatrix bitMatrix = multiFormatWriter.encode(url, BarcodeFormat.QR_CODE, 250, 250);
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
+                bp = barcodeEncoder.createBitmap(bitMatrix);
 
-                SaveImage(bp);
+                //SaveImage(bp);
             } catch (WriterException e) {
                 e.printStackTrace();
             }
 
             // Retorna o caminho da imagem do qrcode
-            File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
+            /*File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
             File dir = new File(sdcard, "Emissor_Web/");
 
             final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1322,7 +1327,7 @@ public class Impressora extends AppCompatActivity {
 
             inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
             bufferedInputStream = new BufferedInputStream(inputStream);
-            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);
+            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);*/
 
             StringBuilder textBuffer = new StringBuilder();
 
@@ -1371,11 +1376,13 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append(urlConsulta).append("{br}");
             textBuffer.append(tamFont).append(" {br}");
             textBuffer.append(tamFont).append("Chave de Acesso{br}");
-            String c = texto[6];
+            String chaveNota = bd.gerarChave(Integer.parseInt(pedido));
+            textBuffer.append(tamFont).append(chaveNota).append("{br}");
+            /*String c = texto[6];
             String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
             String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
             textBuffer.append(tamFont).append(cl1).append("{br}");
-            textBuffer.append(tamFont).append(cl2).append("{br}");
+            textBuffer.append(tamFont).append(cl2).append("{br}");*/
             textBuffer.append(tamFont).append(" {br}");
             textBuffer.append(tamFont).append("Protocolo de autorizacao{br}");
             textBuffer.append(tamFont).append(texto[3]).append("{br}");
@@ -1393,11 +1400,11 @@ public class Impressora extends AppCompatActivity {
             printer.feedPaper(38);
 
             //---------------
-            final int width = Objects.requireNonNull(bitmap).getWidth();
-            final int height = bitmap.getHeight();
+            final int width = Objects.requireNonNull(bp).getWidth();
+            final int height = bp.getHeight();
             final int[] argb = new int[width * height];
-            bitmap.getPixels(argb, 0, width, 0, 0, width, height);
-            bitmap.recycle();
+            bp.getPixels(argb, 0, width, 0, 0, width, height);
+            bp.recycle();
 
             //printer.reset();
             printer.printImage(argb, width, height, Printer.ALIGN_CENTER, true);
@@ -1405,8 +1412,8 @@ public class Impressora extends AppCompatActivity {
             printer.flush();
 
             // Apaga a imgem anterior
-            File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();
+            /*File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
+            imgQrC.delete();*/
 
             if ((cAux.removerAcentos(texto[12]).contains("CARTAO DE CREDITO") || cAux.removerAcentos(texto[12]).contains("CARTAO DE DEBITO")) && !unidades.getCodloja().equalsIgnoreCase("")) {
                 //
@@ -1789,19 +1796,20 @@ public class Impressora extends AppCompatActivity {
             printer.feedPaper(38);
 
             // IMPRIMIR COD BARRA
+            Bitmap bp = null;
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
             try {
                 BitMatrix bitMatrix = multiFormatWriter.encode(prefs.getString("chave", ""), BarcodeFormat.CODE_128, 400, 120);
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
+                bp = barcodeEncoder.createBitmap(bitMatrix);
 
-                SaveImage(bp);
+                //SaveImage(bp);
             } catch (WriterException e) {
                 e.printStackTrace();
             }
 
             // Retorna o caminho da imagem do qrcode
-            File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
+            /*File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
             File dir = new File(sdcard, "Emissor_Web/");
 
             final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1812,20 +1820,21 @@ public class Impressora extends AppCompatActivity {
 
             inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
             bufferedInputStream = new BufferedInputStream(inputStream);
-            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);
-            final int width = Objects.requireNonNull(bitmap).getWidth();
-            final int height = bitmap.getHeight();
+            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);*/
+
+            final int width = Objects.requireNonNull(bp).getWidth();
+            final int height = bp.getHeight();
             final int[] argb = new int[width * height];
-            bitmap.getPixels(argb, 0, width, 0, 0, width, height);
-            bitmap.recycle();
+            bp.getPixels(argb, 0, width, 0, 0, width, height);
+            bp.recycle();
 
             printer.reset();
             printer.printImage(argb, width, height, Printer.ALIGN_CENTER, true);
             printer.feedPaper(38);
 
             // Apaga a imgem anterior
-            File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();
+            /*File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
+            imgQrC.delete();*/
 
             textBuffer = new StringBuilder();
             //textBuffer.append("{reset}{center}").append(tamFont).append(prefs.getString("barcode", "")).append("{br}");
@@ -1956,19 +1965,20 @@ public class Impressora extends AppCompatActivity {
             printer.feedPaper(38);
 
             // IMPRIMIR COD BARRA
+            Bitmap bp = null;
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
             try {
                 BitMatrix bitMatrix = multiFormatWriter.encode(prefs.getString("chave", ""), BarcodeFormat.CODE_128, 400, 120);
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
+                bp = barcodeEncoder.createBitmap(bitMatrix);
 
-                SaveImage(bp);
+                //SaveImage(bp);
             } catch (WriterException e) {
                 e.printStackTrace();
             }
 
             // Retorna o caminho da imagem do qrcode
-            File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
+            /*File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
             File dir = new File(sdcard, "Emissor_Web/");
 
             final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1979,13 +1989,13 @@ public class Impressora extends AppCompatActivity {
 
             inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
             bufferedInputStream = new BufferedInputStream(inputStream);
-            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);
+            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);*/
 
-            final int width = Objects.requireNonNull(bitmap).getWidth();
-            final int height = bitmap.getHeight();
+            final int width = Objects.requireNonNull(bp).getWidth();
+            final int height = bp.getHeight();
             final int[] argb = new int[width * height];
-            bitmap.getPixels(argb, 0, width, 0, 0, width, height);
-            bitmap.recycle();
+            bp.getPixels(argb, 0, width, 0, 0, width, height);
+            bp.recycle();
 
             // IMPRIMIR CÓDIGO DE BARRAS
             printer.reset();
@@ -1993,8 +2003,8 @@ public class Impressora extends AppCompatActivity {
             printer.feedPaper(38);
 
             // Apaga a imgem anterior
-            File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();
+            /*File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
+            imgQrC.delete();*/
 
             textBuffer = new StringBuilder();
             textBuffer.append(tamFont).append("");

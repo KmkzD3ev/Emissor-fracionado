@@ -613,6 +613,8 @@ public class Sincronizar extends AppCompatActivity {
         ll_sucesso.setVisibility(View.VISIBLE);
         new Handler().postDelayed(() -> {
             prefs.edit().putBoolean("sincronizado", true).apply();
+            ClassAuxiliar cAux = new ClassAuxiliar();
+            prefs.edit().putString("data_sincronizado", String.format("%s %s", cAux.exibirDataAtual(), cAux.horaAtual())).apply();
 
             //ABRI A TELA PRINCIPAL
             Intent i = new Intent(Sincronizar.this, Principal.class);

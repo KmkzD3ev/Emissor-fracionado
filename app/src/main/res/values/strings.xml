@@ -81,7 +81,7 @@
     <string name="em_contigencia">Em Contigencia</string>
     <string name="emitida_em_contigencia">Emitida em contigencia</string>
     <string name="notas_sincronizadas">Todas as notas foram sincronizadas!</string>
-    <string name="sincronizar">BAIXAR BANCO DE DADOS</string>
+    <string name="sincronizar">INICIAR POS</string>
     <string name="zenitech">© Zenitech</string>
     <string name="serial">Serial</string>
     <string name="existe_nfc_e_emitida_em_contig_ncia_lembre_se_de_sincronizar_antes_de_fazer_o_fechamento_do_dia">Existe NFC-e emitida em contigência, lembre-se de sincronizar antes de fazer o fechamento do dia.</string>
@@ -94,7 +94,7 @@
     <string name="verificando_serial">Validando serial…</string>
     <string name="ativando_serial">Ativando POS…</string>
     <string name="informe_um_serial">Informe um serial válido!</string>
-    <string name="sincronizado">Tudo Certo!</string>
+    <string name="sincronizado">POS Iniciado!</string>
     <string name="oops">Oops!</string>
     <string name="txt_app_finalizado">App Finalizado!\nPressione \"BAIXAR BANCO DE DADOS\", para iniciar a remessa</string>
     <string name="nova_nota">Nova NFC-e</string>

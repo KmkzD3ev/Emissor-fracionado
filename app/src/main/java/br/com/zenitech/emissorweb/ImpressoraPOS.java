@@ -469,12 +469,14 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         TextView txtConsRec3 = findViewById(R.id.txtConsRec3);
         TextView txtConsRec4 = findViewById(R.id.txtConsRec4);
         //
-        String c = texto[6];
-        String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
-        String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
+        String c = bd.gerarChave(Integer.parseInt(pedido));
+        //String c = texto[6];
+        //String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
+        //String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
         txtConsRec1.setText(urlConsulta);
-        txtConsRec2.setText(cl1);
-        txtConsRec3.setText(cl2);
+        txtConsRec2.setText(c);
+        /*txtConsRec2.setText(cl1);
+        txtConsRec3.setText(cl2);*/
         txtConsRec4.setText(texto[3]);
 
         //CONSUMIDOR

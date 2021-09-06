@@ -698,7 +698,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         builder.setNegativeButton("NÃO", (arg0, arg1) -> {
 
             // **
-            msg(true);
+            //msg(true);
         });
         //cria o AlertDialog
         alerta = builder.create();

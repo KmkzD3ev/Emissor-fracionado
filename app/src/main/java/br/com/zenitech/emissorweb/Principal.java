@@ -107,7 +107,7 @@ public class Principal extends AppCompatActivity
     RelativeLayout LLlistaPedidos;
     List<UserModel> userList;
 
-    TextView textView, txtTransmitida, txtContigencia, txtStatusTransmissao, txtVersao, txtEmpresa, txtCodUnidade;
+    TextView textView, txtTransmitida, txtContigencia, txtStatusTransmissao, txtVersao, txtEmpresa, txtCodUnidade, txtDataUltimoSinc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -327,7 +327,10 @@ public class Principal extends AppCompatActivity
         textView.setText(String.format("%s | %s", posApp.getSerial(), posApp.getSerie()));
         txtVersao = findViewById(R.id.txtVersao);
         //txtVersao.setText(String.format("Versão %s", BuildConfig.VERSION_NAME));
-        txtVersao.setText(String.format("%s", BuildConfig.VERSION_NAME));
+        txtVersao.setText(BuildConfig.VERSION_NAME);
+        txtDataUltimoSinc = findViewById(R.id.txtDataUltimoSinc);
+        txtDataUltimoSinc.setText(prefs.getString("data_sincronizado", ""));
+
         //
         /*elementosPedidos = bd.getPedidosTransmitirFecharDia();
 
@@ -369,6 +372,7 @@ public class Principal extends AppCompatActivity
     }
 
     private void atualizar() {
+        bd.PedidoFracionadosSemFinanceiro();
         bd.listPedidosSemPagamento();
 
         //
@@ -799,6 +803,7 @@ public class Principal extends AppCompatActivity
                             Toast.makeText(context, "Remessa finalizada com sucesso!", Toast.LENGTH_LONG).show();
 
                             //APAGA O BANCO DE DADOS E VAI PARA TELA INICIAL DE SINCRONIZAÇÃO
+                            bd.FecharConexao();
                             context.deleteDatabase("emissorwebDB");
                             //Intent i = new Intent(context, Sincronizar.class);
                             Intent i = new Intent(context, AppFinalizado.class);
