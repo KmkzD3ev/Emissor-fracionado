@@ -2318,6 +2318,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //
         myDataBase.delete(
+                "formas_pagamento_pedidos",
+                "id_pedido = ?",
+                new String[]{idPedido}
+        );
+
+        //
+        myDataBase.delete(
                 "itens_pedidos",
                 "pedido = ?",
                 new String[]{idPedido}

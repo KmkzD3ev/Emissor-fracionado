@@ -163,7 +163,7 @@ public class Principal extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         try {
-            // kleilson está dando erro
+            //
             pedidos = bd.getPedidos();
 
             if (pedidos.size() != 0) {
