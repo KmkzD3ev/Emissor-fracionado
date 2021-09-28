@@ -71,11 +71,11 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     SharedPreferences.Editor ed;
 
     //"FORMA PAGAMENTO",
+    //"OUTROS"
     String[] listaFormasPagamento = {
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
-            "CARTÃO DE DÉBITO",
-            "OUTROS"
+            "CARTÃO DE DÉBITO"
     };
     String[] listaFormasPagamentoDinheiro = {
             "DINHEIRO"

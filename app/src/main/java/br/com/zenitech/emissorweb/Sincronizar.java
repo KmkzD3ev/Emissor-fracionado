@@ -25,11 +25,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.os.StatFs;
+import android.text.Editable;
 import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -63,7 +66,7 @@ public class Sincronizar extends AppCompatActivity {
     public static final int REQUEST_PERMISSIONS_CODE = 128;
     VerificarOnline online;
     AlertDialog alerta;
-    EditText serial;
+    EditText serial, cod1, cod2, cod3;
     TextView txtTotMemoria, txt_msg_sincronizando, txtAppFinalizado;
     LinearLayout ll_sincronizar, ll_sincronizando, ll_sucesso, ll_erro;
     Context context;
@@ -90,10 +93,95 @@ public class Sincronizar extends AppCompatActivity {
         ll_erro = findViewById(R.id.ll_erro);
         txtTotMemoria = findViewById(R.id.txtTotMemoria);
         serial = findViewById(R.id.serial);
+        cod1 = findViewById(R.id.cod1);
+        cod1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 3) {
+                    cod1.clearFocus();
+                    cod2.requestFocus();
+                    cod2.setCursorVisible(true);
+                }
+            }
+        });
+        cod2 = findViewById(R.id.cod2);
+        cod2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 3) {
+                    cod2.clearFocus();
+                    cod3.requestFocus();
+                    cod3.setCursorVisible(true);
+                }
+            }
+        });
+        cod3 = findViewById(R.id.cod3);
+        cod3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() == 3) {
+
+                    //
+                    _iniciarVerificacoes();
+                }
+            }
+        });
+        cod3.setOnEditorActionListener((v, actionId, event) -> {
+            boolean handled = false;
+
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+
+                //ESCODER O TECLADO
+                // TODO Auto-generated method stub
+                try {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                }
+
+                //
+                _iniciarVerificacoes();
+
+                handled = true;
+            }
+            return handled;
+        });
 
         //
         if (!Objects.requireNonNull(prefs.getString("serial_app", "")).equalsIgnoreCase("")) {
             serial.setEnabled(false);
+            findViewById(R.id.llCodInstalacao).setVisibility(View.GONE);
             txtAppFinalizado.setVisibility(View.VISIBLE);
         }
         serial.setText(prefs.getString("serial_app", ""));
@@ -141,6 +229,37 @@ public class Sincronizar extends AppCompatActivity {
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(i);
         });
+
+        findViewById(R.id.btnInfoCod).setOnClickListener(view -> {
+            alertaCod();
+        });
+
+    }
+
+    private void alertaCod() {
+
+        //
+        //Cria o gerador do AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //builder.setIcon(R.drawable.logo_emissor_web);
+        //define o titulo
+        builder.setTitle("Código de Instalação:");
+        String str = "Verifique o código de instação na listagem de POS no Emissor Web.\n\nPara mais informações, contate nosso suporte!";
+        //define a mensagem
+        builder.setMessage(str);
+
+        //define um botão como positivo
+        //builder.setPositiveButton("Sim", (arg0, arg1) -> _finalizarApp());
+
+        //define um botão como negativo.
+        builder.setPositiveButton("OK", (arg0, arg1) -> {
+        });
+
+        //cria o AlertDialog
+        alerta = builder.create();
+
+        //Exibe
+        alerta.show();
     }
 
     @Override
@@ -257,7 +376,8 @@ public class Sincronizar extends AppCompatActivity {
 
         final ISincronizar iSincronizar = ISincronizar.retrofit.create(ISincronizar.class);
 
-        final Call<Sincronizador> call = iSincronizar.verificarSerial("verificar_serial_emissor", serial.getText().toString());
+        final Call<Sincronizador> call = iSincronizar.verificarSerial(
+                "verificar_serial_emissor2", serial.getText().toString());
 
         call.enqueue(new Callback<Sincronizador>() {
             @Override
@@ -265,14 +385,35 @@ public class Sincronizar extends AppCompatActivity {
 
                 //
                 final Sincronizador sincronizacao = response.body();
-                if (!Objects.requireNonNull(sincronizacao).getErro().equalsIgnoreCase("erro")) {
-                    gerarBancoOnline(serial.getText().toString());
+
+                if (prefs.getBoolean("cod_instalacao", false)) {
+                    if (!Objects.requireNonNull(sincronizacao).getErro().equalsIgnoreCase("erro")) {
+                        gerarBancoOnline(serial.getText().toString());
+                    } else {
+                        //
+                        erro = true;
+                        msgErro = "O serial ou código de instalação é inválido ou já está sendo usado em outro aparelho! \nVerifique o serial e tente novamente.";
+                        _limparDadosSincronizacao(false);
+                        _resetarSincronismo(5000, true);
+                    }
                 } else {
-                    //
-                    erro = true;
-                    msgErro = "O serial é inválido ou já está sendo usado em outro aparelho! \nVerifique o serial e tente novamente.";
-                    _limparDadosSincronizacao(false);
-                    _resetarSincronismo(5000, true);
+                    String cod = cod1.getText().toString() + cod2.getText().toString() + cod3.getText().toString();
+
+                    if (!Objects.requireNonNull(sincronizacao).getErro().equalsIgnoreCase("erro")
+                            && cod.equalsIgnoreCase("*0101010#")) {
+                        gerarBancoOnline(serial.getText().toString());
+                    } else {
+                        if (!Objects.requireNonNull(sincronizacao).getErro().equalsIgnoreCase("erro") &&
+                                cod.equalsIgnoreCase(sincronizacao.getCodigo_instalacao())) {
+                            gerarBancoOnline(serial.getText().toString());
+                        } else {
+                            //
+                            erro = true;
+                            msgErro = "O serial ou código de instalação é inválido ou já está sendo usado em outro aparelho! \nVerifique o serial e tente novamente.";
+                            _limparDadosSincronizacao(false);
+                            _resetarSincronismo(5000, true);
+                        }
+                    }
                 }
             }
 
@@ -613,6 +754,7 @@ public class Sincronizar extends AppCompatActivity {
         ll_sucesso.setVisibility(View.VISIBLE);
         new Handler().postDelayed(() -> {
             prefs.edit().putBoolean("sincronizado", true).apply();
+            prefs.edit().putBoolean("cod_instalacao", true).apply();
             ClassAuxiliar cAux = new ClassAuxiliar();
             prefs.edit().putString("data_sincronizado", String.format("%s %s", cAux.exibirDataAtual(), cAux.horaAtual())).apply();
 

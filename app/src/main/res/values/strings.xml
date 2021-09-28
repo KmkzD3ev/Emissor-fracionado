@@ -83,7 +83,7 @@
     <string name="notas_sincronizadas">Todas as notas foram sincronizadas!</string>
     <string name="sincronizar">INICIAR POS</string>
     <string name="zenitech">© Zenitech</string>
-    <string name="serial">Serial</string>
+    <string name="serial">Serial POS</string>
     <string name="existe_nfc_e_emitida_em_contig_ncia_lembre_se_de_sincronizar_antes_de_fazer_o_fechamento_do_dia">Existe NFC-e emitida em contigência, lembre-se de sincronizar antes de fazer o fechamento do dia.</string>
 
     <!-- msg sincronismo -->
