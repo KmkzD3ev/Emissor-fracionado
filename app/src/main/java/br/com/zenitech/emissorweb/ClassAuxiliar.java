@@ -521,7 +521,11 @@ public class ClassAuxiliar {
         } else if (s.equalsIgnoreCase("VALE COMBUSTIVEL")) {
             idFormaPagamento = "13";
 
-        } else if (s.equalsIgnoreCase("OUTROS")) {
+        } else if (s.equalsIgnoreCase("PAGAMENTO INSTANTANEO (PIX)")) {
+            idFormaPagamento = "17";
+
+        }
+        else if (s.equalsIgnoreCase("OUTROS")) {
             idFormaPagamento = "99";
         } else if (s.equalsIgnoreCase("DUPLICATA MERCANTIL")) {
             idFormaPagamento = "00";
@@ -560,7 +564,10 @@ public class ClassAuxiliar {
         } else if (s.equalsIgnoreCase("13")) {
             nomeGPG = "VALE COMBUSTIVEL";
 
-        } else if (s.equalsIgnoreCase("99")) {
+        } else if (s.equalsIgnoreCase("17")) {
+            nomeGPG = "PAGAMENTO INSTANTANEO (PIX)";
+
+        }  else if (s.equalsIgnoreCase("99")) {
             nomeGPG = "OUTROS";
         } else if (s.equalsIgnoreCase("00")) {
             nomeGPG = "DUPLICATA MERCANTIL";

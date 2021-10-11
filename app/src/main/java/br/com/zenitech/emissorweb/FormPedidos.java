@@ -75,7 +75,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     String[] listaFormasPagamento = {
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
-            "CARTÃO DE DÉBITO"
+            "CARTÃO DE DÉBITO",
+            "PAGAMENTO INSTANTÂNEO (PIX)"
     };
     String[] listaFormasPagamentoDinheiro = {
             "DINHEIRO"
@@ -839,20 +840,25 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void confirmar() {
-        Intent i = new Intent(getBaseContext(), ConfirmarDadosPedido.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
-        i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
-        i.putExtra("produto", spProduto.getSelectedItem().toString());
-        i.putExtra("qnt", etQuantidade.getText().toString());
-        i.putExtra("vlt", etPreco.getText().toString());
-        i.putExtra("credenciadora", idCredenciadoras.get(spDescricaoCredenciadora.getSelectedItemPosition()));//spDescricaoCredenciadora.getSelectedItem().toString()
-        i.putExtra("bandeira", aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()));
-        i.putExtra("cod_aut", etCodAutorizacao.getText().toString());
-        i.putExtra("nsu", etNsuCeara.getText().toString());
 
-        startActivity(i);
-        finish();
+        if (bd.getPedidosTransmitirFecharDia().size() > 0) {
+            Intent i = new Intent(getBaseContext(), ConfirmarDadosPedido.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
+            i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
+            i.putExtra("produto", spProduto.getSelectedItem().toString());
+            i.putExtra("qnt", etQuantidade.getText().toString());
+            i.putExtra("vlt", etPreco.getText().toString());
+            i.putExtra("credenciadora", idCredenciadoras.get(spDescricaoCredenciadora.getSelectedItemPosition()));//spDescricaoCredenciadora.getSelectedItem().toString()
+            i.putExtra("bandeira", aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()));
+            i.putExtra("cod_aut", etCodAutorizacao.getText().toString());
+            i.putExtra("nsu", etNsuCeara.getText().toString());
+
+            startActivity(i);
+            finish();
+        } else {
+            Toast.makeText(getBaseContext(), "Encontramos um problema com esse pedido. Precisa refazer!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void iniciarPagamento() {
@@ -1248,7 +1254,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         //INSERI O PEDIDO NO BANCO DE DADOS
         addPedido(
-                "",
+                "OFF",
                 "",
                 aux.inserirData(data),
                 hora,

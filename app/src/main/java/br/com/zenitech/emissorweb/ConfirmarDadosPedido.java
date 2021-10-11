@@ -42,6 +42,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
     private String TAG = "ConfirmarDadosPedidos";
     private ProgressDialog pd;
     private Context contexto;
+    private VerificarOnline verificarOnline;
     AlertDialog alerta;
 
     Button btnPrintNotaCont, btnPrint, btn_sair, btn_fechar;
@@ -124,6 +125,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         }
 
         contexto = ConfirmarDadosPedido.this;
+        verificarOnline = new VerificarOnline();
 
         btn_sair = findViewById(R.id.btn_sair);
 
@@ -227,12 +229,18 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
         findViewById(R.id.btn_transmitir).setOnClickListener(v -> {
             //TRANSMITIR
+            if(verificarOnline.isOnline(contexto))
             transmitirNota();
+            else
+                Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();
         });
 
         findViewById(R.id.btn_reTransmitir).setOnClickListener(v -> {
             //TRANSMITIR
+            if(verificarOnline.isOnline(contexto))
             transmitirNota();
+            else
+            Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();
         });
 
         findViewById(R.id.btn_sair).setOnClickListener(v -> {
@@ -276,7 +284,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
         //INSERI O PEDIDO NO BANCO DE DADOS
         addPedido(
-                "",
+                "OFF",
                 protocoloNota.getText().toString(),
                 cAux.inserirData(data),
                 hora,
@@ -309,6 +317,187 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
     int erro = 0;
 
     private void transmitirNota() {
+        //ESCODER O TECLADO
+        // TODO Auto-generated method stub
+        try {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            Objects.requireNonNull(imm).hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
+        if (transmitindo != 0) {
+            NSdadosPedidos.setVisibility(View.GONE);
+
+            //MOSTRA A MENSAGEM DE SINCRONIZAÇÃO
+            pd = ProgressDialog.show(contexto, count + "/" + transmitir, "Transmitindo...",
+                    true, false);
+
+            count++;
+
+
+            String[] subNotaPed = {String.valueOf(transmitindo), "1"};
+            int linhaPed = cAux.subitrair(subNotaPed).intValue();
+
+            //
+            pedidos = elementosPedidos.get(linhaPed);
+            //
+            elementosItens = bd.getItensPedido(pedidos.getId());
+
+            try {
+                if (elementosItens.size() != 0) {
+                    itensPedidos = elementosItens.get(0);
+                    transmitindo = linhaPed;
+
+                    //
+                    final IValidarNFCe iValidarNFCe = IValidarNFCe.retrofit.create(IValidarNFCe.class);
+                    //
+                    valorUnit = String.valueOf(cAux.converterValores(vlt.getText().toString()));
+                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, bandeiraFPG, nsuFPG;
+
+                    Log.e("IDTEMP", "" + pedidos.getId_pedido_temp());
+
+                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    nsuFPG = bd.getNSUFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+
+                    // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
+                    if (!unidades.getCodloja().equalsIgnoreCase("")) {
+                        credenciadora = "STONE";
+                    }
+
+                    final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
+                            pedidos.getId(),
+                            itensPedidos.getQuantidade(),
+                            posApp.getSerial(),
+                            itensPedidos.getProduto(),
+                            itensPedidos.getValor().replace(".", ""),
+                            idFormaPGPedido,
+                            pedidos.getCpf_cliente(),
+                            credenciadora,
+                            cod_aut,
+                            nsuFPG,
+                            valorFormaPGPedido,
+                            nAutoCartao,
+                            bandeiraFPG,
+                            pedidos.getFracionado()
+                    );
+
+                    call.enqueue(new Callback<ValidarNFCe>() {
+                        @Override
+                        public void onResponse(@NonNull Call<ValidarNFCe> call, @NonNull Response<ValidarNFCe> response) {
+
+                            final ValidarNFCe sincronizacao = response.body();
+                            if (sincronizacao != null) {
+                                runOnUiThread(() -> {
+
+                                    //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
+                                    if (pd != null && pd.isShowing()) {
+                                        pd.dismiss();
+                                    }
+
+                                    // CASO O MODO TESTE ESTEJA ATIVO, FAZ O UPDATE PARA "ON" MESMO SEM PROTOCOLO
+                                    if (!modo_teste) {
+                                        if (!sincronizacao.getProtocolo().isEmpty() && sincronizacao.getProtocolo().length() >= 10) {
+
+                                            //
+                                            statusNota.setText(getString(R.string.autorizada));
+                                            protocoloNota.setText(sincronizacao.getProtocolo());
+                                            dataHoraNota.setText(String.format("%s %s", cAux.exibirDataAtual(), cAux.horaAtual()));
+
+                                            //
+                                            bd.upadtePedidosTransmissao(
+                                                    "ON",
+                                                    sincronizacao.getProtocolo(),
+                                                    cAux.soNumeros(cAux.inserirDataAtual()),
+                                                    cAux.soNumeros(cAux.horaAtual()),
+                                                    pedidos.getId()
+                                            );
+
+                                            Toast.makeText(contexto, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
+                                        } else {
+
+                                            //
+                                            /*bd.upadtePedidosTransmissao(
+                                                    "OFF",
+                                                    " ",
+                                                    "",
+                                                    "",
+                                                    pedidos.getId()
+                                            );*/
+
+                                            erroTransmitir = true;
+                                        }
+                                    } else {
+                                        //
+                                        bd.upadtePedidosTransmissao(
+                                                "ON",
+                                                " ",
+                                                "",
+                                                "",
+                                                pedidos.getId()
+                                        );
+                                    }
+
+                                    transmitirNota();
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(@NonNull Call<ValidarNFCe> call, @NonNull Throwable t) {
+
+                            NSdadosNFCeCont.setVisibility(View.VISIBLE);
+                            NSdadosNFCe.setVisibility(View.GONE);
+                            NSdadosPedidos.setVisibility(View.GONE);
+
+                            Log.i(TAG, "" + t);
+
+                            //
+                            /*bd.upadtePedidosTransmissao(
+                                    "OFF",
+                                    " ",
+                                    "",
+                                    "",
+                                    pedidos.getId()
+                            );*/
+
+                            erroTransmitir = true;
+
+                            //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
+                            if (pd != null && pd.isShowing()) {
+                                pd.dismiss();
+                            }
+
+                            // VERIFICA A QUANTIDADE DE ERROS
+                            if (erro > 3) {
+                                erro++;
+                                transmitirNota();
+                            } else {
+                                Log.i(TAG, "Mais de 3 erros");
+                            }
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
+                if (pd != null && pd.isShowing()) {
+                    pd.dismiss();
+                }
+
+                Log.i(TAG, Objects.requireNonNull(e.getMessage()));
+                erroTransmitir = true;
+            }
+        } else {
+            if (erroTransmitir) {
+                Toast.makeText(contexto, "Encontramos erro ao transmitir uma mais notas!", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void transmitirNota_COPIA_DE_SEGURANCA() {
         //ESCODER O TECLADO
         // TODO Auto-generated method stub
         try {
@@ -405,6 +594,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                             final ValidarNFCe sincronizacao = response.body();
                             if (sincronizacao != null) {
 
+                                //if(!sincronizacao.getErro().equalsIgnoreCase("")) return;
                                 //
                                 runOnUiThread(() -> {
 

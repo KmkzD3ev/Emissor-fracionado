@@ -372,8 +372,13 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
         //double v0 = Double.parseDouble(total);
         //double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
         double tributo = bd.getTributosProduto(produto.getText().toString(), total);
-
-        Intent i = new Intent(context, Impressora.class);
+        Intent i;
+        if (new Configuracoes().GetDevice()) {
+            prefs.edit().putString("tamPapelImpressora", "58mm").apply();
+            i = new Intent(context, ImpressoraPOS.class);
+        } else {
+            i = new Intent(context, Impressora.class);
+        }
 
         ArrayList<Unidades> elementosUnidade = bd.getUnidades();
         unidades = elementosUnidade.get(0);

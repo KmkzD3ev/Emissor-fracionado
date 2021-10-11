@@ -184,6 +184,10 @@ public class Sincronizar extends AppCompatActivity {
             findViewById(R.id.llCodInstalacao).setVisibility(View.GONE);
             txtAppFinalizado.setVisibility(View.VISIBLE);
         }
+        if (!Objects.requireNonNull(prefs.getString("serial_app", "")).equalsIgnoreCase("")
+                && prefs.getBoolean("cod_instalacao", false)) {
+            findViewById(R.id.llCodInstalacao).setVisibility(View.GONE);
+        }
         serial.setText(prefs.getString("serial_app", ""));
         _verificarTotalArmazenamento();
 

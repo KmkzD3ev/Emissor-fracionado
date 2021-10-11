@@ -489,7 +489,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 260, 104);
         //
         LinearLayout impressora = findViewById(R.id.teste);
-        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 424);
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
         LinearLayout impressora1 = findViewById(R.id.teste1);
         Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 180, 100);
 
