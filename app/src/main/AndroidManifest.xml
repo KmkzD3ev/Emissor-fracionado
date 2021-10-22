@@ -49,6 +49,11 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:replace="allowBackup"
         tools:targetApi="q">
+        <activity android:name=".Seguranca"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="Segurança"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".EditarPedido"
             android:configChanges="keyboardHidden|orientation|screenSize"

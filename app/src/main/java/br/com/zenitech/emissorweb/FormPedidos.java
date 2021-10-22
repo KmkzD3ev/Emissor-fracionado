@@ -858,6 +858,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             finish();
         } else {
             Toast.makeText(getBaseContext(), "Encontramos um problema com esse pedido. Precisa refazer!", Toast.LENGTH_SHORT).show();
+
+            //Intent i = new Intent(getBaseContext(), Principal.class);
+            //startActivity(i);
+            //finish();
         }
     }
 

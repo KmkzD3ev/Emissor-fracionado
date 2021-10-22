@@ -677,6 +677,12 @@ public class Principal extends AppCompatActivity
         // Cancelar pagamento cartão
         else if (id == R.id.nav_cancelar_pag) {
             Intent i;
+            i = new Intent(context, Seguranca.class);
+
+            startActivity(i);
+
+            /*
+            Intent i;
             Configuracoes configuracoes = new Configuracoes();
             if (configuracoes.GetDevice())
                 i = new Intent(context, CancelarPagamentoCartaoPOS.class);
@@ -684,6 +690,7 @@ public class Principal extends AppCompatActivity
                 i = new Intent(context, CancelarPagamentoCartao.class);
 
             startActivity(i);
+             */
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
