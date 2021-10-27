@@ -676,10 +676,13 @@ public class Principal extends AppCompatActivity
         }
         // Cancelar pagamento cartão
         else if (id == R.id.nav_cancelar_pag) {
-            Intent i;
-            i = new Intent(context, Seguranca.class);
+            if (bd.getAutorizacaoPinpad() == null) {
+                Toast.makeText(context, "Primeiro realize um pagamento com cartão para poder cancelar!", Toast.LENGTH_SHORT).show();
+            } else {
+                Intent i;
+                i = new Intent(context, Seguranca.class);
 
-            startActivity(i);
+                startActivity(i);
 
             /*
             Intent i;
@@ -691,6 +694,7 @@ public class Principal extends AppCompatActivity
 
             startActivity(i);
              */
+            }
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

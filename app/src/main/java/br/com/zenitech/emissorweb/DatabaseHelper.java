@@ -215,10 +215,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     ArrayList<String> getProdutos() {
         ArrayList<String> list = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        db.beginTransaction();
+        myDataBase = this.getReadableDatabase();
         String selectQuery = "Select * From " + TABELA_PRODUTOS;
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
         list.add("PRODUTO");
         try {
             if (cursor.getCount() > 0) {
@@ -228,12 +227,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     list.add(nome);
                 }
             }
-            db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            db.endTransaction();
-            db.close();
         }
 
         return list;
@@ -896,28 +891,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //ULTIMA NFC-E EMITIDA
     public AutorizacoesPinpad getAutorizacaoPinpad() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        db.beginTransaction();
+        myDataBase = this.getReadableDatabase();
 
-        AutorizacoesPinpad autorizacoesPinpad = new AutorizacoesPinpad(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        AutorizacoesPinpad autorizacoesPinpad = null;// new AutorizacoesPinpad(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
         try {
 
             String query = "SELECT * FROM " + TABELA_AUTORIZACOES_PINPAD + " aut " +
                     " ORDER BY aut.id DESC LIMIT 1";
 
-            Cursor cursor = db.rawQuery(query, null);
+            Cursor cursor = myDataBase.rawQuery(query, null);
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 autorizacoesPinpad = cursorToAutorizacoesPinpad(cursor);
             }
-            db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        db.endTransaction();
-        db.close();
 
         return autorizacoesPinpad;
     }
@@ -1206,8 +1196,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT * FROM pedidos ORDER BY id DESC";
 
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -1898,8 +1888,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT * FROM pos";
 
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {

@@ -222,7 +222,7 @@ public class Sincronizar extends AppCompatActivity {
 
         if (!configuracoes.GetDevice()) {
             if (prefs.getBoolean("mostrar_alerta_versao", true)) {
-                _verificarVersaoAtual();
+                // _verificarVersaoAtual();
             }
         }
 
@@ -456,7 +456,8 @@ public class Sincronizar extends AppCompatActivity {
                             _limparDadosSincronizacao(false);
                             _resetarSincronismo(10000, true);
                         } else {
-                            startDownload(serial);
+                            // startDownload(serial);
+                            esperarParaIniciarDownload(serial);
                         }
                     });
                 } else {
@@ -480,6 +481,12 @@ public class Sincronizar extends AppCompatActivity {
                 _resetarSincronismo(3000, true);
             }
         });
+    }
+
+    private void esperarParaIniciarDownload(String serial) {
+        new Handler().postDelayed(() -> {
+            startDownload(serial);
+        }, 10000);
     }
 
     // LIMPA OS DADOS DA SINCRONIZAÇÃO
@@ -740,7 +747,10 @@ public class Sincronizar extends AppCompatActivity {
 
     void _finalizarSincronizacao() {
         try {
-            pedidos = db.getPedidos();
+            //pedidos =
+            db.getPedidos();
+            db.getPos();
+            db.getProdutos();
             new Handler().postDelayed(this::_sucesso, 2000);
         } catch (Exception e) {
             msgErro = "Importação do banco de dados falhou! Tente novamente.";

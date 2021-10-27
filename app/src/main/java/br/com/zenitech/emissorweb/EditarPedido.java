@@ -74,7 +74,7 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
             "CARTÃO DE DÉBITO",
-            "OUTROS"
+            "PAGAMENTO INSTANTÂNEO (PIX)"
     };
     String[] listaFormasPagamentoDinheiro = {
             "DINHEIRO"
@@ -939,7 +939,28 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
 
     private void voltar() {
         //
+        //
         if (listaFinanceiroCliente == null) {
+            finish();
+        } else {
+            //
+            if (listaFinanceiroCliente.size() > 0) {
+                //confirmar();
+                //VerificarCamposIniciarPedido(false);
+                if (txtTotalItemFinanceiro.getText().equals("0,00")) {
+                    //
+                    Toast.makeText(this, "Adicione pelo menos uma forma de pagamento ao financeiro.", Toast.LENGTH_LONG).show();
+                } else if (!txtTotalItemFinanceiro.getText().equals(txtTotalFinanceiro.getText())) {
+                    //
+                    Toast.makeText(this, "O valor do financeiro está diferente da venda.", Toast.LENGTH_LONG).show();
+                } else {
+                    confirmar();
+                }
+            } else {
+                finish();
+            }
+        }
+        /*if (listaFinanceiroCliente == null) {
             finish();
         } else {
             //
@@ -948,7 +969,7 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
             } else {
                 finish();
             }
-        }
+        }*/
     }
 
     //Selecionar itens spProdutos
