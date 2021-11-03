@@ -521,6 +521,9 @@ public class ClassAuxiliar {
         } else if (s.equalsIgnoreCase("VALE COMBUSTIVEL")) {
             idFormaPagamento = "13";
 
+        } else if (s.equalsIgnoreCase("BOLETO")) {
+            idFormaPagamento = "15";
+
         } else if (s.equalsIgnoreCase("PAGAMENTO INSTANTANEO (PIX)")) {
             idFormaPagamento = "17";
 
@@ -563,6 +566,9 @@ public class ClassAuxiliar {
 
         } else if (s.equalsIgnoreCase("13")) {
             nomeGPG = "VALE COMBUSTIVEL";
+
+        } else if (s.equalsIgnoreCase("15")) {
+            nomeGPG = "BOLETO";
 
         } else if (s.equalsIgnoreCase("17")) {
             nomeGPG = "PAGAMENTO INSTANTANEO (PIX)";

@@ -175,7 +175,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 } else {
 
                     cpfCnpj_cliente.setText(params.getString("cpfCnpj_cliente"));
-                    formaPagamento.setText(params.getString("formaPagamento"));
+                    //formaPagamento.setText(params.getString("formaPagamento"));
+                    formaPagamento.setText(bd.getFormasPagamentoPedidoPrint(bd.getUltimoIdPedido()));
                     produto.setText(params.getString("produto"));
                     qnt.setText(params.getString("qnt"));
                     vlt.setText(params.getString("vlt"));
@@ -229,18 +230,18 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
         findViewById(R.id.btn_transmitir).setOnClickListener(v -> {
             //TRANSMITIR
-            if(verificarOnline.isOnline(contexto))
-            transmitirNota();
+            if (verificarOnline.isOnline(contexto))
+                transmitirNota();
             else
                 Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();
         });
 
         findViewById(R.id.btn_reTransmitir).setOnClickListener(v -> {
             //TRANSMITIR
-            if(verificarOnline.isOnline(contexto))
-            transmitirNota();
+            if (verificarOnline.isOnline(contexto))
+                transmitirNota();
             else
-            Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();
         });
 
         findViewById(R.id.btn_sair).setOnClickListener(v -> {

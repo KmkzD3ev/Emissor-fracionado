@@ -74,7 +74,8 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
             "CARTÃO DE DÉBITO",
-            "PAGAMENTO INSTANTÂNEO (PIX)"
+            "PAGAMENTO INSTANTÂNEO (PIX)",
+            "BOLETO"
     };
     String[] listaFormasPagamentoDinheiro = {
             "DINHEIRO"

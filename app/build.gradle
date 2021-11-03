@@ -19,8 +19,8 @@ android {
         applicationId "br.com.zenitech.emissorweb"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 46
-        versionName '3.4.6'
+        versionCode 47
+        versionName '3.4.7'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config

@@ -76,7 +76,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             "DINHEIRO",
             "CARTÃO DE CRÉDITO",
             "CARTÃO DE DÉBITO",
-            "PAGAMENTO INSTANTÂNEO (PIX)"
+            "PAGAMENTO INSTANTÂNEO (PIX)",
+            "BOLETO"
     };
     String[] listaFormasPagamentoDinheiro = {
             "DINHEIRO"
