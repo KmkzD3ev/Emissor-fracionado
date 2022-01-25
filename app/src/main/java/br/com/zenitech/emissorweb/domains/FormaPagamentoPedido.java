@@ -9,8 +9,10 @@ public class FormaPagamentoPedido {
     public String codigo_autorizacao;
     public String cardBrand;
     public String nsu;
+    public String id_cobranca_pix;
+    public String status_pix;
 
-    public FormaPagamentoPedido(String id, String id_pedido, String id_forma_pagamento, String valor, String codigo_autorizacao, String cardBrand, String nsu) {
+    public FormaPagamentoPedido(String id, String id_pedido, String id_forma_pagamento, String valor, String codigo_autorizacao, String cardBrand, String nsu, String id_cobranca_pix, String status_pix) {
         this.id = id;
         this.id_pedido = id_pedido;
         this.id_forma_pagamento = id_forma_pagamento;
@@ -18,6 +20,8 @@ public class FormaPagamentoPedido {
         this.codigo_autorizacao = codigo_autorizacao;
         this.cardBrand = cardBrand;
         this.nsu = nsu;
+        this.id_cobranca_pix = id_cobranca_pix;
+        this.status_pix = status_pix;
     }
 
     public String getId() {
@@ -74,5 +78,21 @@ public class FormaPagamentoPedido {
 
     public void setNsu(String nsu) {
         this.nsu = nsu;
+    }
+
+    public String getId_cobranca_pix() {
+        return id_cobranca_pix;
+    }
+
+    public void setId_cobranca_pix(String id_cobranca_pix) {
+        this.id_cobranca_pix = id_cobranca_pix;
+    }
+
+    public String getStatus_pix() {
+        return status_pix;
+    }
+
+    public void setStatus_pix(String status_pix) {
+        this.status_pix = status_pix;
     }
 }

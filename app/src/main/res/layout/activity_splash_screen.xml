@@ -23,12 +23,14 @@
         android:background="@drawable/degrade_1" />
 
     <LinearLayout
+        tools:viewBindingIgnore="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical">
 
         <LinearLayout
+            tools:viewBindingIgnore="true"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:gravity="center"

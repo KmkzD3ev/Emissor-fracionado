@@ -16,11 +16,13 @@ public class Unidades {
     private String codigo_ibge;
     private String url_consulta;
     private String codloja;
+    private String api_key_asaas;
+    private String cliente_cob_asaas;
     private String idCSC;
     private String CSC;
     private String url_qrcode;
 
-    public Unidades(String codigo, String razao_social, String cnpj, String endereco, String numero, String bairro, String cep, String telefone, String ie, String cidade, String uf, String codigo_ibge, String url_consulta, String codloja, String idCSC, String CSC, String url_qrcode) {
+    public Unidades(String codigo, String razao_social, String cnpj, String endereco, String numero, String bairro, String cep, String telefone, String ie, String cidade, String uf, String codigo_ibge, String url_consulta, String codloja, String api_key_asaas, String cliente_cob_asaas, String idCSC, String CSC, String url_qrcode) {
         this.codigo = codigo;
         this.razao_social = razao_social;
         this.cnpj = cnpj;
@@ -35,6 +37,8 @@ public class Unidades {
         this.codigo_ibge = codigo_ibge;
         this.url_consulta = url_consulta;
         this.codloja = codloja;
+        this.api_key_asaas = api_key_asaas;
+        this.cliente_cob_asaas = cliente_cob_asaas;
         this.idCSC = idCSC;
         this.CSC = CSC;
         this.url_qrcode = url_qrcode;
@@ -150,6 +154,22 @@ public class Unidades {
 
     public void setCodloja(String codloja) {
         this.codloja = codloja;
+    }
+
+    public String getApi_key_asaas() {
+        return api_key_asaas;
+    }
+
+    public void setApi_key_asaas(String api_key_asaas) {
+        this.api_key_asaas = api_key_asaas;
+    }
+
+    public String getCliente_cob_asaas() {
+        return cliente_cob_asaas;
+    }
+
+    public void setCliente_cob_asaas(String cliente_cob_asaas) {
+        this.cliente_cob_asaas = cliente_cob_asaas;
     }
 
     public String getIdCSC() {

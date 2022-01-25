@@ -11,7 +11,7 @@ import static stone.environment.Environment.SANDBOX;
 public class Configuracoes {
 
     // FALSE PARA DEFINIR PRODUÇÃO
-    final boolean ambinteTeste = false;
+    final boolean ambinteTeste = true;
 
     // INFORMA SE O APARELHO UTILIZADO É UM POS
     // SEMPRE RETORNAR FALSE CONFORME FOR GERADO O BUILD PARA PLAYSTORE

@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/drawable/bg_btn.xml" value="0.30520833333333336" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_main_principal.xml" value="0.10364583333333334" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_pix.xml" value="0.2890625" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_splash_screen.xml" value="0.10182370820668693" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_gerenciar_pagamento_cartao.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_form_pag_pedidos.xml" value="0.25" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

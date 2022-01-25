@@ -33,7 +33,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static org.jacoco.agent.rt.internal_8ff85ea.core.runtime.AgentOptions.OutputMode.file;
+//import static org.jacoco.agent.rt.internal_8ff85ea.core.runtime.AgentOptions.OutputMode.file;
 
 public class ResetApp extends AppCompatActivity {
     SharedPreferences prefs;

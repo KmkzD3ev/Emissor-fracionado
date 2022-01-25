@@ -1,13 +1,16 @@
 package br.com.zenitech.emissorweb.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +19,7 @@ import java.util.ArrayList;
 
 import br.com.zenitech.emissorweb.ClassAuxiliar;
 import br.com.zenitech.emissorweb.DatabaseHelper;
+import br.com.zenitech.emissorweb.Pix;
 import br.com.zenitech.emissorweb.R;
 import br.com.zenitech.emissorweb.domains.FormaPagamentoPedido;
 import br.com.zenitech.emissorweb.domains.Unidades;
@@ -37,9 +41,11 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
     private ClassAuxiliar classAuxiliar;
     private Context context;
     private ArrayList<FormaPagamentoPedido> elementos;
+    boolean api_asaas = false;
 
     ArrayList<Unidades> elementosUnidades;
     Unidades unidades;
+    AlertDialog alerta;
 
     /*String getId;
     String getId_pedido;
@@ -76,27 +82,42 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
     public void onBindViewHolder(ViewHolder holder, final int position) {
 
         //
-        final FormaPagamentoPedido formaPagamentoPedido = elementos.get(position);
+        final FormaPagamentoPedido fPP = elementos.get(position);
         classAuxiliar = new ClassAuxiliar();
+        unidades = elementosUnidades.get(0);
+        if (!unidades.getApi_key_asaas().equalsIgnoreCase("")) {
+            api_asaas = true;
+        }
 
         //
+        LinearLayout llFormPg = holder.llFormPg;
+        llFormPg.setBackgroundResource(R.color.transparente);
+        holder.btnExcluirFinanceiro.setVisibility(View.VISIBLE);
+
+        if (!fPP.getId_cobranca_pix().equals("")) {
+            holder.btnExcluirFinanceiro.setVisibility(View.GONE);
+        }
+        if (fPP.status_pix.equals("1")) {
+            llFormPg.setBackgroundResource(R.color.erro);
+            llFormPg.setOnClickListener(view -> mostrarMsg(fPP.id, fPP.valor, unidades.getApi_key_asaas(), unidades.getCliente_cob_asaas(),
+                    fPP.id_pedido, fPP.id_forma_pagamento, fPP.id_cobranca_pix));
+        }
+
+        //
+        String nomeFPG = classAuxiliar.getNomeFormaPagamento(fPP.getId_forma_pagamento());
         TextView txtFormaPagamento = holder.txtFormaPagamento;
-        txtFormaPagamento.setText(classAuxiliar.getNomeFormaPagamento(formaPagamentoPedido.getId_forma_pagamento()));
-        String nomeFPG = classAuxiliar.getNomeFormaPagamento(formaPagamentoPedido.getId_forma_pagamento());
+        txtFormaPagamento.setText(nomeFPG);
 
         //
         TextView total = holder.txtFinanceiro;
-        total.setText(classAuxiliar.maskMoney(new BigDecimal(formaPagamentoPedido.getValor())));
+        total.setText(classAuxiliar.maskMoney(new BigDecimal(fPP.getValor())));
 
         holder.btnExcluirFinanceiro.setOnClickListener(v -> {
-            final String getId = formaPagamentoPedido.getId();
-            final String getId_pedido = formaPagamentoPedido.getId_pedido();
-            final String getValor = formaPagamentoPedido.getValor();
-            final String codigoAutorizacao = formaPagamentoPedido.getCodigo_autorizacao();
+            final String getId = fPP.getId();
+            final String getId_pedido = fPP.getId_pedido();
+            final String getValor = fPP.getValor();
+            final String codigoAutorizacao = fPP.getCodigo_autorizacao();
             final int positionItem = position;
-
-
-            unidades = elementosUnidades.get(0);
 
             if ((nomeFPG.equalsIgnoreCase("CARTAO DE CREDITO") ||
                     nomeFPG.equalsIgnoreCase("CARTAO DE DEBITO"))
@@ -105,8 +126,12 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
                 //Log.e("Cancel", formaPagamentoPedido.getCodigo_autorizacao());
                 //iniciarTranzacao(codigoAutorizacao, getId, getId_pedido, getValor, positionItem);
                 makeText(context, "Não é possível excluir esta forma de pagamento!", LENGTH_SHORT).show();
+            } else if (nomeFPG.equalsIgnoreCase("PAGAMENTO INSTANTÂNEO (PIX)")
+                    && !unidades.getApi_key_asaas().equalsIgnoreCase("")
+            ) {
+                makeText(context, "Não é possível excluir esta forma de pagamento!", LENGTH_SHORT).show();
             } else {
-                _excluirFpg(getId, getId_pedido, getValor, positionItem);
+                _excluirFpg(getId, getId_pedido, getValor, positionItem, api_asaas);
             }
 
         });
@@ -119,7 +144,7 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        //LinearLayout LlList;
+        LinearLayout llFormPg;
         TextView txtFormaPagamento, txtFinanceiro;
         ImageButton btnExcluirFinanceiro;
 
@@ -127,15 +152,15 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
             super(itemView);
 
             //
-            //LlList = (LinearLayout) itemView.findViewById(R.id.LlList);
-            txtFormaPagamento = (TextView) itemView.findViewById(R.id.txtFormaPagamento);
-            txtFinanceiro = (TextView) itemView.findViewById(R.id.txtFinanceiro);
-            btnExcluirFinanceiro = (ImageButton) itemView.findViewById(R.id.btnExcluirFinanceiro);
+            llFormPg = itemView.findViewById(R.id.llFormPg);
+            txtFormaPagamento = itemView.findViewById(R.id.txtFormaPagamento);
+            txtFinanceiro = itemView.findViewById(R.id.txtFinanceiro);
+            btnExcluirFinanceiro = itemView.findViewById(R.id.btnExcluirFinanceiro);
         }
     }
 
-    public void excluirItem(String codigo, String codigo_financeiro_app, String totalVenda, int position) {
-        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, null, null, null, null, null, null);
+    public void excluirItem(String codigo, String codigo_financeiro_app, String totalVenda, int position, boolean api_asaas) {
+        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, null, null, null, null, null, null, null, null);
         DatabaseHelper bd;
         bd = new DatabaseHelper(context);
         bd.deleteItemFormPagPedido(formaPagamentoPedido);
@@ -149,7 +174,7 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
         //txtTotalFinanceiro
 
         if (elementos.size() != 0) {
-            String valor = bd.getValorTotalFinanceiro(codigo_financeiro_app);
+            String valor = bd.getValorTotalFinanceiro(codigo_financeiro_app, api_asaas);
             txtTotalItemFinanceiro.setText(classAuxiliar.maskMoney(new BigDecimal(valor)));
             //textTotalItens.setText(String.valueOf(elementos.size()));
         } else {
@@ -224,7 +249,7 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
 
                 printMerchant.print();*/
 
-                _excluirFpg(getId, getId_pedido, getValor, positionItem);
+                _excluirFpg(getId, getId_pedido, getValor, positionItem, api_asaas);
             }
 
             @Override
@@ -241,12 +266,13 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
         provider.execute();
     }
 
-    private void _excluirFpg(String getId, String getId_pedido, String getValor, int positionItem) {
+    private void _excluirFpg(String getId, String getId_pedido, String getValor, int positionItem, boolean api_asaas) {
         excluirItem(
                 getId,
                 getId_pedido,
                 getValor,
-                positionItem
+                positionItem,
+                api_asaas
         );
     }
 
@@ -254,5 +280,40 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
         Toast toast = makeText(context, msg, LENGTH_SHORT);
         toast.setGravity(1, 0, 0);
         toast.show();
+    }
+
+    public void mostrarMsg(String idLisForPag, String valor, String apiKey, String cliCob,
+                           String pedido, String idForPagPix, String idPagamento) {
+
+        //Cria o gerador do AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setIcon(R.drawable.logo_emissor_web);
+        //define o titulo
+        builder.setTitle("Pix");
+        //define a mensagem
+        String msg = "Ecolha uma opção para avançar.";
+        builder.setMessage(msg);
+        //define um botão como positivo
+        builder.setPositiveButton("VERIFICAR PAGAMENTO", (arg0, arg1) -> {
+            Intent i = new Intent(context, Pix.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.putExtra("idLisForPag", idLisForPag);
+            i.putExtra("valor", "R$ " + classAuxiliar.maskMoney(new BigDecimal(valor)));
+            i.putExtra("apiKey", apiKey);
+            i.putExtra("cliCob", cliCob);
+            i.putExtra("pedido", "" + pedido);
+            i.putExtra("idForPagPix", idForPagPix);
+            i.putExtra("idPagamento", idPagamento);
+            context.startActivity(i);
+            //Toast.makeText(InformacoesVagas.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
+        });
+        //define um botão como negativo.
+        builder.setNegativeButton("Negativo", (arg0, arg1) -> {
+            //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
+        });
+        //cria o AlertDialog
+        alerta = builder.create();
+        //Exibe alerta
+        alerta.show();
     }
 }

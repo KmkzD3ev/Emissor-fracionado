@@ -66,9 +66,11 @@ import static br.com.zenitech.emissorweb.GerenciarPagamentoCartao.getApplication
 
 public class FormPedidos extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     static final int PAGAMENTO_REQUEST = 1;
+    static final int PAGAMENTO_PIX_REQUEST = 2;
     private DatabaseHelper bd;
     SharedPreferences prefs;
     SharedPreferences.Editor ed;
+    boolean api_asaas = false;
 
     //"FORMA PAGAMENTO",
     //"OUTROS"
@@ -204,6 +206,9 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         elementos = bd.getUnidades();
         unidades = elementos.get(0);
+        if (!unidades.getApi_key_asaas().equalsIgnoreCase("")) {
+            api_asaas = true;
+        }
 
         //
         btnPagamentoCartaoNFCE = findViewById(R.id.btnPagamentoCartaoNFCE);
@@ -321,7 +326,18 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
                         // Retirar quando for usar o pinpad
                         //btnAvancarNFCE.setVisibility(View.VISIBLE);
-                    } else {
+                    }/* else if (parent.getItemAtPosition(position).toString().equalsIgnoreCase("PAGAMENTO INSTANTÂNEO (PIX)")) {
+                        //
+
+                        Intent a = new Intent(getBaseContext(), Pix.class);
+                        a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        a.putExtra("valor", txtValorFormaPagamento.getText().toString());
+                        a.putExtra("apiKey", unidades.getApi_key_asaas());
+                        a.putExtra("cliCob", unidades.getCliente_cob_asaas());
+                        a.putExtra("pedido", "" + idTemp);
+                        startActivity(a);
+                        //finish();
+                    }*/ else {
                         //
                         //llCredenciadora.setVisibility(View.VISIBLE);
                         //
@@ -439,6 +455,13 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         });
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+
+        atualizarListaFormPag();
+    }
+
     private void AddFormaPagamento(String authorizationCode, String cardBrand, String nsu) {
 
         //ESCONDER O TECLADO
@@ -453,8 +476,16 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //
         if (!compararValorRestante()) return;
 
+        String val = aux.soNumeros(txtValorFormaPagamento.getText().toString());
+
         if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             ShowMsgToast("Selecione a forma de pagamento.");
+        } else if (val.equalsIgnoreCase("") || val.equalsIgnoreCase("000")) {
+            ShowMsgToast("Adicione um valor");
+        } else if (!unidades.getApi_key_asaas().equalsIgnoreCase("") && spFormasPagamento.getSelectedItem().toString().equalsIgnoreCase("PAGAMENTO INSTANTÂNEO (PIX)")) {
+            // PIX
+            //AddFormaPagamentoPIX("","","");
+            iniciarPagamentoPIX();
         } else {
             if (unidades.getCodloja().equalsIgnoreCase("")) {
                 //
@@ -480,7 +511,9 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                     "" + aux.converterValores(aux.soNumeros(txtValorFormaPagamento.getText().toString())),
                     authorizationCode,
                     cardBrand,
-                    nsu
+                    nsu,
+                    "",
+                    "0"
             ));
 
             //
@@ -489,7 +522,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             rvFinanceiro.setAdapter(adapter);
 
             //
-            String tif = aux.maskMoney(new BigDecimal(bd.getValorTotalFinanceiro(String.valueOf(idTemp))));
+            String tif = aux.maskMoney(new BigDecimal(bd.getValorTotalFinanceiro(String.valueOf(idTemp), api_asaas)));
             txtTotalItemFinanceiro.setText(tif);
 
             //
@@ -519,6 +552,97 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             spFormasPagamento.setSelection(0);
             etCodAutorizacao.setText("");
         }
+    }
+
+    void atualizarListaFormPag() {
+        //
+        listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
+        adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos);
+        rvFinanceiro.setAdapter(adapter);
+
+        //
+        String tif = aux.maskMoney(new BigDecimal(bd.getValorTotalFinanceiro(String.valueOf(idTemp), api_asaas)));
+        txtTotalItemFinanceiro.setText(tif);
+
+        //
+        //!txtTotalItemFinanceiro.getText().equals(txtTotalFinanceiro.getText()
+
+        //
+        String valorFinanceiro = String.valueOf(aux.converterValores(txtTotalFinanceiro.getText().toString()));
+        String valorFinanceiroAdd = String.valueOf(aux.converterValores(txtTotalItemFinanceiro.getText().toString()));
+
+        //SUBTRAIR O VALOR PELA QUANTIDADE
+        String[] subtracao = {valorFinanceiro, valorFinanceiroAdd};
+        String total = String.valueOf(aux.subitrair(subtracao));
+
+        txtValorFormaPagamento.setText(total);
+
+        //
+        if (comparar()) {
+            bgTotal.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.erro));
+            txtValorFormaPagamento.setText("0,00");
+        } else {
+            bgTotal.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.transparente));
+        }
+
+        //
+            /*txtDocumentoFormaPagamento.setText("");
+            tilDocumento.setVisibility(View.VISIBLE);*/
+        spFormasPagamento.setSelection(0);
+        etCodAutorizacao.setText("");
+    }
+
+    private void AddFormaPagamentoPIX(String authorizationCode, String cardBrand, String nsu) {
+
+        String val = aux.soNumeros(txtValorFormaPagamento.getText().toString());
+
+        bd.addFormasPagamentoPedidosTemp(new FormaPagamentoPedido(
+                "",
+                String.valueOf(idTemp), //ID PEDIDO
+                aux.getIdFormaPagamento(spFormasPagamento.getSelectedItem().toString()),
+                "" + aux.converterValores(aux.soNumeros(txtValorFormaPagamento.getText().toString())),
+                authorizationCode,
+                cardBrand,
+                nsu,
+                "",
+                "1"
+        ));
+
+        //
+        listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
+        adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos);
+        rvFinanceiro.setAdapter(adapter);
+
+        //
+        String tif = aux.maskMoney(new BigDecimal(bd.getValorTotalFinanceiro(String.valueOf(idTemp), api_asaas)));
+        txtTotalItemFinanceiro.setText(tif);
+
+        //
+        //!txtTotalItemFinanceiro.getText().equals(txtTotalFinanceiro.getText()
+
+        //
+        String valorFinanceiro = String.valueOf(aux.converterValores(txtTotalFinanceiro.getText().toString()));
+        String valorFinanceiroAdd = String.valueOf(aux.converterValores(txtTotalItemFinanceiro.getText().toString()));
+
+        //SUBTRAIR O VALOR PELA QUANTIDADE
+        String[] subtracao = {valorFinanceiro, valorFinanceiroAdd};
+        String total = String.valueOf(aux.subitrair(subtracao));
+
+        txtValorFormaPagamento.setText(total);
+
+        //
+        if (comparar()) {
+            bgTotal.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.erro));
+            txtValorFormaPagamento.setText("0,00");
+        } else {
+            bgTotal.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.transparente));
+        }
+
+        //
+            /*txtDocumentoFormaPagamento.setText("");
+            tilDocumento.setVisibility(View.VISIBLE);*/
+        spFormasPagamento.setSelection(0);
+        etCodAutorizacao.setText("");
     }
 
     //COMPARAR O VALOR DO FINANCEIRO COM O VALOR ADICIONADO
@@ -866,6 +990,21 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         }
     }
 
+    private void iniciarPagamentoPIX() {
+
+        Intent a = new Intent(getBaseContext(), Pix.class);
+        a.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        a.putExtra("valor", txtValorFormaPagamento.getText().toString());
+        a.putExtra("apiKey", unidades.getApi_key_asaas());
+        a.putExtra("cliCob", unidades.getCliente_cob_asaas());
+        a.putExtra("pedido", "" + idTemp);
+
+        AddFormaPagamentoPIX("", "", "");
+        a.putExtra("idForPagPix", bd.ultimoIdFormPagPIX(String.valueOf(idTemp)));
+
+        startActivityForResult(a, PAGAMENTO_PIX_REQUEST);
+    }
+
     private void iniciarPagamento() {
         Intent i;
         Configuracoes configuracoes = new Configuracoes();
@@ -1144,6 +1283,17 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 //ShowMsgToast(data.getStringExtra("result"));
                 AddFormaPagamento(data.getStringExtra("authorizationCode"), aux.getIdBandeira(data.getStringExtra("cardBrand")), data.getStringExtra("nsu"));
                 //Timber.tag("Stone").i(Objects.requireNonNull(data.getStringExtra("authorizationCode")));
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+                ShowMsgToast("Operação Cancelada!");
+            }
+        }
+        if (requestCode == PAGAMENTO_PIX_REQUEST) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("result");
+                // AddFormaPagamentoPIX("", "", "");
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result

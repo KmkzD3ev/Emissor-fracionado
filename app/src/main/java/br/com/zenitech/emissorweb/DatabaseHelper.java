@@ -222,8 +222,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             if (cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    String codigo = cursor.getString(cursor.getColumnIndex("codigo"));
-                    String nome = cursor.getString(cursor.getColumnIndex("nome"));
+                    String codigo = cursor.getString(cursor.getColumnIndexOrThrow("codigo"));
+                    String nome = cursor.getString(cursor.getColumnIndexOrThrow("nome"));
                     list.add(nome);
                 }
             }
@@ -243,7 +243,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             if (cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    produto = cursor.getString(cursor.getColumnIndex(NOME_PRODUTO));
+                    produto = cursor.getString(cursor.getColumnIndexOrThrow(NOME_PRODUTO));
                 }
             }
             db.setTransactionSuccessful();
@@ -287,7 +287,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (produtos.moveToFirst()) {
             do {
 
-                id = produtos.getString(produtos.getColumnIndex(NOME_PRODUTO));
+                id = produtos.getString(produtos.getColumnIndexOrThrow(NOME_PRODUTO));
 
             } while (produtos.moveToNext());
         }
@@ -311,7 +311,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (produtos.moveToFirst()) {
             do {
 
-                tributo = produtos.getString(produtos.getColumnIndex(TRIBUTOS_PRODUTO));
+                tributo = produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO));
 
             } while (produtos.moveToNext());
         }
@@ -335,7 +335,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (produtos.moveToFirst()) {
             do {
 
-                tributo = produtos.getString(produtos.getColumnIndex(TRIBUTOS_PRODUTO));
+                tributo = produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO));
 
             } while (produtos.moveToNext());
         }
@@ -359,7 +359,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (produtos.moveToFirst()) {
             do {
 
-                tributo = produtos.getString(produtos.getColumnIndex(TRIBUTOS_PRODUTO));
+                tributo = produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO));
 
             } while (produtos.moveToNext());
         }
@@ -383,7 +383,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (produtos.moveToFirst()) {
             do {
 
-                tributo = produtos.getString(produtos.getColumnIndex(TRIBUTOS_PRODUTO));
+                tributo = produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO));
 
             } while (produtos.moveToNext());
         }
@@ -404,7 +404,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (produtos.moveToFirst()) {
             do {
 
-                tributo = produtos.getString(produtos.getColumnIndex(VALOR_MINIMO_PRODUTO));
+                tributo = produtos.getString(produtos.getColumnIndexOrThrow(VALOR_MINIMO_PRODUTO));
 
             } while (produtos.moveToNext());
         }
@@ -430,7 +430,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (produtos.moveToFirst()) {
             do {
 
-                tributo = produtos.getString(produtos.getColumnIndex(VALOR_MAXIMO_PRODUTO));
+                tributo = produtos.getString(produtos.getColumnIndexOrThrow(VALOR_MAXIMO_PRODUTO));
 
             } while (produtos.moveToNext());
         }
@@ -452,7 +452,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             produtos = db.rawQuery(query_pos, null);
             if (produtos.moveToFirst()) {
                 do {
-                    quatProd = produtos.getString(produtos.getColumnIndex(QTD_REVENDA));
+                    quatProd = produtos.getString(produtos.getColumnIndexOrThrow(QTD_REVENDA));
                 } while (produtos.moveToNext());
             }
         } catch (Exception ignored) {
@@ -466,7 +466,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             intProdutos = db.rawQuery(query_intPro, null);
             if (intProdutos.moveToFirst()) {
                 do {
-                    quantInt = intProdutos.getString(intProdutos.getColumnIndex("quantidade"));
+                    quantInt = intProdutos.getString(intProdutos.getColumnIndexOrThrow("quantidade"));
                 } while (intProdutos.moveToNext());
             }
         } catch (Exception ignored) {
@@ -480,7 +480,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             intProdutosNFE = db.rawQuery(query_intProNFE, null);
             if (intProdutosNFE.moveToFirst()) {
                 do {
-                    quantIntNFE = intProdutosNFE.getString(intProdutosNFE.getColumnIndex("quantidade"));
+                    quantIntNFE = intProdutosNFE.getString(intProdutosNFE.getColumnIndexOrThrow("quantidade"));
                 } while (intProdutosNFE.moveToNext());
             }
         } catch (Exception ignored) {
@@ -991,6 +991,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("codigo_autorizacao", formaPagamentoPedido.codigo_autorizacao);
         values.put("bandeira", formaPagamentoPedido.cardBrand);
         values.put("nsu", formaPagamentoPedido.codigo_autorizacao);
+        values.put("id_cobranca_pix", formaPagamentoPedido.id_cobranca_pix);
+        values.put("status_pix", formaPagamentoPedido.status_pix);
         db.insert("formas_pagamento_pedidos", null, values);
         db.close();
     }
@@ -1387,7 +1389,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             produtos = db.rawQuery(query_pos, null);
             if (produtos.moveToFirst()) {
                 do {
-                    quatProd = produtos.getString(produtos.getColumnIndex(QTD_REVENDA));
+                    quatProd = produtos.getString(produtos.getColumnIndexOrThrow(QTD_REVENDA));
                 } while (produtos.moveToNext());
             }
         } catch (Exception ignored) {
@@ -1400,7 +1402,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             intProdutos = db.rawQuery(query_intPro, null);
             if (intProdutos.moveToFirst()) {
                 do {
-                    quantInt = intProdutos.getString(intProdutos.getColumnIndex("quantidade"));
+                    quantInt = intProdutos.getString(intProdutos.getColumnIndexOrThrow("quantidade"));
                 } while (intProdutos.moveToNext());
             }
         } catch (Exception ignored) {
@@ -1413,7 +1415,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             intProdutosNFE = db.rawQuery(query_intProNFE, null);
             if (intProdutosNFE.moveToFirst()) {
                 do {
-                    quantIntNFE = intProdutosNFE.getString(intProdutosNFE.getColumnIndex("quantidade"));
+                    quantIntNFE = intProdutosNFE.getString(intProdutosNFE.getColumnIndexOrThrow("quantidade"));
                 } while (intProdutosNFE.moveToNext());
             }
         } catch (Exception ignored) {
@@ -1619,8 +1621,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                totPad = Integer.parseInt(cursor.getString(cursor.getColumnIndex("valor_total")));
-                totFin = Integer.parseInt(cursor.getString(cursor.getColumnIndex("val_financeiro")));
+                totPad = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow("valor_total")));
+                totFin = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow("val_financeiro")));
             } while (cursor.moveToNext());
         }
 
@@ -1648,7 +1650,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (pos.moveToFirst()) {
             do {
 
-                ultimoId = pos.getString(pos.getColumnIndex("ultnfce"));
+                ultimoId = pos.getString(pos.getColumnIndexOrThrow("ultnfce"));
 
             } while (pos.moveToNext());
         }
@@ -1698,11 +1700,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (unidades.moveToFirst()) {
             do {
 
-                if (unidades.getColumnIndex("cnpj") == 2) {
-                    chave_CNPJ = aux.soNumeros(unidades.getString(unidades.getColumnIndex("cnpj")));
+                if (unidades.getColumnIndexOrThrow("cnpj") == 2) {
+                    chave_CNPJ = aux.soNumeros(unidades.getString(unidades.getColumnIndexOrThrow("cnpj")));
                 }
-                if (unidades.getColumnIndex("numero") == 4) {
-                    chave_cUF = aux.idEstado(unidades.getString(unidades.getColumnIndex("uf")));
+                if (unidades.getColumnIndexOrThrow("numero") == 4) {
+                    chave_cUF = aux.idEstado(unidades.getString(unidades.getColumnIndexOrThrow("uf")));
                 }
 
             } while (unidades.moveToNext());
@@ -1714,8 +1716,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         pos = db.rawQuery(query_pos, null);
         if (pos.moveToFirst()) {
             do {
-                if (pos.getColumnIndex("serie") == 3) {
-                    chave_serie = aux.soNumeros(pos.getString(pos.getColumnIndex("serie")));
+                if (pos.getColumnIndexOrThrow("serie") == 3) {
+                    chave_serie = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serie")));
                 }
             } while (pos.moveToNext());
         }
@@ -1777,8 +1779,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (pos.moveToFirst()) {
             do {
 
-                if (pos.getColumnIndex("serie") == 3) {
-                    serie = aux.soNumeros(pos.getString(pos.getColumnIndex("serie")));
+                if (pos.getColumnIndexOrThrow("serie") == 3) {
+                    serie = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serie")));
                 }
 
             } while (pos.moveToNext());
@@ -1814,10 +1816,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (pos.moveToFirst()) {
             do {
 
-               /* if (pos.getColumnIndex("serial") == 3) {
-                    serie = aux.soNumeros(pos.getString(pos.getColumnIndex("serie")));
+               /* if (pos.getColumnIndexOrThrow("serial") == 3) {
+                    serie = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serie")));
                 }*/
-                serial = aux.soNumeros(pos.getString(pos.getColumnIndex("serial")));
+                serial = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serial")));
 
             } while (pos.moveToNext());
         }
@@ -1827,7 +1829,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private Unidades cursorToUnidade(Cursor cursor) {
-        Unidades unidades = new Unidades(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        Unidades unidades = new Unidades(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         //
         unidades.setCodigo(cursor.getString(0));
         unidades.setRazao_social(cursor.getString(1));
@@ -1843,9 +1845,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         unidades.setCodigo_ibge(cursor.getString(11));
         unidades.setUrl_consulta(cursor.getString(12));
         unidades.setCodloja(cursor.getString(13));
-        unidades.setIdCSC(cursor.getString(14));
-        unidades.setCSC(cursor.getString(15));
-        unidades.setUrl_qrcode(cursor.getString(16));
+        unidades.setApi_key_asaas(cursor.getString(14));
+        unidades.setCliente_cob_asaas(cursor.getString(15));
+        unidades.setIdCSC(cursor.getString(16));
+        unidades.setCSC(cursor.getString(17));
+        unidades.setUrl_qrcode(cursor.getString(18));
         return unidades;
     }
 
@@ -1913,7 +1917,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             if (cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    String nome = cursor.getString(cursor.getColumnIndex("descricao_credenciadora"));
+                    String nome = cursor.getString(cursor.getColumnIndexOrThrow("descricao_credenciadora"));
                     list.add(nome);
                 }
             }
@@ -1938,7 +1942,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             if (cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
-                    String nome = cursor.getString(cursor.getColumnIndex("codigo_credenciadora"));
+                    String nome = cursor.getString(cursor.getColumnIndexOrThrow("codigo_credenciadora"));
                     list.add(nome);
                 }
             }
@@ -1955,7 +1959,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR POS
     private FormaPagamentoPedido cursorFormaPagamentoPedido(Cursor cursor) {
-        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(null, null, null, null, null, null, null);
+        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(null, null, null, null, null, null, null, null, null);
 
         //
         formaPagamentoPedido.setId(cursor.getString(0));
@@ -1965,6 +1969,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         formaPagamentoPedido.setCodigo_autorizacao(cursor.getString(4));
         formaPagamentoPedido.setCardBrand(cursor.getString(5));
         formaPagamentoPedido.setNsu(cursor.getString(6));
+        formaPagamentoPedido.setId_cobranca_pix(cursor.getString(7));
+        formaPagamentoPedido.setStatus_pix(cursor.getString(8));
         return formaPagamentoPedido;
     }
 
@@ -1979,8 +1985,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                FormaPagamentoPedido formaPagamentoPedido = cursorFormaPagamentoPedido(cursor);
-                listaFinanceiroVendas.add(formaPagamentoPedido);
+                //FormaPagamentoPedido formaPagamentoPedido = cursorFormaPagamentoPedido(cursor);
+                listaFinanceiroVendas.add(cursorFormaPagamentoPedido(cursor));
+                //Log.e("SQL", "getFinanceiroCliente - " + formaPagamentoPedido.getId_pedido());
             } while (cursor.moveToNext());
         }
 
@@ -2130,33 +2137,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //SOMAR O VALOR DO FINANCEIRO
-    public String getValorTotalFinanceiro(String idPedido) {
-
-        /*SQLiteDatabase db = this.getReadableDatabase();
-        db.beginTransaction();
-
-        String selectQuery = "SELECT SUM(valor) FROM formas_pagamento_pedidos WHERE id_pedido = '" + idPedido + "'";
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        String total = "0.0";
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                total = cursor.getString(0);
-            }
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            db.endTransaction();
-            db.close();
-        }*/
-
+    public String getValorTotalFinanceiro(String idPedido, boolean api_asaas) {
         myDataBase = this.getReadableDatabase();
-        //db.beginTransaction();
 
-        String selectQuery = "SELECT SUM(valor) FROM formas_pagamento_pedidos WHERE id_pedido = '" + idPedido + "'";
+        String selectQuery;
+        if (api_asaas) {
+            selectQuery = "SELECT SUM(valor) " +
+                    "FROM formas_pagamento_pedidos " +
+                    "WHERE id_pedido = '" + idPedido + "' AND status_pix = '0'";
+        } else {
+            selectQuery = "SELECT SUM(valor) FROM formas_pagamento_pedidos WHERE id_pedido = '" + idPedido + "'";
+        }
 
         Cursor cursor = myDataBase.rawQuery(selectQuery, null);
 
@@ -2362,6 +2353,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return pedidos;
     }
 
+    public void apagarPixSemPagamento() {
+        String query = "DELETE FROM formas_pagamento_pedidos WHERE status_pix = '1'";
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        /*if (cursor.moveToFirst()) {
+            do {
+                pedidos = cursorToPedidos(cursor);
+            } while (cursor.moveToNext());
+        }*/
+    }
+
     // ADICIONA FINANCEIRO PARA OS PEDIDOS FRACIONADOS
     public void PedidoFracionadosSemFinanceiro() {
 
@@ -2401,6 +2405,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 }
             } while (cursor.moveToNext());
         }
+    }
+
+    //
+    String ultimoIdFormPagPIX(String idPedido) {
+        myDataBase = this.getReadableDatabase();
+        String id = null;
+        String query = "SELECT * " +
+                "FROM formas_pagamento_pedidos fpp " +
+                "WHERE fpp.id_pedido = '" + idPedido + "' AND fpp.status_pix = 1 " +
+                "ORDER BY fpp.id DESC " +
+                "LIMIT 1";
+        Cursor cursor = myDataBase.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                id = cursor.getString(cursor.getColumnIndexOrThrow("id"));
+            } while (cursor.moveToNext());
+        }
+
+        return id;
+    }
+
+    // SALVA O ID DO PAGAMENTO PIX RETORNADO DA API ASAAS
+    void updateFormPagPIX(String id_cobranca_pix, String id) {
+        myDataBase = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("id_cobranca_pix", id_cobranca_pix);
+        myDataBase.update("formas_pagamento_pedidos", values, "id=" + id, null);
+    }
+
+    void updateFormPagPIXRecebido(String id) {
+        myDataBase = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("status_pix", "0");
+        myDataBase.update("formas_pagamento_pedidos", values, "id=" + id, null);
     }
 
     public void FecharConexao() {

@@ -1,5 +1,6 @@
 package br.com.zenitech.emissorweb;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+@SuppressLint("CustomSplashScreen")
 public class SplashScreen extends AppCompatActivity {
     //
     private SharedPreferences prefs;
@@ -32,7 +34,7 @@ public class SplashScreen extends AppCompatActivity {
     private int time = 2300;
     private Bundle params;
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
+    //@TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,7 +120,7 @@ public class SplashScreen extends AppCompatActivity {
                 Runtime runtime = Runtime.getRuntime();
                 runtime.exec("pm clear " + packageName);
 
-                Toast.makeText(getBaseContext(), "O App foi resetado com sucesso!", Toast.LENGTH_LONG);
+                Toast.makeText(getBaseContext(), "O App foi resetado com sucesso!", Toast.LENGTH_LONG).show();
             }
 
             //prefs.edit().putBoolean("reset", false).apply();

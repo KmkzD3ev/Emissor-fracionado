@@ -562,7 +562,7 @@ public class Sincronizar extends AppCompatActivity {
 
     }
 
-    public void queryStatus(View v) {
+    /*public void queryStatus(View v) {
         Cursor c = mgr.query(new DownloadManager.Query().setFilterById(lastDownload));
 
         if (c == null) {
@@ -571,17 +571,17 @@ public class Sincronizar extends AppCompatActivity {
             c.moveToFirst();
 
             Log.d(getClass().getName(), "COLUMN_ID: " +
-                    c.getLong(c.getColumnIndex(DownloadManager.COLUMN_ID)));
+                    c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_ID)));
             Log.d(getClass().getName(), "COLUMN_BYTES_DOWNLOADED_SO_FAR: " +
-                    c.getLong(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)));
+                    c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)));
             Log.d(getClass().getName(), "COLUMN_LAST_MODIFIED_TIMESTAMP: " +
-                    c.getLong(c.getColumnIndex(DownloadManager.COLUMN_LAST_MODIFIED_TIMESTAMP)));
+                    c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_LAST_MODIFIED_TIMESTAMP)));
             Log.d(getClass().getName(), "COLUMN_LOCAL_URI: " +
-                    c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)));
+                    c.getString(c.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI)));
             Log.d(getClass().getName(), "COLUMN_STATUS: " +
-                    c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS)));
+                    c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)));
             Log.d(getClass().getName(), "COLUMN_REASON: " +
-                    c.getInt(c.getColumnIndex(DownloadManager.COLUMN_REASON)));
+                    c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON)));
 
             Toast.makeText(this, statusMessage(c), Toast.LENGTH_LONG).show();
         }
@@ -594,7 +594,7 @@ public class Sincronizar extends AppCompatActivity {
     private String statusMessage(Cursor c) {
         String msg;
 
-        switch (c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
+        switch (c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))) {
             case DownloadManager.STATUS_FAILED:
                 msg = "Download failed!";
                 break;
@@ -621,7 +621,7 @@ public class Sincronizar extends AppCompatActivity {
         }
 
         return (msg);
-    }
+    }*/
 
     BroadcastReceiver onComplete = new BroadcastReceiver() {
         public void onReceive(Context ctxt, Intent intent) {

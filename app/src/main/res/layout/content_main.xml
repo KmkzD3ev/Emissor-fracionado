@@ -37,8 +37,8 @@
                     android:layout_height="32dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginRight="16dp"
-                    android:tint="@color/colorPrimary"
-                    app:srcCompat="@drawable/logo_emissor_web" />
+                    app:srcCompat="@drawable/logo_emissor_web"
+                    app:tint="@color/colorPrimary" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="0dp"
