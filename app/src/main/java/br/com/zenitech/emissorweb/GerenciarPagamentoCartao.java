@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,9 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import br.com.zenitech.emissorweb.controller.LogCartaoControllerKT;
 import br.com.zenitech.emissorweb.domains.Autorizacoes;
 import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.Unidades;
+import br.com.zenitech.emissorweb.util.ActionCodeStone;
 import stone.application.StoneStart;
 import stone.application.enums.Action;
 import stone.application.enums.InstalmentTransactionEnum;
@@ -102,9 +105,10 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
     //
     Context context;
     private DatabaseHelper bd;
-    TextView txtTotalPagar, txtStatusPagamento, txtMsgCausaErro;
+    TextView txtTotalPagar, txtStatusPagamento, txtMsgCausaErro, txtMsgErro, txtErroDiverso;
     ClassAuxiliar cAux;
-    LinearLayoutCompat llDebito, llCredito, llPagamentoImprimir;
+    LinearLayoutCompat llDebito, llCredito, llPagamentoImprimir, llPagamentoPedirCartao, llProcessandoPagamento;
+    LinearLayoutCompat llPagamentoAprovado, llPagamentoReprovado, llErroDiversoPg;
     AlertDialog alerta;
     SharedPreferences prefs;
 
@@ -120,6 +124,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
     String valorUnit;
     String total;
     int transactionId;
+    TextView txtFalha;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,9 +148,25 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
         txtTotalPagar = findViewById(R.id.txtTotalPagarCartao);
         txtStatusPagamento = findViewById(R.id.txtStatusPagamento);
         txtMsgCausaErro = findViewById(R.id.txtMsgCausaErro);
+        txtMsgErro = findViewById(R.id.txtMsgErro);
+        txtErroDiverso = findViewById(R.id.txtErroDiverso);
+        txtFalha = findViewById(R.id.txtFalha);
         llDebito = findViewById(R.id.llDebito);
         llCredito = findViewById(R.id.llCredito);
         llPagamentoImprimir = findViewById(R.id.llPagamentoImprimir);
+        //
+        llPagamentoPedirCartao = findViewById(R.id.llPagamentoPedirCartao);
+        llPagamentoPedirCartao.setVisibility(View.GONE);
+        //
+        llProcessandoPagamento = findViewById(R.id.llProcessandoPagamento);
+        llProcessandoPagamento.setVisibility(View.GONE);
+        //
+        llErroDiversoPg = findViewById(R.id.llErroDiversoPg);
+        llErroDiversoPg.setVisibility(View.GONE);
+        //
+        llPagamentoAprovado = findViewById(R.id.llPagamentoAprovado);
+        llPagamentoReprovado = findViewById(R.id.llPagamentoReprovado);
+        llPagamentoReprovado.setVisibility(View.GONE);
         //
         btnEnviarTrazacao = findViewById(R.id.btnEnviarTrazacao);
 
@@ -158,6 +179,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
         // ** Cancelar pagamento
         btnCancelarFinalizarPagamento = findViewById(R.id.btnCancelarFinalizarPagamento);
         btnCancelarFinalizarPagamento.setOnClickListener(v -> cancelarPagamento());
+        findViewById(R.id.btnSairPag).setOnClickListener(view -> Sair());
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listaTotalParcelas);
         spParcelas = findViewById(R.id.spParcelas);
@@ -493,6 +515,13 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
         builder.show();
     }
 
+    private void Sair() {
+        //
+        Intent returnIntent = new Intent();
+        setResult(Activity.RESULT_CANCELED, returnIntent);
+        finish();
+    }
+
     // Cancelar Pagamento
     private void cancelarPagamento() {
         final CancellationProvider provider = new CancellationProvider(context, transactionObject);
@@ -543,9 +572,8 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
 
     void msg(boolean statusPag) {
         //
-        LinearLayoutCompat llPagamentoAprovado, llPagamentoReprovado;
-        llPagamentoAprovado = findViewById(R.id.llPagamentoAprovado);
-        llPagamentoReprovado = findViewById(R.id.llPagamentoReprovado);
+        /*llPagamentoAprovado = findViewById(R.id.llPagamentoAprovado);
+        llPagamentoReprovado = findViewById(R.id.llPagamentoReprovado);*/
 
         runOnUiThread(() -> {
             //
@@ -580,7 +608,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
         //Log.i("Stone", String.valueOf(transactionDAO.findTransactionWithId(transactionId)));
 
         //
-        transactionDAO = new TransactionDAO(getApplicationContext());
+        transactionDAO = new TransactionDAO(context);
         Log.e("transactionDAO", transactionDAO.toString());
         Intent returnIntent = new Intent();
         returnIntent.putExtra("result", "ok");
@@ -642,7 +670,7 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment(new Configuracoes().Ambiente());
+        //Stone.setEnvironment(new Configuracoes().Ambiente());
         //Ambiente de Produção
         //Stone.setEnvironment((Environment.PRODUCTION));
 
@@ -729,10 +757,117 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
 
     @Override
     public void onSuccess() {
-        runOnUiThread(() -> {
+        AsyncTask.execute(() -> {
+            //runOnUiThread(() -> {
+
+            // Transação enviada com sucesso e salva no banco. Para acessar, use o TransactionDAO
+            //
+            transactionDAO = new TransactionDAO(context);
+            Log.e("Stone", String.valueOf(transactionDAO.getLastTransactionId()));
+            // Pega o id da última transação
+            transactionId = transactionDAO.getLastTransactionId();
+            // Pega os dados da última transação
+            //transactionObject = transactionDAO.findTransactionWithId(transactionId);
+            Log.i("Stone", String.valueOf(transactionDAO.findTransactionWithId(transactionId)));
+            TransactionObject to = transactionDAO.findTransactionWithId(transactionId);
+
+            // PAGAMENTO APROVADO
+            if (Objects.requireNonNull(to).getTransactionStatus() == TransactionStatusEnum.APPROVED) {
+
+                //imprimircomprovantePOS();
+
+                // **
+                //String actionCode = Objects.requireNonNull(to).getActionCode();
+                String actionCode = transactionObject.getActionCode();
+                Log.i("Stone", "ActionCode : " + actionCode);
+                // ** ADD
+                bd.addAutorizacoesPinPad(new AutorizacoesPinpad(
+                        String.valueOf(transactionId),
+                        "",
+                        String.valueOf(Objects.requireNonNull(to).getIdFromBase()),
+                        to.getAmount(),
+                        to.getRequestId(),
+                        to.getEmailSent(),
+                        to.getTimeToPassTransaction(),
+                        to.getInitiatorTransactionKey(),
+                        to.getRecipientTransactionIdentification(),
+                        to.getCardHolderNumber(),
+                        to.getCardHolderName(),
+                        to.getDate(),
+                        to.getTime(),
+                        to.getAid(),
+                        to.getArcq(),
+                        to.getAuthorizationCode(),
+                        to.getIccRelatedData(),
+                        to.getTransactionReference(),
+                        to.getActionCode(),
+                        to.getCommandActionCode(),
+                        to.getPinpadUsed(),
+                        to.getSaleAffiliationKey(),
+                        to.getCne(),
+                        to.getCvm(),
+                        to.getBalance(),
+                        to.getServiceCode(),
+                        to.getSubMerchantCategoryCode(),
+                        String.valueOf(to.getEntryMode()),
+                        String.valueOf(to.getCardBrand()),
+                        String.valueOf(to.getInstalmentTransaction()),
+                        String.valueOf(to.getTransactionStatus()),
+                        String.valueOf(to.getInstalmentType()),
+                        String.valueOf(to.getTypeOfTransactionEnum()),
+                        "",//String.valueOf(to.getSignature())
+                        String.valueOf(to.getCancellationDate()),
+                        String.valueOf(to.isCapture()),
+                        to.getShortName(),
+                        to.getSubMerchantAddress(),
+                        "",//to.getUserModel().toString()
+                        String.valueOf(to.isFallbackTransaction()),
+                        to.getAppLabel(),
+                        to.getUserModel().getMerchantName(),
+                        to.getUserModel().getMerchantAddress().getCity() + "/" + to.getUserModel().getMerchantAddress().getDistric(),
+                        to.getUserModel().getMerchantDocumentNumber()
+                ));
+
+                msg(true);
+            }
+            // OUTROS STATUS DO PAGAMENTO
+            else {
+                if (to.getTransactionStatus() == TransactionStatusEnum.UNKNOWN) {
+                    txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Ocorreu um erro antes de ser enviada para o autorizador."));
+                }
+                //
+                else if (to.getTransactionStatus() == TransactionStatusEnum.DECLINED) {
+                    txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação negada."));
+                }
+                //
+                else if (to.getTransactionStatus() == TransactionStatusEnum.DECLINED_BY_CARD) {
+                    txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação negada pelo cartão."));
+                }
+                //
+                else if (to.getTransactionStatus() == TransactionStatusEnum.PARTIAL_APPROVED) {
+                    txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação foi parcialmente aprovada."));
+                }
+                //
+                else if (to.getTransactionStatus() == TransactionStatusEnum.TECHNICAL_ERROR) {
+                    txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Erro técnico (ocorreu um erro ao processar a mensagem no autorizador)."));
+                }
+                //
+                else if (to.getTransactionStatus() == TransactionStatusEnum.REJECTED) {
+                    txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação rejeitada."));
+                }
+                //
+                else if (to.getTransactionStatus() == TransactionStatusEnum.WITH_ERROR) {
+                    txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação não completada com sucesso. O Provedor de Reversão irá desfazer as transações com este status."));
+                }
+
+                //logCC.enviarLogCartao(prefs.getString("serial", ""), transactionObject.toString());
+                new LogCartaoControllerKT().enviarLogCartao(prefs.getString("serial_app", ""), transactionObject.toString());
+
+                msg(false);
+            }
             // Transação enviada com sucesso e salva no banco. Para acessar, use o TransactionDAO
 
-            //
+            /*/
             transactionDAO = new TransactionDAO(context);
             // Pega o id da última transação
             transactionId = transactionDAO.getLastTransactionId();
@@ -818,14 +953,45 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
                     txtMsgCausaErro.setText(to.getActionCode());
                 }
                 msg(false);
-            }
+            }*/
+            //});
         });
     }
 
     @Override
     public void onError() {
         // Erro na transação
-        msg(false);
+        //msg(false);
+        AsyncTask.execute(() -> {
+            try {
+
+                transactionDAO = new TransactionDAO(context);
+                // Pega o id da última transação
+                transactionId = transactionDAO.getLastTransactionId();
+                // Pega os dados da última transação
+                TransactionObject to = transactionDAO.findTransactionWithId(transactionId);
+
+                runOnUiThread(() -> {
+                    btnEnviarTrazacao.setVisibility(View.GONE);
+                    Log.e("StoneTO", to.toString());
+                    llProcessandoPagamento.setVisibility(View.GONE);
+                    llErroDiversoPg.setVisibility(View.VISIBLE);
+
+                    //
+                    ActionCodeStone acs = new ActionCodeStone();
+                    String tipoErro = to.getTransactionStatus().name();
+                    txtErroDiverso.setText(tipoErro);
+                    txtMsgErro.setText(acs.getError(tipoErro));
+
+                    // ENVIAR LOG PARA O SERVIDOR
+                    new LogCartaoControllerKT().enviarLogCartao(prefs.getString("serial_app", ""), transactionObject.toString());
+                });
+                // Erro na transação
+                //msg(false);
+            } catch (Exception e) {
+                msg(false);
+            }
+        });
     }
 
     /*@Override

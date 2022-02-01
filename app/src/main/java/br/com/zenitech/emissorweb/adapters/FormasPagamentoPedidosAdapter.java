@@ -1,10 +1,7 @@
 package br.com.zenitech.emissorweb.adapters;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,23 +16,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 
-import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
-import br.com.stonesdk.sdkdemo.controller.PrintController;
 import br.com.zenitech.emissorweb.ClassAuxiliar;
 import br.com.zenitech.emissorweb.DatabaseHelper;
 import br.com.zenitech.emissorweb.Pix;
 import br.com.zenitech.emissorweb.R;
-import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.FormaPagamentoPedido;
 import br.com.zenitech.emissorweb.domains.Unidades;
-import stone.application.enums.ReceiptType;
 import stone.application.interfaces.StoneCallbackInterface;
 import stone.database.transaction.TransactionDAO;
 import stone.database.transaction.TransactionObject;
 import stone.providers.CancellationProvider;
-import stone.user.UserModel;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -298,7 +289,7 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
         //define o titulo
         builder.setTitle("Pix");
         //define a mensagem
-        String msg = "Ecolha uma opção para avançar.";
+        String msg = "Escolha uma opção para avançar.";
         builder.setMessage(msg);
         //define um botão como positivo
         builder.setPositiveButton("VERIFICAR PAGAMENTO", (arg0, arg1) -> {
@@ -315,7 +306,7 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
             //Toast.makeText(InformacoesVagas.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
         });
         //define um botão como negativo.
-        builder.setNegativeButton("Negativo", (arg0, arg1) -> {
+        builder.setNeutralButton("Voltar", (arg0, arg1) -> {
             //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
         });
         //cria o AlertDialog

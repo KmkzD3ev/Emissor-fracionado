@@ -49,7 +49,6 @@
                     android:layout_marginTop="30dp"
                     android:padding="16dp"
                     android:text="@string/forma_de_pagamento_escolhida"
-                    android:textColor="@android:color/darker_gray"
                     android:textSize="20sp" />
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -163,9 +162,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:paddingStart="16dp"
-                    android:paddingLeft="16dp"
-                    android:text="Status da transação:"
-                    android:textColor="@android:color/darker_gray"
+                    android:text="@string/status_da_transao"
+                    android:textColor="#A1887F"
                     android:textSize="20sp"
                     android:visibility="gone"
                     tools:ignore="RtlSymmetry" />
@@ -203,7 +201,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:text="Aproxime, insira ou passe o cartão"
+                android:text="@string/aproxime_insira_ou_passe_o_cart_o"
                 android:textColor="#001D35"
                 android:textSize="30sp" />
 
@@ -236,7 +234,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:gravity="center"
-                android:text="Aguarde, Processando Pagamento..."
+                android:text="@string/aguarde_processando_pagamento"
                 android:textColor="#FF000219"
                 android:textSize="30sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -276,7 +274,7 @@
                 android:textSize="40sp" />-->
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <!-- Painel Erro -->
+        <!-- Painel Erro Pagamento -->
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/llPagamentoReprovado"
             android:layout_width="match_parent"
@@ -317,6 +315,61 @@
                 android:textSize="26sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
+        <!-- Painel Erro Diverso -->
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/llErroDiversoPg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E53935"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:contentDescription="@string/app_name"
+                app:srcCompat="@drawable/ic_sentiment_dissatisfied"
+                app:tint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/txtErroDiverso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="@string/tipo_erro"
+                android:textColor="@android:color/white"
+                android:textSize="30sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:layout_margin="16dp"
+                android:background="@android:color/white" />
+
+            <TextView
+                android:id="@+id/txtMsgErro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="@string/msg_erro"
+                android:textColor="@android:color/white"
+                android:textSize="26sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSairPag"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="16dp"
+                android:background="@color/colorErro"
+                android:text="@string/sair"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
         <!-- Painel Impressão Comprovante -->
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/llPagamentoImprimir"
@@ -334,7 +387,7 @@
                 android:layout_height="60dp"
                 android:layout_alignParentBottom="true"
                 android:background="@color/colorAccent"
-                android:text="Imprimir Comprovante"
+                android:text="@string/imprimir_comprovante"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
@@ -345,7 +398,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
                 android:background="@color/colorPrimaryDark"
-                android:text="Enviar Comprovante"
+                android:text="@string/enviar_comprovante"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
@@ -356,7 +409,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="16dp"
                 android:background="@color/colorPrimaryDark"
-                android:text="Concluir Pagamento"
+                android:text="@string/concluir_pagamento"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
@@ -367,7 +420,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="50dp"
                 android:background="@color/colorErro"
-                android:text="Cancelar Pagamento"
+                android:text="@string/cancelar_pagamento"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
@@ -378,7 +431,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginTop="50dp"
                 android:background="@color/colorErro"
-                android:text="Enviar Comprovante cancelamento"
+                android:text="@string/enviar_comprovante_cancelamento"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -389,7 +442,7 @@
             android:layout_height="56dp"
             android:layout_alignParentBottom="true"
             android:background="@color/colorPrimary"
-            android:text="Enviar Transação"
+            android:text="@string/enviar_transao"
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:visibility="gone" />

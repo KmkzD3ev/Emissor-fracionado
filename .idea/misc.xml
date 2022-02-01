@@ -4,11 +4,18 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/drawable/bg_btn.xml" value="0.30520833333333336" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_consultar_nfe.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_form_pedidos_nfe.xml" value="0.1" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_main_principal.xml" value="0.10364583333333334" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_pix.xml" value="0.2890625" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_splash_screen.xml" value="0.10182370820668693" />
-        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_gerenciar_pagamento_cartao.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_form_pedidos_nfe.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_gerenciar_pagamento_cartao.xml" value="0.22" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_status.xml" value="0.11503623188405797" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_clientes_nfe.xml" value="0.33" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_form_pag_pedidos.xml" value="0.25" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_pedidos.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_timeline.xml" value="0.5" />
       </map>
     </option>
   </component>

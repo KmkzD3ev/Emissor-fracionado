@@ -1,6 +1,9 @@
 package br.com.zenitech.emissorweb.interfaces;
 
+import java.util.ArrayList;
+
 import br.com.zenitech.emissorweb.Configuracoes;
+import br.com.zenitech.emissorweb.domains.ClientesNFE;
 import br.com.zenitech.emissorweb.domains.DomainPrincipal;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -23,6 +26,15 @@ public interface IPrincipal {
             @Field("TELA") String tela,
             @Field("SERIAL") String serial,
             @Field("CODCLI") String codcli
+    );
+
+    // TRANSMITIR NOTAS NFC-E
+    @FormUrlEncoded
+    @POST("indexApp.php")
+    Call<ArrayList<ClientesNFE>> consultarCliNome(
+            @Field("TELA") String tela,
+            @Field("SERIAL") String serial,
+            @Field("CLI") String cli
     );
 
     Retrofit retrofit = new Retrofit.Builder()

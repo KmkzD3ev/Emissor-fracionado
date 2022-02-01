@@ -1,11 +1,9 @@
-package br.com.stonesdk.sdkdemo.controller
+package br.com.zenitech.emissorweb.controller
 
 import android.content.Context
 import android.widget.Toast
 import br.com.stone.posandroid.providers.PosPrintReceiptProvider
-import stone.application.enums.ReceiptType
 import stone.application.interfaces.StoneCallbackInterface
-import stone.database.transaction.TransactionObject
 
 class PrintController(private val context: Context,
                       private val provider: PosPrintReceiptProvider) {

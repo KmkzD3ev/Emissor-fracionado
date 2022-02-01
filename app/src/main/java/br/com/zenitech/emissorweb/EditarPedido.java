@@ -4,15 +4,18 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -185,7 +188,7 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
 
         //idTemp = prefs.getInt("id_pedido_temp", 1);
         //ed.putInt("id_pedido", (prefs.getInt("id_pedido", 0) + 1)).apply();
-        idTemp = Integer.parseInt(bd.getUltimoIdPedido());// prefs.getInt("id_pedido", 1);
+        idTemp = Integer.parseInt(bd.IdEditarPedido());//bd.getUltimoIdPedido()  prefs.getInt("id_pedido", 1);
         id = idTemp;
 
         elementos = bd.getUnidades();
@@ -440,7 +443,6 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
         });
 
 
-
         //
         pedidos = bd.ultimoPedido();
         itensPedidos = bd.getItensPedido(pedidos.getId_pedido_temp()).get(0);
@@ -518,7 +520,7 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    private void atualizarDadosFinanceiro(){
+    private void atualizarDadosFinanceiro() {
         //
         listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
         adapter = new FormasPagamentoEditarPedidosAdapter(this, listaFinanceiroCliente, elementos);
@@ -928,7 +930,7 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
             ShowMsgToast("Informe a quantidade.");
         } else if (Integer.parseInt(etQuantidade.getText().toString()) > quant) {
             ShowMsgToast("Restam apenas " + quant + " itens. Diminua a quantidade!");
-        } */else if (txtValorFormaPagamento.getText().toString().equals("")
+        } */ else if (txtValorFormaPagamento.getText().toString().equals("")
                 || valEtPreco.equals("R$ 0,00")
                 || valEtPreco.equals("0.0")
                 || valEtPreco.equals("0.00")) {
@@ -982,6 +984,10 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void confirmar() {
+        // APAGA TODOS OS PAGAMENTOS PIX COM STATUS 1
+        bd.deleteFormPagPIX();
+
+        //
         Intent i = new Intent(getBaseContext(), ConfirmarDadosPedido.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.putExtra("cpfCnpj_cliente", pedidos.getCpf_cliente());// cpf_cnpj_cliente.getText().toString());
@@ -1232,7 +1238,7 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(getApplicationContext()));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment(new Configuracoes().Ambiente());
+        //Stone.setEnvironment(new Configuracoes().Ambiente());
         //Ambiente de Produção
         //Stone.setEnvironment((Environment.PRODUCTION));
 
@@ -1252,6 +1258,16 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
 
     public void turnBluetoothOn() {
         try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             mBluetoothAdapter.enable();
             do {
             } while (!mBluetoothAdapter.isEnabled());

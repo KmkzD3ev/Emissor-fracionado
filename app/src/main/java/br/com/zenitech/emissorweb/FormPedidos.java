@@ -1,5 +1,6 @@
 package br.com.zenitech.emissorweb;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -186,6 +188,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         //MULTIPLICA O VALOR PELA QUANTIDADE
         idTemp = bd.getProximoIdPedido();
+        Log.e("IdTemp", String.valueOf(idTemp));
         /*if (prefs.getBoolean("primeiro_pedido", true)) {
             ed.putBoolean("primeiro_pedido", false).apply();
         }*/
@@ -967,6 +970,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     private void confirmar() {
 
         if (bd.getPedidosTransmitirFecharDia().size() > 0) {
+            // APAGA TODOS OS PAGAMENTOS PIX COM STATUS 1
+            bd.deleteFormPagPIX();
+
+            //
             Intent i = new Intent(getBaseContext(), ConfirmarDadosPedido.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
@@ -1310,7 +1317,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(getApplicationContext()));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment(new Configuracoes().Ambiente());
+        //Stone.setEnvironment(new Configuracoes().Ambiente());
         //Ambiente de Produção
         //Stone.setEnvironment((Environment.PRODUCTION));
 
@@ -1330,6 +1337,16 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     public void turnBluetoothOn() {
         try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             mBluetoothAdapter.enable();
             do {
             } while (!mBluetoothAdapter.isEnabled());

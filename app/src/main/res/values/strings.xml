@@ -155,4 +155,21 @@
     <string name="retire_o_cartao">Retire o Cartão</string>
     <string name="title_activity_reset_app">Reset App</string>
     <string name="mensagem_reset">Insira o código que você recebeu</string>
+    <string name="enviar_transao">Enviar Transação</string>
+    <string name="enviar_comprovante_cancelamento">Enviar Comprovante cancelamento</string>
+    <string name="cancelar_pagamento">Cancelar Pagamento</string>
+    <string name="concluir_pagamento">Concluir Pagamento</string>
+    <string name="enviar_comprovante">Enviar Comprovante</string>
+    <string name="imprimir_comprovante">Imprimir Comprovante</string>
+    <string name="aguarde_processando_pagamento">Aguarde, Processando Pagamento...</string>
+    <string name="aproxime_insira_ou_passe_o_cart_o">Aproxime, insira ou passe o cartão</string>
+    <string name="status_da_transao">Status da transação:</string>
+    <string name="tipo_erro">Tipo Erro</string>
+    <string name="msg_erro">Msg Erro</string>
+    <string name="sair">SAIR</string>
+    <string name="id_do_cliente">Id do Cliente</string>
+    <string name="nome_cliente">Nome de Cliente</string>
+    <string name="consultar_cliente">CONSULTAR CLIENTE</string>
+    <string name="avancar">Avançar</string>
+    <string name="mostrar_qrcode_para_pagar">MOSTRAR QRCODE\nPARA PAGAR</string>
 </resources>

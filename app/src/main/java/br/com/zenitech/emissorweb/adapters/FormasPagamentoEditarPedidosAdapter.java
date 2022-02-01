@@ -291,7 +291,7 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
         //define o titulo
         builder.setTitle("Pix");
         //define a mensagem
-        String msg = "Ecolha uma opção para avançar.";
+        String msg = "Escolha uma opção para avançar.";
         builder.setMessage(msg);
         //define um botão como positivo
         builder.setPositiveButton("VERIFICAR PAGAMENTO", (arg0, arg1) -> {
@@ -308,7 +308,7 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
             //Toast.makeText(InformacoesVagas.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
         });
         //define um botão como negativo.
-        builder.setNegativeButton("Negativo", (arg0, arg1) -> {
+        builder.setNeutralButton("Voltar", (arg0, arg1) -> {
             //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
         });
         //cria o AlertDialog

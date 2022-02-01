@@ -91,14 +91,23 @@
             android:id="@+id/btnMostrarQrCodePix"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="MOSTRAR QRCODE\nPARA PAGAR" />
+            android:layout_margin="16dp"
+            android:background="@color/colorAccent"
+            android:padding="8dp"
+            android:text="@string/mostrar_qrcode_para_pagar"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSairPix"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="SAIR" />
+            android:background="@color/erro"
+            android:padding="8dp"
+            android:text="@string/sair"
+            android:textColor="@android:color/black"
+            android:textSize="20sp" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

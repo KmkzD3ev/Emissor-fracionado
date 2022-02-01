@@ -15,7 +15,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.SpannableString;
@@ -41,6 +44,8 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import br.com.zenitech.emissorweb.adapters.ClientesNfeAdapter;
+import br.com.zenitech.emissorweb.domains.ClientesNFE;
 import br.com.zenitech.emissorweb.domains.DomainPrincipal;
 import br.com.zenitech.emissorweb.interfaces.IPrincipal;
 import retrofit2.Call;
@@ -53,7 +58,7 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
     String[] listaFormasPagamento = {"DINHEIRO"};
 
     private Spinner spProduto, spFormasPagamento;
-    private EditText cpf_cnpj_cliente, etQuantidade, etPreco;
+    private EditText cpf_cnpj_cliente, nome_cliente, etQuantidade, etPreco;
     private DatabaseHelper bd;
     SharedPreferences prefs;
     SharedPreferences.Editor ed;
@@ -63,6 +68,13 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
     private ClassAuxiliar aux;
     private Context context;
     private int quant = 0;
+
+    RecyclerView rvClienteNFE;
+    ClientesNfeAdapter adapter;
+    public static LinearLayoutCompat llClienteNFE, llIdNomeCli;
+
+    public static String idCli = "";
+    public static TextView txtNomeCliente;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +92,16 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
         //
         bd = new DatabaseHelper(this);
         aux = new ClassAuxiliar();
+
+
+        txtNomeCliente = findViewById(R.id.txtNomeCliente);
+        nome_cliente = findViewById(R.id.nome_cliente);
+        rvClienteNFE = findViewById(R.id.rvClienteNFE);
+        rvClienteNFE.setLayoutManager(new LinearLayoutManager(context));
+        rvClienteNFE.setNestedScrollingEnabled(false);
+
+        llClienteNFE = findViewById(R.id.llClienteNFE);
+        llIdNomeCli = findViewById(R.id.llIdNomeCli);
 
         //
         //LISTA DE PRODUTOS
@@ -126,6 +148,7 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
 
         //
         cpf_cnpj_cliente = findViewById(R.id.cpf_cnpj_cliente);
+        cpf_cnpj_cliente.setText("");
         //cpf_cnpj_cliente.addTextChangedListener(MaskUtil.insert(cpf_cnpj_cliente, MaskUtil.MaskType.AUTO));
 
         //
@@ -153,6 +176,13 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> VerificarCamposIniciarPedido());
+
+        findViewById(R.id.btnSincronizarNFE).setOnClickListener(view -> VerificarCamposIniciarPedido());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void ConsultarCodCliente() {
@@ -165,44 +195,95 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
             // TODO: handle exception
         }
 
-        //
-        final IPrincipal iPrincipal = IPrincipal.retrofit.create(IPrincipal.class);
+        if (!nome_cliente.getText().toString().equalsIgnoreCase("")) {
 
-        final Call<DomainPrincipal> call = iPrincipal.consultarCli(
-                "601",
-                prefs.getString("serial_app", ""),
-                cpf_cnpj_cliente.getText().toString());
+            final IPrincipal iPrincipal = IPrincipal.retrofit.create(IPrincipal.class);
 
-        call.enqueue(new Callback<DomainPrincipal>() {
-            @Override
-            public void onResponse(@NonNull Call<DomainPrincipal> call, @NonNull Response<DomainPrincipal> response) {
+            final Call<ArrayList<ClientesNFE>> call = iPrincipal.consultarCliNome(
+                    "2003",
+                    prefs.getString("serial_app", ""),
+                    nome_cliente.getText().toString());
 
-                //
-                final DomainPrincipal principal = response.body();
-                if (principal != null) {
+            call.enqueue(new Callback<ArrayList<ClientesNFE>>() {
+                @Override
+                public void onResponse(@NonNull Call<ArrayList<ClientesNFE>> call, @NonNull Response<ArrayList<ClientesNFE>> response) {
 
-                    if (principal.getErro().equalsIgnoreCase("OK")) {
-                        TextView txtNomeCliente = findViewById(R.id.txtNomeCliente);
-                        txtNomeCliente.setText(principal.getNome_cliente());
+                    //
+                    final ArrayList<ClientesNFE> clientesNFES = response.body();
+                    if (clientesNFES != null) {
+
+                        adapter = new ClientesNfeAdapter(context, clientesNFES);
+                        rvClienteNFE.setAdapter(adapter);
+                        llClienteNFE.setVisibility(View.VISIBLE);
+
+
                         findViewById(R.id.btnConsultarCliNFE).setVisibility(View.GONE);
                         findViewById(R.id.llFormNFE).setVisibility(View.VISIBLE);
 
-                        //Toast.makeText(context, "Cliente encontrado", Toast.LENGTH_LONG).show();
-                        //
-                        //runOnUiThread(() -> startActivity(new Intent(getBaseContext(), FormPedidosNFE.class)));
-                    } else {
-                        Toast.makeText(context, "Não conseguimos encontrar nenhum cliente com esse id.", Toast.LENGTH_LONG).show();
+                        /*if (principal.getErro().equalsIgnoreCase("OK")) {
+                            TextView txtNomeCliente = findViewById(R.id.txtNomeCliente);
+                            txtNomeCliente.setText(principal.getNome_cliente());
+                            findViewById(R.id.btnConsultarCliNFE).setVisibility(View.GONE);
+                            findViewById(R.id.llFormNFE).setVisibility(View.VISIBLE);
+
+                            //Toast.makeText(context, "Cliente encontrado", Toast.LENGTH_LONG).show();
+                            //
+                            //runOnUiThread(() -> startActivity(new Intent(getBaseContext(), FormPedidosNFE.class)));
+                        } else {
+                            Toast.makeText(context, "Não conseguimos encontrar nenhum cliente com esse id.", Toast.LENGTH_LONG).show();
+                        }*/
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<DomainPrincipal> call, @NonNull Throwable t) {
-                //Log.i(TAG, Objects.requireNonNull(t.getMessage()));
+                @Override
+                public void onFailure(@NonNull Call<ArrayList<ClientesNFE>> call, @NonNull Throwable t) {
+                    //Log.i(TAG, Objects.requireNonNull(t.getMessage()));
 
-                Toast.makeText(getBaseContext(), "Não conseguimos encontrar nenhum cliente com esse id.", Toast.LENGTH_LONG).show();
-            }
-        });
+                    Toast.makeText(getBaseContext(), "Não conseguimos encontrar nenhum cliente com esse id.", Toast.LENGTH_LONG).show();
+                }
+            });
+        } else {
+
+            //
+            final IPrincipal iPrincipal = IPrincipal.retrofit.create(IPrincipal.class);
+
+            final Call<DomainPrincipal> call = iPrincipal.consultarCli(
+                    "601",
+                    prefs.getString("serial_app", ""),
+                    cpf_cnpj_cliente.getText().toString());
+
+            call.enqueue(new Callback<DomainPrincipal>() {
+                @Override
+                public void onResponse(@NonNull Call<DomainPrincipal> call, @NonNull Response<DomainPrincipal> response) {
+
+                    //
+                    final DomainPrincipal principal = response.body();
+                    if (principal != null) {
+
+                        if (principal.getErro().equalsIgnoreCase("OK")) {
+                            idCli = cpf_cnpj_cliente.getText().toString();
+                            txtNomeCliente.setText(principal.getNome_cliente());
+                            findViewById(R.id.btnConsultarCliNFE).setVisibility(View.GONE);
+                            llIdNomeCli.setVisibility(View.GONE);
+                            findViewById(R.id.llFormNFE).setVisibility(View.VISIBLE);
+
+                            //Toast.makeText(context, "Cliente encontrado", Toast.LENGTH_LONG).show();
+                            //
+                            //runOnUiThread(() -> startActivity(new Intent(getBaseContext(), FormPedidosNFE.class)));
+                        } else {
+                            Toast.makeText(context, "Não conseguimos encontrar nenhum cliente com esse id.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<DomainPrincipal> call, @NonNull Throwable t) {
+                    //Log.i(TAG, Objects.requireNonNull(t.getMessage()));
+
+                    Toast.makeText(getBaseContext(), "Não conseguimos encontrar nenhum cliente com esse id.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     private void VerificarCamposIniciarPedido() {
@@ -284,7 +365,7 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
     private void confirmar() {
         Intent i = new Intent(getBaseContext(), ConfirmarDadosPedidoNFE.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
+        i.putExtra("cpfCnpj_cliente", idCli);
         i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
         i.putExtra("produto", spProduto.getSelectedItem().toString());
         i.putExtra("qnt", etQuantidade.getText().toString());

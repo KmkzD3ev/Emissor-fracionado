@@ -1,11 +1,9 @@
 package br.com.zenitech.emissorweb;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
-import br.com.stonesdk.sdkdemo.controller.PrintController;
+import br.com.zenitech.emissorweb.controller.PrintController;
 import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import stone.application.StoneStart;
@@ -26,7 +24,6 @@ import stone.database.transaction.TransactionDAO;
 import stone.database.transaction.TransactionObject;
 import stone.providers.ActiveApplicationProvider;
 import stone.providers.CancellationProvider;
-import stone.providers.TransactionProvider;
 import stone.user.UserModel;
 import stone.utils.Stone;
 
@@ -88,7 +85,7 @@ public class CancelarPagamentoCartaoPOS extends AppCompatActivity {
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment(new Configuracoes().Ambiente());
+        //Stone.setEnvironment(new Configuracoes().Ambiente());
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);

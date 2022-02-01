@@ -1605,7 +1605,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "       (" +
                 "           SELECT SUM(fpp.valor) * 100" +
                 "             FROM formas_pagamento_pedidos fpp" +
-                "            WHERE fpp.id_pedido = ped.id_pedido_temp" +
+                "            WHERE fpp.id_pedido = ped.id_pedido_temp AND fpp.status_pix = '0'" +
                 "       )" +
                 "       val_financeiro" +
                 "  FROM pedidos ped" +
@@ -2216,6 +2216,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return total;
     }
 
+    //SOMAR O VALOR DO FINANCEIRO
+    public String IdEditarPedido() {
+
+        myDataBase = this.getReadableDatabase();
+        //db.beginTransaction();
+        //pedidos_temp
+        String selectQuery = "SELECT ped.id FROM pedidos ped WHERE ped.situacao = 'OFF' LIMIT 1";
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        String total = "";
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                total = cursor.getString(0);
+            }
+            //db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return total;
+    }
+
     //PEGA O ULTIMO ID DA TABELA DE PEDIDOS
     public String getUltimoIdPedidos() {
 
@@ -2441,6 +2465,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         values.put("status_pix", "0");
         myDataBase.update("formas_pagamento_pedidos", values, "id=" + id, null);
+    }
+
+    //
+    public void deleteFormPagPIX() {
+        myDataBase = this.getWritableDatabase();
+        myDataBase.delete("formas_pagamento_pedidos", "status_pix" + "=?", new String[]{"1"});
+        /*String query = "DELETE FROM formas_pagamento_pedidos WHERE status_pix = 1";
+        myDataBase.rawQuery(query, null);
+        Cursor cursor =
+        if (cursor.moveToFirst()) {
+            do {
+            } while (cursor.moveToNext());
+        }*/
     }
 
     public void FecharConexao() {

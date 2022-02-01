@@ -128,7 +128,7 @@ public class CancelarPagamentoCartao extends AppCompatActivity {
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
         //Ambiente de Sandbox "Teste"
-        Stone.setEnvironment(new Configuracoes().Ambiente());
+        //Stone.setEnvironment(new Configuracoes().Ambiente());
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);
