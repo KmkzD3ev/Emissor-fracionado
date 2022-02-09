@@ -654,13 +654,21 @@ public class Sincronizar extends AppCompatActivity {
                 //
                 final Sincronizador sincronizacao = response.body();
                 if (sincronizacao != null) {
-                    _limparDadosSincronizacao(false);
-                    _finalizarSincronizacao();
+                    Log.e("Banco", sincronizacao.getErro());
+                    if (sincronizacao.getErro().equalsIgnoreCase("1")) {
+                        _limparDadosSincronizacao(false);
+                        _finalizarSincronizacao();
+                    } else {
+                        erro = true;
+                        msgErro = "Não conseguimos ativar o app! Tente novamente em alguns instantes.";
+                        _limparDadosSincronizacao(true);
+                        _resetarSincronismo(3000, true);
+                    }
                 } else {
                     //
                     erro = true;
                     msgErro = "Não conseguimos ativar o app! Tente novamente em alguns instantes.";
-                    _limparDadosSincronizacao(false);
+                    _limparDadosSincronizacao(true);
                     _resetarSincronismo(3000, true);
                 }
             }
@@ -671,7 +679,7 @@ public class Sincronizar extends AppCompatActivity {
                 //
                 erro = true;
                 msgErro = "Não conseguimos ativar o app! Tente novamente em alguns instantes.";
-                _limparDadosSincronizacao(false);
+                _limparDadosSincronizacao(true);
                 _resetarSincronismo(3000, true);
             }
         });

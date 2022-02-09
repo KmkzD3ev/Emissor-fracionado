@@ -1486,7 +1486,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 cpf,//CPF/CNPJ CLIENTE
                 FPagamento,//FORMA PAGAMENTO
                 "",
-                bd.getUltimoIdPedido(),
+                String.valueOf(idTemp), //bd.getUltimoIdPedido()
                 NotaFracionada,
                 spDescricaoCredenciadora.getSelectedItem().toString()
         ));

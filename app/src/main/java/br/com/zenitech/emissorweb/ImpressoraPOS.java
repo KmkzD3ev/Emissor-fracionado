@@ -486,10 +486,28 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         // GERAR IMAGEM DE IMPRESSÃO
         //
         LinearLayout CabecalhoNFCe = findViewById(R.id.CabecalhoNFCe);
+        /*//Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 260, 104);
         Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 260, 104);
         //
         LinearLayout impressora = findViewById(R.id.teste);
-        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
+        //Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 330);//45
+        //
+        LinearLayout impressoraChave = findViewById(R.id.teste3);
+        //Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
+        Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressoraChave, 260, 200);//45*/
+
+        //Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 260, 104);
+        Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 384, 114);
+        //
+        LinearLayout impressora = findViewById(R.id.teste);
+        //Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 384, 290);//45
+        //
+        LinearLayout impressoraChave = findViewById(R.id.teste3);
+        //Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
+        Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressoraChave, 384, 150);//45
+        //
         LinearLayout impressora1 = findViewById(R.id.teste1);
         Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 180, 100);
 
@@ -508,6 +526,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
         ppp.addBitmap(bitmapCabecalhoNFCe);
         ppp.addBitmap(bitmap1);
+        ppp.addBitmap(bitmap3);
         ppp.addBitmap(bitmap2);
         ppp.execute();
 
