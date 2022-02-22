@@ -19,8 +19,8 @@ android {
         applicationId "br.com.zenitech.emissorweb"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 51
-        versionName '3.5.1'
+        versionCode 52
+        versionName '3.5.2'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
@@ -97,23 +97,23 @@ dependencies {
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0@aar'
 
-    /*/ Stone **
-    implementation 'br.com.stone:stone-sdk:3.14.13'
-    implementation 'br.com.stone:stone-sdk-posandroid:3.14.13'
-    implementation 'br.com.stone:stone-sdk-posandroid-ingenico:3.14.13'
-    //implementation 'br.com.stone:stone-sdk-posandroid-sunmi:3.14.13'
-    implementation 'br.com.stone:stone-sdk-posandroid-gertec:3.14.13'*/
+    /*/ Stone ***/
+    implementation 'br.com.stone:stone-sdk:4.0.2'
+    implementation 'br.com.stone:stone-sdk-posandroid:4.0.2'
+    implementation 'br.com.stone:stone-sdk-posandroid-ingenico:4.0.2'
+    implementation 'br.com.stone:stone-sdk-posandroid-sunmi:4.0.2'
+    //implementation 'br.com.stone:stone-sdk-posandroid-gertec:4.0.2'
 
 /*    // Stone **
     implementation 'br.com.stone:stone-sdk:3.4.3.2'
-    implementation 'br.com.stone:stone-sdk-posandroid:3.4.3.2'*/
+    implementation 'br.com.stone:stone-sdk-posandroid:3.4.3.2'
 
     implementation 'br.com.stone:stone-sdk:4.0.2'
     implementation 'br.com.stone:stone-sdk-posandroid:4.0.2'
 
     // Terminais Gertec:
     implementation 'br.com.stone:stone-sdk-posandroid-ingenico:4.0.2'
-    //implementation 'br.com.stone:stone-sdk-posandroid-gertec:3.14.13'
+    //implementation 'br.com.stone:stone-sdk-posandroid-gertec:3.14.13'*/
 
     /*implementation 'br.com.stone:stone-sdk:3.10.0'
     implementation 'br.com.stone:stone-sdk-posandroid:3.10.0' */

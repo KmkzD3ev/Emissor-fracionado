@@ -350,6 +350,8 @@ public class Principal extends AppCompatActivity
         userList = StoneStart.init(context);
 
         atualizar();
+
+        //startActivity(new Intent(this, TesteConexaoImpressora.class));
     }
 
 

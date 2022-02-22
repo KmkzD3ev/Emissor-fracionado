@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:text="Pesquisando Impressora..."
-            android:textSize="13sp" />
+            android:textSize="10sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -126,8 +126,8 @@
 
         <LinearLayout
             android:id="@+id/CabecalhoNFCe"
-            android:layout_width="300dp"
-            android:layout_height="104dp"
+            android:layout_width="190dp"
+            android:layout_height="110dp"
             android:background="@android:color/white"
             android:orientation="vertical">
 
@@ -145,7 +145,7 @@
                     android:fontFamily="sans-serif-black"
                     android:text="ZENITECH INFORMATICA LTDA"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="10sp" />
 
                 <TextView
                     android:id="@+id/txtCab2"
@@ -154,7 +154,7 @@
                     android:fontFamily="sans-serif-black"
                     android:text="CNPJ: 10552850000156 I.E.: 20217"
                     android:textColor="@android:color/black"
-                    android:textSize="13sp" />
+                    android:textSize="10sp" />
 
             </LinearLayout>
 
@@ -166,7 +166,7 @@
                 android:gravity="center"
                 android:text="Rua do Chumbo, 125 Lagoa nova, Mossoro, Rn 59076-180  84996680990"
                 android:textColor="@android:color/black"
-                android:textSize="13sp" />
+                android:textSize="10sp" />
             <!-- FIM CABECALHO DA NOTA -->
 
             <!-- ************************* -->
@@ -179,11 +179,12 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif-black"
                 android:gravity="center"
                 android:text="DANFE NFC-e - DOCUMENTO AUXILIAR DA"
                 android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textSize="9sp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -192,15 +193,15 @@
                 android:gravity="center"
                 android:text="NOTA FISCAL DE CONSUMIDOR ELETRONICA"
                 android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textSize="9sp" />
             <!-- FIM DANFE NFC-e -->
         </LinearLayout>
 
         <!--Print teste 1-->
         <LinearLayout
             android:id="@+id/teste"
-            android:layout_width="300dp"
-            android:layout_height="328dp"
+            android:layout_width="190dp"
+            android:layout_height="240dp"
             android:background="@android:color/white">
 
             <LinearLayout
@@ -218,73 +219,72 @@
                 <!-- INFORMACOES PEDIDO -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
                         android:text="#"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
                         android:text="COD."
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="DESC."
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="QTDE."
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="UN."
+                        android:text="DESC."
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="54dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="QTDE."
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="UN."
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
                         android:gravity="end"
                         android:text="VL.UNIT."
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="60dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:fontFamily="sans-serif-black"
                         android:gravity="end"
                         android:text="VL.TOTAL"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
                 </LinearLayout>
 
                 <!-- DESCRIÇÃO DA NOTA -->
@@ -300,7 +300,7 @@
                         android:gravity="center"
                         android:text="1"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtDescCod"
@@ -311,7 +311,7 @@
                         android:gravity="center"
                         android:text="1"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtDescDesc"
@@ -323,7 +323,7 @@
                         android:gravity="start"
                         android:text="P-13"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
@@ -339,7 +339,7 @@
                         android:gravity="center"
                         android:text=""
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtDescQuant"
@@ -349,7 +349,7 @@
                         android:gravity="center"
                         android:text="2"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -358,7 +358,7 @@
                         android:gravity="center"
                         android:text="UN."
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtDescValUnit"
@@ -368,7 +368,7 @@
                         android:gravity="end"
                         android:text="85,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtDescValTot"
@@ -378,7 +378,7 @@
                         android:gravity="end"
                         android:text="170,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
                 <!-- FIM INFORMACOES PEDIDO -->
@@ -402,7 +402,7 @@
                         android:gravity="start"
                         android:text="Qtde. Total de Itens"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtInfoVal1"
@@ -412,7 +412,7 @@
                         android:gravity="center"
                         android:text="2"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
@@ -428,7 +428,7 @@
                         android:gravity="start"
                         android:text="Valor Total"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtInfoVal2"
@@ -438,7 +438,7 @@
                         android:gravity="center"
                         android:text="170,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
@@ -454,7 +454,7 @@
                         android:gravity="start"
                         android:text="FORMA DE PAGAMENTO"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -463,13 +463,14 @@
                         android:gravity="center"
                         android:text="VALOR PAGO"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/txtInfoVal3"
@@ -480,7 +481,7 @@
                         android:gravity="start"
                         android:text="CARTAO DE DEBITO\n\n\n"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtInfoVal4"
@@ -490,7 +491,7 @@
                         android:gravity="end"
                         android:text="170,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="11sp" />
 
                 </LinearLayout>
                 <!-- FIM INFORMACOES VALORES -->
@@ -509,7 +510,7 @@
                     android:gravity="start"
                     android:text="Tributos totais incidentes"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="10sp" />
 
                 <!-- Tributos totais -->
                 <LinearLayout
@@ -524,7 +525,7 @@
                         android:gravity="start"
                         android:text="(Lei Federal 12.741/2012)"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtTributos"
@@ -534,7 +535,7 @@
                         android:gravity="end"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
@@ -551,7 +552,7 @@
                         android:gravity="start"
                         android:text="TRIBUTOS FEDERAIS"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtTributosN"
@@ -561,7 +562,7 @@
                         android:gravity="end"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
@@ -578,7 +579,7 @@
                         android:gravity="start"
                         android:text="TRIBUTOS ESTADUAIS"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtTributosE"
@@ -588,7 +589,7 @@
                         android:gravity="end"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
@@ -605,7 +606,7 @@
                         android:gravity="start"
                         android:text="TRIBUTOS MUNICIPAIS"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtTributosM"
@@ -615,7 +616,7 @@
                         android:gravity="end"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
                 <!-- FIM TRIBUTOS TOTAIS -->
@@ -638,7 +639,7 @@
                         android:gravity="start"
                         android:text="Numero:"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtEmissao1"
@@ -649,7 +650,7 @@
                         android:gravity="end"
                         android:text="1202"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -659,7 +660,7 @@
                         android:gravity="end"
                         android:text="Serie:"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtEmissao2"
@@ -670,7 +671,7 @@
                         android:gravity="end"
                         android:text="25"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
@@ -685,7 +686,7 @@
                         android:gravity="start"
                         android:text="Emissao:"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtEmissao3"
@@ -696,7 +697,7 @@
                         android:gravity="end"
                         android:text="10/03/2021"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtEmissao4"
@@ -707,7 +708,7 @@
                         android:gravity="end"
                         android:text="10:01:00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
                 <!-- FIM EMISSÃO -->
@@ -725,8 +726,8 @@
         <!--Print teste 1-->
         <LinearLayout
             android:id="@+id/teste3"
-            android:layout_width="300dp"
-            android:layout_height="150dp"
+            android:layout_width="190dp"
+            android:layout_height="130dp"
             android:background="@android:color/white">
 
             <LinearLayout
@@ -742,7 +743,7 @@
                     android:gravity="center"
                     android:text="Consulte pela Chave de Acesso em"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:id="@+id/txtConsRec1"
@@ -752,7 +753,7 @@
                     android:gravity="center"
                     android:text="www.set.rn.gov.br/nfce/consulta"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -762,7 +763,7 @@
                     android:gravity="center"
                     android:text="Chave de Acesso"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:id="@+id/txtConsRec2"
@@ -772,7 +773,7 @@
                     android:gravity="center"
                     android:text="0000  0000  0000  0000  0000"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="10sp" />
 
                 <TextView
                     android:id="@+id/txtConsRec3"
@@ -782,7 +783,7 @@
                     android:gravity="center"
                     android:text="0000  0000  0000  0000  0000"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp"
+                    android:textSize="10sp"
                     android:visibility="gone" />
 
                 <TextView
@@ -793,7 +794,7 @@
                     android:gravity="center"
                     android:text="Protocolo de autorizacao"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:id="@+id/txtConsRec4"
@@ -803,7 +804,7 @@
                     android:gravity="center"
                     android:text="10/03/2021 10:01:00"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="10sp" />
                 <!-- FIM COSULTA NA RECEITA -->
 
                 <!-- ************************* -->
@@ -821,7 +822,7 @@
                     android:gravity="center"
                     android:text="CONSUMIDOR NAO IDENTIFICADO"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
                 <!-- FIM CONSUMIDOR -->
 
                 <!-- ************************* -->
@@ -836,8 +837,8 @@
         <!--Print teste 2-->
         <LinearLayout
             android:id="@+id/teste1"
-            android:layout_width="300dp"
-            android:layout_height="130dp"
+            android:layout_width="190dp"
+            android:layout_height="120dp"
             android:layout_gravity="center_horizontal"
             android:background="@android:color/white"
             android:orientation="vertical">
@@ -845,8 +846,8 @@
             <!-- QRCODE DA NOTA -->
             <ImageView
                 android:id="@+id/imgQrCode"
-                android:layout_width="140dp"
-                android:layout_height="100dp"
+                android:layout_width="110dp"
+                android:layout_height="110dp"
                 android:layout_gravity="center_horizontal"
                 android:background="@android:color/white" />
 
@@ -868,17 +869,16 @@
         android:visibility="gone">
 
         <LinearLayout
-            android:layout_width="260dp"
+            android:layout_width="190dp"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/printNfe"
-                android:layout_width="260dp"
-                android:layout_height="wrap_content"
+                android:layout_width="190dp"
+                android:layout_height="150dp"
                 android:background="@android:color/white"
-                android:gravity="center"
                 android:orientation="vertical">
 
                 <!-- ************************* -->
@@ -901,27 +901,30 @@
                         android:gravity="center"
                         android:text="Recebemos de"
                         android:textColor="@android:color/black"
-                        android:textSize="13sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="_______________________________________  ______/______/_________"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="end"
+                        android:text="__________________________________________\n\n_______/_______/___________"
                         android:textColor="@android:color/black"
-                        android:textSize="13sp" />
+                        android:textSize="10sp" />
                 </LinearLayout>
 
-                <!-- ************************* -->
+                <!-- *************************
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.8dp"
                     android:layout_marginBottom="4dp"
-                    android:background="@android:color/black" />
+                    android:background="@android:color/black" /> -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -932,7 +935,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="N9                   -                   SERIE 2"
                         android:textColor="@android:color/black"
-                        android:textSize="13sp" />
+                        android:textSize="9sp" />
 
                     <!-- COSULTA NA RECEITA -->
 
@@ -944,7 +947,7 @@
                         android:gravity="center"
                         android:text="0000  0000  0000  0000  0000"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtNfeConsRec3"
@@ -954,7 +957,7 @@
                         android:gravity="center"
                         android:text="0000  0000  0000  0000  0000"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
                     <!-- FIM COSULTA NA RECEITA -->
 
                 </LinearLayout>
@@ -963,8 +966,8 @@
             <!-- CODIGO DE BARRA NF-e -->
             <LinearLayout
                 android:id="@+id/printNfe1"
-                android:layout_width="260dp"
-                android:layout_height="80dp"
+                android:layout_width="190dp"
+                android:layout_height="70dp"
                 android:layout_gravity="center_horizontal"
                 android:background="@android:color/white"
                 android:orientation="vertical">
@@ -973,7 +976,7 @@
                 <ImageView
                     android:id="@+id/imgNfeQrCode"
                     android:layout_width="match_parent"
-                    android:layout_height="70dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/white" />
             </LinearLayout>
@@ -981,8 +984,8 @@
 
             <LinearLayout
                 android:id="@+id/printNfe2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="190dp"
+                android:layout_height="260dp"
                 android:background="@android:color/white"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -999,7 +1002,7 @@
                     android:fontFamily="sans-serif-black"
                     android:text="DADOS DO EMITENTE"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -1007,7 +1010,7 @@
                     android:fontFamily="sans-serif-black"
                     android:text="NOME/RAZAO SOCIAL:"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
 
                 <!-- CABECALHO DA NOTA -->
                 <LinearLayout
@@ -1023,7 +1026,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="ZENITECH INFORMATICA LTDA"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtNfeCab2"
@@ -1032,7 +1035,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="CNPJ: 10552850000156 I.E.: 20217"
                         android:textColor="@android:color/black"
-                        android:textSize="13sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -1044,7 +1047,7 @@
                     android:gravity="center"
                     android:text="Rua do Chumbo, 125 Lagoa nova, Mossoro, Rn 59076-180"
                     android:textColor="@android:color/black"
-                    android:textSize="13sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:id="@+id/txtNfeCab51"
@@ -1054,7 +1057,7 @@
                     android:gravity="center"
                     android:text="84996680990"
                     android:textColor="@android:color/black"
-                    android:textSize="13sp" />
+                    android:textSize="9sp" />
                 <!-- FIM CABECALHO DA NOTA -->
 
                 <!-- ************************* -->
@@ -1069,7 +1072,7 @@
                     android:fontFamily="sans-serif-black"
                     android:text="DADOS DO DESTINATARIO"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -1077,7 +1080,7 @@
                     android:fontFamily="sans-serif-black"
                     android:text="NOME/RAZAO SOCIAL:"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
 
                 <!-- CABECALHO DA NOTA -->
                 <LinearLayout
@@ -1093,7 +1096,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="ZENITECH INFORMATICA LTDA"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtNfeCab4"
@@ -1102,7 +1105,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="CNPJ: 10552850000156 I.E.: 20217"
                         android:textColor="@android:color/black"
-                        android:textSize="13sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -1114,7 +1117,7 @@
                     android:gravity="center"
                     android:text="Rua do Chumbo, 125 Lagoa nova, Mossoro, Rn 59076-180  84996680990"
                     android:textColor="@android:color/black"
-                    android:textSize="13sp" />
+                    android:textSize="9sp" />
                 <!-- FIM CABECALHO DA NOTA -->
 
                 <!-- ************************* -->
@@ -1130,7 +1133,7 @@
                     android:gravity="center"
                     android:text="NATUREZA DA OPRACAO"
                     android:textColor="@android:color/black"
-                    android:textSize="13sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:id="@+id/txtNfen"
@@ -1140,7 +1143,7 @@
                     android:gravity="center"
                     android:text="VENDA DE GLP DENTRO DO ESTADO - REVENDA"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
 
                 <!-- ************************* -->
                 <View
@@ -1157,10 +1160,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
                         android:text="#"
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                     <!--<TextView
                         android:layout_width="wrap_content"
@@ -1173,51 +1175,49 @@
                         android:textSize="11sp" />-->
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="start"
-                        android:text="|DESC."
+                        android:text="| DESC."
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="|QTDE."
-                        android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="|UN."
+                        android:text="| QTDE."
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="53dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="end"
-                        android:text="|VL.UNIT."
+                        android:text="| UN."
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="60dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="end"
-                        android:text="|VL.TOTAL"
+                        android:text="| VL.UNIT."
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="| VL.TOTAL"
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
 
                     <!-- DESCRIÇÃO DA NOTA -->
                 </LinearLayout>
@@ -1233,7 +1233,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="1"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtNFeDescProduto"
@@ -1244,7 +1244,7 @@
                         android:gravity="end"
                         android:text=""
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -1261,7 +1261,7 @@
                         android:gravity="center"
                         android:text=""
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="40dp"
@@ -1270,7 +1270,7 @@
                         android:gravity="center"
                         android:text="2"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -1279,7 +1279,7 @@
                         android:gravity="center"
                         android:text="UN."
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="50dp"
@@ -1288,7 +1288,7 @@
                         android:gravity="end"
                         android:text="85,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="60dp"
@@ -1297,7 +1297,7 @@
                         android:gravity="end"
                         android:text="170,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
 
@@ -1314,7 +1314,7 @@
                         android:gravity="start"
                         android:text="VALOR TOTAL DA NOTA"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtNfeInfoVal2"
@@ -1324,7 +1324,7 @@
                         android:gravity="center"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
                 <!-- FIM INFORMACOES PEDIDO -->
@@ -1338,10 +1338,9 @@
 
             <LinearLayout
                 android:id="@+id/printNfe3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="190dp"
+                android:layout_height="250dp"
                 android:background="@android:color/white"
-                android:gravity="center"
                 android:orientation="vertical">
 
                 <!-- TRIBUTOS TOTAIS -->
@@ -1352,24 +1351,23 @@
                     android:gravity="center"
                     android:text="DADOS ADICIONAIS"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="9sp" />
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/txtNFeDadosAdd"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/txtNFeDadosAdd"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="Dados adicionais"
-                        android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                </LinearLayout>
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:text="( DECLARAMOS QUE OS PRODUTOS ESTAO ADEQUADAMENTE
+                ACONDICIONADOS E ESTIVADOS PARA SUPORTAR OS RISCOS NORMAIS DAS ETAPAS NECESSARIAS A OPERACAO
+                DE TRANSPORTE (CARREGAMENTO, DESCARREGAMENTO, TRANSBORDO E TRANSPORTE) E QUE ATENDEM A REGULAMENTACAO
+                EM VIGOR. DATA:  .. . .. DECLARAMOS QUE A EXPEDICAO NAO CONTEM EMBALAGENS VAZIAS E
+                NAO LIMPAS DE PRODUTOS PERIGOSOS QUE APRESENTAM VALOR DE QUANTIDADE LIMITADA POR VEICULO (
+                COLUNA 8 DA RELACAO DE PRODUTOS PERIGOSOS) IGUAL A ZERO. DATA:  .. . .. /nASSINATURA:
+                ____________________________________________________________________"
+                    android:textColor="@android:color/black"
+                    android:textSize="9sp" />
                 <!-- FIM TRIBUTOS TOTAIS -->
 
                 <!-- ************************* -->
@@ -1380,13 +1378,13 @@
 
                 <!-- RESERVADO AO FISCO -->
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:gravity="center"
                     android:text="RESERVADO AO FISCO"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
                 <!-- FIM RESERVADO AO FISCO -->
 
                 <!-- ************************* -->
@@ -1408,15 +1406,15 @@
         android:visibility="gone">
 
         <LinearLayout
-            android:layout_width="260dp"
+            android:layout_width="190dp"
             android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/printCabRel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="190dp"
+                android:layout_height="110dp"
                 android:background="@android:color/white"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -1435,7 +1433,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="ZENITECH INFORMATICA LTDA"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtCabRel2"
@@ -1444,7 +1442,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="CNPJ: 10552850000156 I.E.: 20217"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -1456,7 +1454,7 @@
                     android:gravity="center"
                     android:text="Rua do Chumbo, 125 Lagoa nova, Mossoro, Rn 59076-180"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:id="@+id/txtCabRel4"
@@ -1466,7 +1464,7 @@
                     android:gravity="center"
                     android:text="84996680990"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
                 <!-- FIM CABECALHO DA NOTA -->
 
                 <!-- ************************* -->
@@ -1491,7 +1489,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="Serie: 025 84996680990"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -1507,24 +1505,24 @@
                     android:fontFamily="sans-serif-black"
                     android:text="NFC-e"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
                 <!-- FIM CABECALHO DA NOTA -->
 
-                <!-- ************************* -->
+                <!-- *************************
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.8dp"
                     android:layout_marginTop="4dp"
-                    android:background="@android:color/black" />
+                    android:background="@android:color/black" /> -->
 
             </LinearLayout>
 
+            <!---->
             <LinearLayout
                 android:id="@+id/printRel2"
-                android:layout_width="260dp"
-                android:layout_height="wrap_content"
+                android:layout_width="190dp"
+                android:layout_height="100dp"
                 android:background="@android:color/white"
-                android:gravity="center"
                 android:orientation="vertical">
 
                 <TextView
@@ -1535,7 +1533,7 @@
                     android:gravity="center"
                     android:text="Numero: 12 Emissao: 29/03/2021"
                     android:textColor="@android:color/black"
-                    android:textSize="10sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:id="@+id/txtCorpoRel2"
@@ -1545,7 +1543,7 @@
                     android:gravity="center"
                     android:text="Protocolo: EMITIDA EM CONTIGENCIA"
                     android:textColor="@android:color/black"
-                    android:textSize="10sp" />
+                    android:textSize="9sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -1559,7 +1557,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="Chave:"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <!-- COSULTA NA RECEITA -->
 
@@ -1571,7 +1569,7 @@
                         android:gravity="center"
                         android:text="0000  0000  0000  0000  0000"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtCorpoRel4"
@@ -1581,89 +1579,87 @@
                         android:gravity="center"
                         android:text="0000  0000  0000  0000  0000"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp"
+                        android:visibility="gone" />
                     <!-- FIM COSULTA NA RECEITA -->
 
                 </LinearLayout>
 
-                <!-- ************************* -->
+                <!-- *************************
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.8dp"
-                    android:background="@android:color/black" />
+                    android:background="@android:color/black" /> -->
 
                 <!-- INFORMACOES PEDIDO -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
                         android:text="#"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
                         android:text="COD."
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="DESC."
-                        android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="QTDE."
-                        android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="UN."
+                        android:text="DESC."
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="QTDE."
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="UN."
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
                         android:gravity="end"
                         android:text="VL.UNIT."
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="60dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:fontFamily="sans-serif-black"
                         android:gravity="end"
                         android:text="VL.TOTAL"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                    <!-- DESCRIÇÃO DA NOTA -->
+                        android:textSize="9sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -1678,7 +1674,7 @@
                         android:gravity="center"
                         android:text="1"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtCorpoRel5"
@@ -1688,7 +1684,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="1"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -1700,7 +1696,7 @@
                     android:gravity="end"
                     android:text="0,00"
                     android:textColor="@android:color/black"
-                    android:textSize="10sp" />
+                    android:textSize="9sp" />
                 <!-- FIM INFORMACOES PEDIDO -->
 
                 <!-- ************************* -->
@@ -1713,14 +1709,14 @@
             <!-- -->
             <LinearLayout
                 android:id="@+id/printRelNFe"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="190dp"
+                android:layout_height="20dp"
                 android:orientation="vertical">
-                <!-- ************************* -->
+                <!-- *************************
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.8dp"
-                    android:background="@android:color/black" />
+                    android:background="@android:color/black" /> -->
 
                 <TextView
                     android:layout_width="match_parent"
@@ -1728,21 +1724,21 @@
                     android:fontFamily="sans-serif-black"
                     android:text="NF-e"
                     android:textColor="@android:color/black"
-                    android:textSize="12sp" />
+                    android:textSize="9sp" />
                 <!-- FIM CABECALHO DA NOTA -->
 
-                <!-- ************************* -->
+                <!-- *************************
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.8dp"
                     android:layout_marginTop="4dp"
-                    android:background="@android:color/black" />
+                    android:background="@android:color/black" /> -->
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/printRel3"
-                android:layout_width="260dp"
-                android:layout_height="wrap_content"
+                android:layout_width="190dp"
+                android:layout_height="100dp"
                 android:background="@android:color/white"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -1755,7 +1751,7 @@
                     android:gravity="center"
                     android:text="Numero: 12 Emissao: 29/03/2021"
                     android:textColor="@android:color/black"
-                    android:textSize="10sp" />
+                    android:textSize="9sp" />
 
                 <TextView
                     android:id="@+id/txtCorpoRelNfe2"
@@ -1765,7 +1761,7 @@
                     android:gravity="center"
                     android:text="Protocolo: EMITIDA EM CONTIGENCIA"
                     android:textColor="@android:color/black"
-                    android:textSize="10sp" />
+                    android:textSize="9sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -1779,7 +1775,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="Chave:"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <!-- COSULTA NA RECEITA -->
 
@@ -1791,7 +1787,7 @@
                         android:gravity="center"
                         android:text="0000  0000  0000  0000  0000"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtCorpoRelNfe4"
@@ -1801,89 +1797,87 @@
                         android:gravity="center"
                         android:text="0000  0000  0000  0000  0000"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp"
+                        android:visibility="gone" />
                     <!-- FIM COSULTA NA RECEITA -->
 
                 </LinearLayout>
 
-                <!-- ************************* -->
+                <!-- *************************
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="0.8dp"
-                    android:background="@android:color/black" />
+                    android:background="@android:color/black" /> -->
 
                 <!-- INFORMACOES PEDIDO -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
                         android:text="#"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
                         android:text="COD."
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="DESC."
-                        android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="QTDE."
-                        android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="UN."
+                        android:text="DESC."
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="50dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="QTDE."
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:fontFamily="sans-serif-black"
+                        android:text="UN."
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="sans-serif-black"
                         android:gravity="end"
                         android:text="VL.UNIT."
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
-                        android:layout_width="60dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:fontFamily="sans-serif-black"
                         android:gravity="end"
                         android:text="VL.TOTAL"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                    <!-- DESCRIÇÃO DA NOTA -->
+                        android:textSize="9sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -1898,7 +1892,7 @@
                         android:gravity="center"
                         android:text="1"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtCorpoRelNfe5"
@@ -1908,7 +1902,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="1"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -1920,7 +1914,7 @@
                     android:gravity="end"
                     android:text="0,00"
                     android:textColor="@android:color/black"
-                    android:textSize="10sp" />
+                    android:textSize="9sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -1935,7 +1929,7 @@
                         android:gravity="center"
                         android:text=""
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="40dp"
@@ -1944,7 +1938,7 @@
                         android:gravity="center"
                         android:text="2"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -1953,7 +1947,7 @@
                         android:gravity="center"
                         android:text="UN."
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="50dp"
@@ -1962,7 +1956,7 @@
                         android:gravity="end"
                         android:text="85,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="60dp"
@@ -1971,7 +1965,7 @@
                         android:gravity="end"
                         android:text="170,00"
                         android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:textSize="10sp" />
 
                 </LinearLayout>
                 <!-- FIM INFORMACOES PEDIDO -->
@@ -1985,10 +1979,10 @@
 
             <LinearLayout
                 android:id="@+id/printTotais"
-                android:layout_width="260dp"
-                android:layout_height="wrap_content"
+                android:layout_width="190dp"
+                android:layout_height="60dp"
                 android:background="@android:color/white"
-                android:gravity="center"
+                android:gravity="bottom"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -2004,7 +1998,7 @@
                         android:gravity="start"
                         android:text="Total de Produtos NFC-e: "
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtTotNfce"
@@ -2014,7 +2008,7 @@
                         android:gravity="center"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -2031,7 +2025,7 @@
                         android:gravity="start"
                         android:text="Total de Produtos NF-e: "
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtTotNfe"
@@ -2041,7 +2035,7 @@
                         android:gravity="center"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -2058,7 +2052,7 @@
                         android:gravity="start"
                         android:text="Total de Produtos: "
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                     <TextView
                         android:id="@+id/txtTotal"
@@ -2068,7 +2062,7 @@
                         android:gravity="center"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="11sp" />
+                        android:textSize="9sp" />
 
                 </LinearLayout>
 
@@ -2093,40 +2087,43 @@
 
         <LinearLayout
             android:id="@+id/printReimpressao"
-            android:layout_width="260dp"
-            android:layout_height="wrap_content"
+            android:layout_width="190dp"
+            android:layout_height="200dp"
             android:background="@android:color/white"
             android:orientation="vertical">
 
             <RelativeLayout
+                android:background="@drawable/bg_reimpressao"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <ImageView
-                    android:layout_width="260dp"
+                <!--<ImageView
+                    android:layout_width="190dp"
                     android:layout_height="200dp"
-                    android:alpha=".5"
                     android:orientation="vertical"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/bg_reimpressao" />
+                    android:src="@drawable/bg_reimpressao" />-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:gravity="end"
                     android:orientation="vertical">
 
                     <ImageView
                         android:layout_width="70dp"
-                        android:layout_height="20dp"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:scaleType="centerCrop"
                         android:src="@drawable/ic_receipt_manager_logo" />
 
                     <TextView
                         android:id="@+id/txtReimpressao"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="start"
+                        android:textColor="@android:color/black"
+                        android:textSize="10sp" />
                 </LinearLayout>
 
 
@@ -2205,7 +2202,7 @@
                         android:gravity="center"
                         android:text="Rua do Chumbo, 125 Lagoa nova, Mossoro, Rn 59076-180"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/txtReim4"
@@ -2215,7 +2212,7 @@
                         android:gravity="center"
                         android:text="84996680990"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="10sp" />
                     <!-- FIM CABECALHO DA NOTA -->
 
                     <!-- ************************* -->
@@ -2240,7 +2237,7 @@
                             android:fontFamily="sans-serif-black"
                             android:text="Serie: 025 84996680990"
                             android:textColor="@android:color/black"
-                            android:textSize="12sp" />
+                            android:textSize="10sp" />
 
                     </LinearLayout>
 
@@ -2256,7 +2253,7 @@
                         android:fontFamily="sans-serif-black"
                         android:text="NFC-e"
                         android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="10sp" />
                     <!-- FIM CABECALHO DA NOTA -->
 
                     <!-- ************************* -->

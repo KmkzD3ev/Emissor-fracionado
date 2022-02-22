@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -222,6 +223,11 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     private void toast(final String text) {
         Log.d(LOG_TAG, text);
 
@@ -306,9 +312,9 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         String txtCompPag2 = cAux.removerAcentos(pinpad.getNomeEmpresa()) + "\n" +
                 cAux.removerAcentos(pinpad.getEnderecoEmpresa()) + "\n" +
                 cAux.exibirData(pinpad.getDate()) + " " + pinpad.getTime() + " CNPJ:" + pinpad.getCnpjEmpresa() + "\n" +
-                "--------------------------------------------------------------\n" +
+                "------------------------------------------\n" +
                 pinpad.getTypeOfTransactionEnum() + "                                         RS " + pinpad.getAmount() + "\n" +
-                "--------------------------------------------------------------\n" +
+                "------------------------------------------\n" +
                 pinpad.getCardBrand() + " - " + pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8) + "  AUT: " + pinpad.getAuthorizationCode() + "\n" +
                 pinpad.getCardHolderName() + "\n" +
                 pinpad.getRecipientTransactionIdentification() + "\n" +
@@ -320,7 +326,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         txtReimpressao.setText(txtCompPag2);
 
         LinearLayout impressora1 = findViewById(R.id.printReimpressao);
-        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 260, 230);
+        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 190, 200);
 
 
         ppp.setConnectionCallback(new StoneCallbackInterface() {
@@ -498,18 +504,18 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressoraChave, 260, 200);//45*/
 
         //Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 260, 104);
-        Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 384, 114);
+        Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 190, 110);
         //
         LinearLayout impressora = findViewById(R.id.teste);
         //Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
-        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 384, 290);//45
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 190, 240);//45
         //
         LinearLayout impressoraChave = findViewById(R.id.teste3);
         //Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
-        Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressoraChave, 384, 150);//45
+        Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressoraChave, 190, 130);//45
         //
         LinearLayout impressora1 = findViewById(R.id.teste1);
-        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 180, 100);
+        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 190, 120);
 
         ppp.setConnectionCallback(new StoneCallbackInterface() {
             @Override
@@ -543,7 +549,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
         MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
         try {
-            BitMatrix bitMatrix = multiFormatWriter.encode(prefs.getString("chave", ""), BarcodeFormat.CODE_128, 300, 80);
+            BitMatrix bitMatrix = multiFormatWriter.encode(prefs.getString("chave", ""), BarcodeFormat.CODE_128, 190, 80);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
 
@@ -631,16 +637,16 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
         //
         LinearLayout impressora = findViewById(R.id.printNfe);
-        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 380, 150);
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 190, 150);
         //
         LinearLayout impressora1 = findViewById(R.id.printNfe1);
-        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 280, 50);
+        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 190, 70);
         //
         LinearLayout impressora2 = findViewById(R.id.printNfe2);
-        Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressora2, 280, 350);
+        Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressora2, 190, 260);
         //
         LinearLayout impressora3 = findViewById(R.id.printNfe3);
-        Bitmap bitmap4 = printViewHelper.createBitmapFromView(impressora3, 280, 250);
+        Bitmap bitmap4 = printViewHelper.createBitmapFromView(impressora3, 190, 250);
 
         ppp.setConnectionCallback(new StoneCallbackInterface() {
             @Override
@@ -669,10 +675,11 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
     // --------------------     IMPRESSÃO DE RELATÓRIOS     ----------------------------------------
     private void printRelatorio() {
 
+
         PosPrintProvider pppCab = new PosPrintProvider(this);
-        PosPrintProvider pppCor = new PosPrintProvider(this);
-        PosPrintProvider pppCorNfe = new PosPrintProvider(this);
-        PosPrintProvider pppTotal = new PosPrintProvider(this);
+        //PosPrintProvider pppCor = new PosPrintProvider(this);
+        //PosPrintProvider pppCorNfe = new PosPrintProvider(this);
+        //PosPrintProvider pppTotal = new PosPrintProvider(this);
 
         String serie = bd.getSeriePOS();
         elementosUnidade = bd.getUnidades();
@@ -691,10 +698,10 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         txtCabRel4.setText(String.format("CEP: %s  %s", unidades.getCep(), unidades.getTelefone()));
 
         //
-        txtCabRel5.setText(String.format("Serie: %s  %s", serie, unidades.getTelefone()));
+        txtCabRel5.setText(String.format("Serie: %s Serial: %s", serie, prefs.getString("serial_app", "")));
         //
         LinearLayout impressora = findViewById(R.id.printCabRel);
-        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 110);
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 190, 110);
 
         //
         pppCab.setConnectionCallback(new StoneCallbackInterface() {
@@ -712,7 +719,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
             }
         });
         pppCab.addBitmap(bitmap1);
-        pppCab.execute();
+        //pppCab.execute();
 
         // TOTAL DE PRODUTOS
         int totalProdutos = 0;
@@ -744,27 +751,16 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 txtCorpoRel2.setText(String.format("Protocolo: %s", pedidos.getProtocolo().equals(" ") ? "EMITIDA EM CONTIGENCIA" : pedidos.getProtocolo()));
 
                 String c = bd.gerarChave(Integer.parseInt(pedidos.getId()));
-                String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
-                String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
-                //
-                txtCorpoRel3.setText(cl1);
-                txtCorpoRel4.setText(cl2);
-
-                //
-                /*linhaProduto = new String[]{
-                        itensPedidos.getProduto() + "         " + bd.getProduto(itensPedidos.getProduto()),
-                        "" + itensPedidos.getQuantidade() + "     " + "UN     " + cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))) + "   " +
-                                cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(pedidos.getValor_total()))))
-                };*/
+                txtCorpoRel3.setText(c);
 
                 //IMPRIMIR TEXTO
                 txtCorpoRel5.setText(String.format("%s               %s", itensPedidos.getProduto(), bd.getProduto(itensPedidos.getProduto())));
                 txtCorpoRel6.setText(String.format("%s          UN          %s          %s", itensPedidos.getQuantidade(), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getTotal()))))));
 
                 LinearLayout impressora1 = findViewById(R.id.printRel2);
-                Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 260, 120);
+                Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 190, 120);
 
-                pppCor.addBitmap(bitmap2);
+                pppCab.addBitmap(bitmap2);
 
                 try {
                     String[] sum = {String.valueOf(n), "1"};
@@ -775,7 +771,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 totalProdutos += Integer.parseInt(itensPedidos.getQuantidade());
             }
 
-            pppCor.setConnectionCallback(new StoneCallbackInterface() {
+            /*pppCor.setConnectionCallback(new StoneCallbackInterface() {
                 @Override
                 public void onSuccess() {
                     impressao2 = true;
@@ -789,7 +785,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                     Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
                 }
             });
-            pppCor.execute();
+            pppCor.execute();*/
         } else {
             impressao2 = true;
             finalizarImpressao();
@@ -799,9 +795,9 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         if (elementosPedidosNFE.size() > 0) {
             //
             LinearLayout impressoraTxtNFe = findViewById(R.id.printRelNFe);
-            Bitmap bitmapTxtNFe = printViewHelper.createBitmapFromView(impressoraTxtNFe, 260, 20);
+            Bitmap bitmapTxtNFe = printViewHelper.createBitmapFromView(impressoraTxtNFe, 190, 20);
 
-            pppTotal.addBitmap(bitmapTxtNFe);
+            pppCab.addBitmap(bitmapTxtNFe);
             //
             TextView txtCorpoRelNfe1 = findViewById(R.id.txtCorpoRelNfe1);
             TextView txtCorpoRelNfe2 = findViewById(R.id.txtCorpoRelNfe2);
@@ -826,10 +822,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 txtCorpoRelNfe2.setText(String.format("Protocolo: %s", pedidosNFE.getProtocolo()));
 
                 String c = bd.gerarChave(Integer.parseInt(pedidosNFE.getId()));
-                String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
-                String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
-                txtCorpoRelNfe3.setText(cl1);
-                txtCorpoRelNfe4.setText(cl2);
+                txtCorpoRelNfe3.setText(c);
 
                 //IMPRIMIR TEXTO
                 txtCorpoRelNfe5.setText(String.format("%s               %s", itensPedidos.getProduto(), bd.getProduto(itensPedidos.getProduto())));
@@ -837,9 +830,9 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
                 //
                 LinearLayout impressoraNFe = findViewById(R.id.printRel3);
-                Bitmap bitmapNFe = printViewHelper.createBitmapFromView(impressoraNFe, 260, 120);
+                Bitmap bitmapNFe = printViewHelper.createBitmapFromView(impressoraNFe, 190, 120);
 
-                pppCorNfe.addBitmap(bitmapNFe);
+                pppCab.addBitmap(bitmapNFe);
 
                 try {
                     String[] sum = {String.valueOf(n), "1"};
@@ -851,7 +844,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
             }
 
             //
-            pppCorNfe.setConnectionCallback(new StoneCallbackInterface() {
+            /*pppCorNfe.setConnectionCallback(new StoneCallbackInterface() {
                 @Override
                 public void onSuccess() {
                     impressao3 = true;
@@ -865,7 +858,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                     Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
                 }
             });
-            pppCorNfe.execute();
+            pppCorNfe.execute();*/
         } else {
             impressao3 = true;
             finalizarImpressao();
@@ -881,7 +874,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         String[] somar = {String.valueOf(totalProdutos), String.valueOf(totalProdutosNFE)};
         txtTotal.setText(String.valueOf(Math.round(Float.parseFloat(String.valueOf(cAux.somar(somar))))));
 
-        pppTotal.setConnectionCallback(new StoneCallbackInterface() {
+        pppCab.setConnectionCallback(new StoneCallbackInterface() {
             @Override
             public void onSuccess() {
                 impressao4 = true;
@@ -897,16 +890,16 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         });
 
         LinearLayout impressoraTot = findViewById(R.id.printTotais);
-        Bitmap bitmapTot = printViewHelper.createBitmapFromView(impressoraTot, 260, 120);
+        Bitmap bitmapTot = printViewHelper.createBitmapFromView(impressoraTot, 190, 60);
 
-        pppTotal.addBitmap(bitmapTot);
-        pppTotal.execute();
+        pppCab.addBitmap(bitmapTot);
+        runOnUiThread(pppCab::execute);
     }
 
     //
     private void finalizarImpressao() {
         //
-        if (!impressao1 || !impressao2 || !impressao3 || !impressao4) return;
+        //if (!impressao1 || !impressao2 || !impressao3 || !impressao4) return;
 
         //
         Intent i = new Intent(ImpressoraPOS.this, Principal.class);

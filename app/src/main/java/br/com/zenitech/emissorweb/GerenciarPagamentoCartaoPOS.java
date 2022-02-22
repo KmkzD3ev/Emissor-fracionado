@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import br.com.stone.posandroid.providers.PosPrintProvider;
 import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
 import br.com.stone.posandroid.providers.PosTransactionProvider;
 import br.com.zenitech.emissorweb.controller.LogCartaoControllerKT;
@@ -94,6 +96,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     LinearLayoutCompat llPagamentoAprovado, llPagamentoReprovado, llErroDiversoPg;
     AlertDialog alerta;
     SharedPreferences prefs;
+    ProgressBar prossBarPag;
 
     AppCompatButton btnEnviarTrazacao, btnFinalizarPagamento, btnEnviarComprovante, btnCancelarFinalizarPagamento;
 
@@ -128,6 +131,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         STONE_CODE = unidades.getCodloja();
 
         // **
+        prossBarPag = findViewById(R.id.prossBarPag);
         txtTotalPagar = findViewById(R.id.txtTotalPagarCartao);
         txtStatusPagamento = findViewById(R.id.txtStatusPagamento);
         txtMsgCausaErro = findViewById(R.id.txtMsgCausaErro);
@@ -220,6 +224,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
             finish();
         });
 
+        prossBarPag.setVisibility(View.GONE);
         btnEnviarTrazacao.setVisibility(View.GONE);
         btnEnviarTrazacao.setOnClickListener(view -> iniciarCaptura());
 
@@ -228,6 +233,8 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
     // INICIAR UMA CAPTURA DE PAGAMENTO COM O POS
     private void iniciarCaptura() {
+        btnEnviarTrazacao.setVisibility(View.GONE);
+        prossBarPag.setVisibility(View.VISIBLE);
         transactionObject = new TransactionObject();
         //Definir o valor da transação em centavos
         transactionObject.setAmount(totalAPagar);
@@ -283,12 +290,27 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
     // IMPRIMIR COMPROVANTE
     private void imprimircomprovantePOS() {
-        final PrintController printMerchant =
-                new PrintController(GerenciarPagamentoCartaoPOS.this,
-                        new PosPrintReceiptProvider(this.getApplicationContext(),
-                                transactionObject, ReceiptType.MERCHANT));
 
-        printMerchant.print();
+
+        PosPrintProvider pppCab = new PosPrintProvider(this);
+        pppCab.addLine("Serial POS: " + prefs.getString("serial_app", ""));
+        pppCab.setConnectionCallback(new StoneCallbackInterface() {
+            final PrintController printMerchant = new PrintController(
+                    context, new PosPrintReceiptProvider(
+                    context, transactionObject, ReceiptType.MERCHANT)
+            );
+
+            @Override
+            public void onSuccess() {
+                printMerchant.print();
+            }
+
+            @Override
+            public void onError() {
+                printMerchant.print();
+            }
+        });
+        runOnUiThread(pppCab::execute);
 
         final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         builder.setCancelable(false);
@@ -556,6 +578,8 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                 btnEnviarTrazacao.setVisibility(View.GONE);
                 llPagamentoPedirCartao.setVisibility(View.VISIBLE);
             } else if (action == Action.TRANSACTION_WAITING_PASSWORD) {
+
+                prossBarPag.setVisibility(View.GONE);
                 btnEnviarTrazacao.setVisibility(View.GONE);
                 llPagamentoPedirCartao.setVisibility(View.GONE);
             } else {

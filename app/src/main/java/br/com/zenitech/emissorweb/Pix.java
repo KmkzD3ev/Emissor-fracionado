@@ -129,17 +129,20 @@ public class Pix extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<PixDomain> call, @NonNull Response<PixDomain> response) {
 
-                //
-                final PixDomain infoPix = response.body();
-                if (!infoPix.getEncodedImage().equalsIgnoreCase("")) {
-                    Log.e("PIX", infoPix.getId());
-                    btm = convertBase64ToBitmap(infoPix.getEncodedImage());
-                    imageView2.setImageBitmap(btm);
+                try {
+                    final PixDomain infoPix = response.body();
+                    if (!infoPix.getEncodedImage().equalsIgnoreCase("")) {
+                        Log.e("PIX", infoPix.getId());
+                        btm = convertBase64ToBitmap(infoPix.getEncodedImage());
+                        imageView2.setImageBitmap(btm);
 
-                    idPagamento = infoPix.getId();
+                        idPagamento = infoPix.getId();
 
-                    bd.updateFormPagPIX(idPagamento, idForPagPix);
-                    espera();
+                        bd.updateFormPagPIX(idPagamento, idForPagPix);
+                        espera();
+                    }
+                } catch (Exception ignored) {
+
                 }
             }
 
