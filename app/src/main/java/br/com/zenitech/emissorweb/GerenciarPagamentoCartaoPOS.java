@@ -515,16 +515,20 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);
-
+        makeText(context, "" + userList.size(), LENGTH_SHORT).show();
+        //makeText(context, "" + userList.get(0).getStoneCode(), LENGTH_SHORT).show();
+        ativarStoneCode();
         // Quando é retornado null, o SDK ainda não foi ativado
-        if (userList != null) {
+        /*if (userList != null) {
+
+            makeText(context, "" + userList.get(1).getStoneCode(), LENGTH_SHORT).show();
             // O SDK já foi ativado.
             _pinpadAtivado();
 
         } else {
             // Inicia a ativação do SDK
             ativarStoneCode();
-        }
+        }*/
     }
 
     //
@@ -533,7 +537,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         userList = StoneStart.init(context);
 
         // Quando é retornado null, o SDK ainda não foi ativado
-        if (userList == null) {
+        //if (userList == null) {
             ActiveApplicationProvider activeApplicationProvider = new ActiveApplicationProvider(context);
             activeApplicationProvider.setDialogMessage("Ativando o Stone Code");
             activeApplicationProvider.setDialogTitle("Aguarde");
@@ -543,6 +547,8 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                 public void onSuccess() {
                     // SDK ativado com sucesso
                     //Toast.makeText(context, "Stone Code:" + STONE_CODE + " ativado com sucesso!", Toast.LENGTH_SHORT).show();
+
+                    makeText(context, "" + userList.get(0).getStoneCode(), LENGTH_SHORT).show();
                     _pinpadAtivado();
                 }
 
@@ -551,10 +557,10 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                 }
             });
             activeApplicationProvider.activate(STONE_CODE);
-        } else {
+        /*} else {
             // O SDK já foi ativado.
             _pinpadAtivado();
-        }
+        }*/
     }
 
     void _pinpadAtivado() {
