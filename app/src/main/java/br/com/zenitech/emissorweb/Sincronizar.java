@@ -1,5 +1,8 @@
 package br.com.zenitech.emissorweb;
 
+import static android.widget.Toast.LENGTH_SHORT;
+import static android.widget.Toast.makeText;
+
 import android.Manifest;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -13,6 +16,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -39,6 +43,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.datecs.api.BuildInfo;
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
@@ -46,6 +51,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.Pedidos;
@@ -54,6 +60,9 @@ import br.com.zenitech.emissorweb.interfaces.ISincronizar;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import stone.application.StoneStart;
+import stone.user.UserModel;
+import stone.utils.Stone;
 
 public class Sincronizar extends AppCompatActivity {
 
@@ -238,6 +247,13 @@ public class Sincronizar extends AppCompatActivity {
             alertaCod();
         });
 
+        iniciarStone();
+    }
+
+    // Iniciar o Stone
+    void iniciarStone() {
+        StoneStart.init(context);
+        Stone.setAppName(new Configuracoes().getApplicationName(context));
     }
 
     private void alertaCod() {
@@ -436,10 +452,30 @@ public class Sincronizar extends AppCompatActivity {
     public void gerarBancoOnline(final String serial) {
         //GERAR O BANCO ATUALIZADO ONLINE
         txt_msg_sincronizando.setText(R.string.gerando_banco_de_dados);
+        String txt;
+        String serialMaquinaStone = "";
+        String manufacture = "";
+
+        if (configuracoes.GetDevice()) {
+            serialMaquinaStone = Stone.getPosAndroidDevice().getPosAndroidSerialNumber();
+            manufacture = Stone.getPosAndroidDevice().getPosAndroidManufacturer();
+            //makeText(context, "" + serialMaquinaStone + " | "+ manufacture, LENGTH_SHORT).show();
+            txt = manufacture + "\n" + serialMaquinaStone;
+        } else {
+            serialMaquinaStone = Stone.getPosAndroidDevice().getPosAndroidSerialNumber();
+            manufacture = Stone.getPosAndroidDevice().getPosAndroidManufacturer();
+            txt = manufacture + "\n" + serialMaquinaStone;;// Build.MANUFACTURER + " " + Build.MODEL + ", Datecs API " + BuildInfo.VERSION;
+        }
+
+
+        prefs.edit().putString("infoPos", txt).apply();
 
         //
         final ISincronizar iSincronizar = ISincronizar.retrofit.create(ISincronizar.class);
-        final Call<Sincronizador> call = iSincronizar.sincronizar(serial);
+        final Call<Sincronizador> call = iSincronizar.sincronizar(serial,
+                manufacture,
+                serialMaquinaStone,
+                new ClassAuxiliar().exibirDataAtual());
         call.enqueue(new Callback<Sincronizador>() {
             @Override
             public void onResponse(@NonNull Call<Sincronizador> call, @NonNull Response<Sincronizador> response) {

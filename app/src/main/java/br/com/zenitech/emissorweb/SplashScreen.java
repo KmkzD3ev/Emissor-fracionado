@@ -1,7 +1,6 @@
 package br.com.zenitech.emissorweb;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -33,6 +34,7 @@ public class SplashScreen extends AppCompatActivity {
     //private DatabaseHelper bd;
     private int time = 2300;
     private Bundle params;
+    TextView txtSerial;
 
     //@TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
@@ -43,6 +45,7 @@ public class SplashScreen extends AppCompatActivity {
         //
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         ed = prefs.edit();
+        txtSerial = findViewById(R.id.txtSerial);
 
         if (prefs.getBoolean("reset", false)) {
             //
@@ -51,6 +54,11 @@ public class SplashScreen extends AppCompatActivity {
             startActivity(i);
             finish();
             return;
+        }
+
+        if(!prefs.getString("serial_app", "").equalsIgnoreCase("")){
+            txtSerial.setVisibility(View.VISIBLE);
+            txtSerial.setText(String.format("SERIAL\n%s", prefs.getString("serial_app", "")));
         }
 
         //

@@ -4,21 +4,33 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/drawable/bg_btn.xml" value="0.30520833333333336" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/drawable/ic_menu_camera.xml" value="0.1785" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_consultar_nfe.xml" value="0.1" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_form_pedidos_nfe.xml" value="0.1" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_impressora.xml" value="0.20108695652173914" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_main_principal.xml" value="0.10364583333333334" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_pix.xml" value="0.2890625" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_principal.xml" value="0.1408514492753623" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_splash_screen.xml" value="0.10182370820668693" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_teste_conexao_impressora.xml" value="0.5191768007483629" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/activity_teste_principal2.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/app_bar_principal.xml" value="0.10182370820668693" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_form_pedidos_nfe.xml" value="0.1" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_gerenciar_pagamento_cartao.xml" value="0.22" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_impressora.xml" value="0.33" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_status.xml" value="0.11503623188405797" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/content_teste_principal2.xml" value="0.10182370820668693" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/fragment_gallery.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/fragment_slideshow.xml" value="0.1" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_clientes_nfe.xml" value="0.33" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_form_pag_pedidos.xml" value="0.25" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_pedidos.xml" value="0.1" />
         <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/item_timeline.xml" value="0.5" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/nav_header_principal.xml" value="0.12545289855072464" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/layout/nav_header_teste_principal2.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/menu/activity_main_drawer.xml" value="0.20272108843537415" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/menu/principal.xml" value="0.1" />
+        <entry key="..\:/Users/kma_s/Documents/PROJETOS ANDROID/ZENITECH/EMISSOR_WEB_VERSSIONADO/app/src/main/res/menu/teste_principal2.xml" value="0.13796296296296295" />
       </map>
     </option>
   </component>

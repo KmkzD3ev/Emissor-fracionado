@@ -1,5 +1,8 @@
 package br.com.zenitech.emissorweb;
 
+import static android.widget.Toast.LENGTH_SHORT;
+import static android.widget.Toast.makeText;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -52,6 +55,7 @@ import java.util.List;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.adapters.PedidosAdapter;
+import br.com.zenitech.emissorweb.databinding.ActivityMainBinding;
 import br.com.zenitech.emissorweb.domains.DomainPrincipal;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
@@ -70,6 +74,7 @@ import stone.application.interfaces.StoneCallbackInterface;
 import stone.database.transaction.TransactionDAO;
 import stone.database.transaction.TransactionObject;
 import stone.user.UserModel;
+import stone.utils.Stone;
 
 public class Principal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -108,7 +113,7 @@ public class Principal extends AppCompatActivity
     List<UserModel> userList;
 
     TextView textView, txtTransmitida, txtContigencia, txtStatusTransmissao, txtVersao, txtEmpresa, txtCodUnidade, txtDataUltimoSinc;
-
+    AppBarConfiguration appBarConfiguration;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -223,8 +228,9 @@ public class Principal extends AppCompatActivity
         BottomNavigationView navView = findViewById(R.id.nav_view_b);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+        appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
+                .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -511,7 +517,7 @@ public class Principal extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        //DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -699,7 +705,7 @@ public class Principal extends AppCompatActivity
             }
         }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        //DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -837,5 +843,12 @@ public class Principal extends AppCompatActivity
                 Toast.makeText(getBaseContext(), "Não conseguimos finalizar, tente novamente.", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        return NavigationUI.navigateUp(navController, appBarConfiguration)
+                || super.onSupportNavigateUp();
     }
 }

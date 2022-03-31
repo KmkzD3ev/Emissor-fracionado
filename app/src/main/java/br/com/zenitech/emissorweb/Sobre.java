@@ -1,6 +1,7 @@
 package br.com.zenitech.emissorweb;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -17,6 +18,7 @@ import java.util.Objects;
 public class Sobre extends AppCompatActivity {
 
     TextView txtVersao;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +27,12 @@ public class Sobre extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
 
         txtVersao = findViewById(R.id.txtVersao);
-        txtVersao.setText(String.format("Versão %s", BuildConfig.VERSION_NAME));
+
+        String info = prefs.getString("infoPos", "");
+        txtVersao.setText(String.format("%s\nVersão %s", info, BuildConfig.VERSION_NAME));
 
         /*FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)

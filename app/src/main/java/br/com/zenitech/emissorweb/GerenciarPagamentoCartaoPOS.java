@@ -234,7 +234,8 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     // INICIAR UMA CAPTURA DE PAGAMENTO COM O POS
     private void iniciarCaptura() {
         btnEnviarTrazacao.setVisibility(View.GONE);
-        prossBarPag.setVisibility(View.VISIBLE);
+        //prossBarPag.setVisibility(View.VISIBLE);
+        prossBarPag.setVisibility(View.GONE);
         transactionObject = new TransactionObject();
         //Definir o valor da transação em centavos
         transactionObject.setAmount(totalAPagar);
@@ -515,7 +516,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
         // Esse método deve ser executado para inicializar o SDK
         List<UserModel> userList = StoneStart.init(context);
-        makeText(context, "" + userList.size(), LENGTH_SHORT).show();
+        //makeText(context, "" + userList.size(), LENGTH_SHORT).show();
         //makeText(context, "" + userList.get(0).getStoneCode(), LENGTH_SHORT).show();
         ativarStoneCode();
         // Quando é retornado null, o SDK ainda não foi ativado
@@ -548,7 +549,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                     // SDK ativado com sucesso
                     //Toast.makeText(context, "Stone Code:" + STONE_CODE + " ativado com sucesso!", Toast.LENGTH_SHORT).show();
 
-                    makeText(context, "" + userList.get(0).getStoneCode(), LENGTH_SHORT).show();
+                    //makeText(context, "" + userList.get(0).getStoneCode(), LENGTH_SHORT).show();
                     _pinpadAtivado();
                 }
 
