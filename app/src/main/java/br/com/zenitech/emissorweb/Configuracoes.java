@@ -40,4 +40,7 @@ public class Configuracoes {
         int stringId = applicationInfo.labelRes;
         return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
     }
+
+    //
+    public static String token_authorization;
 }

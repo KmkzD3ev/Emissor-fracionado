@@ -1,13 +1,5 @@
 package br.com.zenitech.emissorweb;
 
-import static br.com.zenitech.emissorweb.Configuracoes.token_authorization;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.LinearLayoutCompat;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,33 +7,31 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.LinearLayoutCompat;
+
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Objects;
 
 import br.com.stone.posandroid.providers.PosPrintProvider;
-import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.PixDomain;
-import br.com.zenitech.emissorweb.domains.Sincronizador;
-import br.com.zenitech.emissorweb.domains.Unidades;
 import br.com.zenitech.emissorweb.interfaces.IPix;
-import br.com.zenitech.emissorweb.interfaces.ISincronizar;
+import br.com.zenitech.emissorweb.interfaces.IPixAssas;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import stone.application.interfaces.StoneCallbackInterface;
 
-public class Pix extends AppCompatActivity {
+public class PixAsaas extends AppCompatActivity {
 
     private DatabaseHelper bd;
     ImageView imageView2;
@@ -126,12 +116,11 @@ public class Pix extends AppCompatActivity {
     private void getQrCodePayment() {
 
         //Log.e("PIX", "cobranca | " + " | " + apiKey + " | " + cliCob + " | " + pedido + " | " + valor);
-        final IPix iPix = IPix.retrofit.create(IPix.class);
+        final IPixAssas iPix = IPixAssas.retrofit.create(IPixAssas.class);
         final Call<PixDomain> call = iPix.getImgQrCode(
-                "token",
-                "ff284a00-0454-43dc-ba29-1266561b0e7f",
-                "ffb2238a-b401-416d-aff0-fbf4590e5055",
-                "b35a024c-d05c-4b64-bfe2-302060739197da137d51-da87-4eca-9a80-ca33bdba25e1",
+                "cobranca",
+                apiKey,
+                cliCob,
                 pedido,
                 valor);
         call.enqueue(new Callback<PixDomain>() {
@@ -146,9 +135,6 @@ public class Pix extends AppCompatActivity {
                         imageView2.setImageBitmap(btm);
 
                         idPagamento = infoPix.getId();
-                        token_authorization = infoPix.getTokenAuthorization();
-
-                        Toast.makeText(Pix.this, "Token: " + token_authorization, Toast.LENGTH_SHORT).show();
 
                         bd.updateFormPagPIX(idPagamento, idForPagPix);
                         espera();
@@ -165,13 +151,11 @@ public class Pix extends AppCompatActivity {
     }
 
     private void getStatusPayment(String id) {
-        final IPix iPix = IPix.retrofit.create(IPix.class);
+        final IPixAssas iPix = IPixAssas.retrofit.create(IPixAssas.class);
         final Call<PixDomain> call = iPix.getStatusCobranca(
                 "status",
-                "ffb2238a-b401-416d-aff0-fbf4590e5055",
-                "b35a024c-d05c-4b64-bfe2-302060739197da137d51-da87-4eca-9a80-ca33bdba25e1",
-                id,
-                token_authorization);
+                apiKey,
+                id);
         call.enqueue(new Callback<PixDomain>() {
             @Override
             public void onResponse(@NonNull Call<PixDomain> call, @NonNull Response<PixDomain> response) {
@@ -181,7 +165,7 @@ public class Pix extends AppCompatActivity {
                     if (infoPix != null) {
 
                         //PENDING
-                        if (infoPix.getStatus().equalsIgnoreCase("CONCLUIDA")) {
+                        if (infoPix.getStatus().equalsIgnoreCase("RECEIVED")) {
                             if (consulta) {
                                 bd.updateFormPagPIXRecebido(idLisForPag);
                             } else {
@@ -215,14 +199,11 @@ public class Pix extends AppCompatActivity {
     }
 
     private void verificarPagamento(String id) {
-        Toast.makeText(this, token_authorization, Toast.LENGTH_SHORT).show();
-        final IPix iPix = IPix.retrofit.create(IPix.class);
+        final IPixAssas iPix = IPixAssas.retrofit.create(IPixAssas.class);
         final Call<PixDomain> call = iPix.getStatusCobranca(
                 "status",
-                "ffb2238a-b401-416d-aff0-fbf4590e5055",
-                "b35a024c-d05c-4b64-bfe2-302060739197da137d51-da87-4eca-9a80-ca33bdba25e1",
-                id,
-                token_authorization);
+                apiKey,
+                id);
         call.enqueue(new Callback<PixDomain>() {
             @Override
             public void onResponse(@NonNull Call<PixDomain> call, @NonNull Response<PixDomain> response) {
@@ -236,7 +217,7 @@ public class Pix extends AppCompatActivity {
                         //finish();
 
                         //PENDING
-                        if (infoPix.getStatus().equalsIgnoreCase("CONCLUIDA")) {
+                        if (infoPix.getStatus().equalsIgnoreCase("RECEIVED")) {
                             //Toast.makeText(getBaseContext(), "RECEBIDO", Toast.LENGTH_SHORT).show();
                             bd.updateFormPagPIXRecebido(idLisForPag);
                             llcConsultarPix.setVisibility(View.GONE);
@@ -269,13 +250,11 @@ public class Pix extends AppCompatActivity {
     }
 
     private void pegarQrCode(String id) {
-        final IPix iPix = IPix.retrofit.create(IPix.class);
+        final IPixAssas iPix = IPixAssas.retrofit.create(IPixAssas.class);
         final Call<PixDomain> call = iPix.pegarQrCode(
                 "pegar_qrcode",
-                "ffb2238a-b401-416d-aff0-fbf4590e5055",
-                "b35a024c-d05c-4b64-bfe2-302060739197da137d51-da87-4eca-9a80-ca33bdba25e1",
-                id,
-                token_authorization);
+                apiKey,
+                id);
         call.enqueue(new Callback<PixDomain>() {
             @Override
             public void onResponse(@NonNull Call<PixDomain> call, @NonNull Response<PixDomain> response) {

@@ -4,6 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/EMISSOR_WEB_VERSSIONADO.iml" filepath="$PROJECT_DIR$/.idea/modules/EMISSOR_WEB_VERSSIONADO.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EMISSOR_WEB_VERSSIONADO.app.unitTest.iml" />
     </modules>
   </component>
 </project>

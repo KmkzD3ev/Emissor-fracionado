@@ -450,8 +450,12 @@ public class Principal extends AppCompatActivity
 
     private void _pedidoFinaceiroDiferente() {
         //ABRI A TELA DE SINCRONIZAR
-        if (bd.getVerificarFinanceiroUltimoPedido()) {
-            pedidoNaoFinalizadoDialog();
+        try {
+            if (bd.getVerificarFinanceiroUltimoPedido()) {
+                pedidoNaoFinalizadoDialog();
+            }
+        }catch (Exception ignored){
+
         }
     }
 

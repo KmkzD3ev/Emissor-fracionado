@@ -177,14 +177,20 @@ public class SplashScreen extends AppCompatActivity {
                         Intent i;
                         if (time == 0) {
 
-                            i = new Intent(getBaseContext(), ConfirmarDadosPedido.class);
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            i = new Intent(getBaseContext(), GerenciarPagamentoCartaoPOS.class);
+                            //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             //i.putExtra("produto", params.getString("produto"));
                             i.putExtra("siac", "1");
-                            i.putExtra("quantidade", params.getString("quantidade"));
+                            /*i.putExtra("quantidade", params.getString("quantidade"));
                             i.putExtra("produto", params.getString("produto"));
                             i.putExtra("valor_unit", params.getString("valor_unit"));
-                            i.putExtra("forma_pagamento", "DINHEIRO");
+                            i.putExtra("forma_pagamento", "DINHEIRO");*/
+
+                            i.putExtra("cpfCnpj_cliente", "000.000.000-00");
+                            i.putExtra("formaPagamento", params.getString("formaPagamento"));
+                            i.putExtra("produto", params.getString("produto"));
+                            i.putExtra("qnt", "1");
+                            i.putExtra("vlt", params.getString("vlt"));
                         } else {
 
                             i = new Intent(getBaseContext(), Principal.class);

@@ -213,6 +213,8 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
             } else if (tipoImpressao.equals("comprovante_cancelamento")) {
 
                 //Imprimir comprovante do pagamento cartão
+            } else if (tipoImpressao.equals("comprovante_pix")) {
+                ComprovantePix();
             } else {
 
                 //Imprimir nota fiscal eletronica
@@ -894,6 +896,88 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
         pppCab.addBitmap(bitmapTot);
         runOnUiThread(pppCab::execute);
+    }
+
+    // --------------------     COMPROVANTE PIX         --------------------------------------------
+    private void ComprovantePix() {
+        PosPrintProvider ppp = new PosPrintProvider(this);
+
+        /*final BitmapFactory.Options optionsStone = new BitmapFactory.Options();
+        optionsStone.inScaled = false;
+
+        // Logo Stone
+        final AssetManager assetManagerStone = getApplicationContext().getAssets();
+        final Bitmap bitmapStone = BitmapFactory.decodeStream(assetManagerStone.open("stone.png"),
+                null, optionsStone);
+        final int widthStone = Objects.requireNonNull(bitmapStone).getWidth();
+        final int heightStone = bitmapStone.getHeight();
+        final int[] argbStone = new int[widthStone * heightStone];
+        bitmapStone.getPixels(argbStone, 0, widthStone, 0, 0, widthStone, heightStone);
+        bitmapStone.recycle();
+
+        //printer.reset();
+        printer.printImage(argbStone, widthStone, heightStone, Printer.ALIGN_CENTER, true);
+        printer.feedPaper(0);*/
+
+        // Reimpressao
+        /*final BitmapFactory.Options optionsReimpressao = new BitmapFactory.Options();
+        optionsReimpressao.inScaled = false;
+        final AssetManager assetManagerReimpressao = getApplicationContext().getAssets();
+        final Bitmap bitmapReimpressao = BitmapFactory.decodeStream(assetManagerReimpressao.open("reimpressao.png"),
+                null, optionsReimpressao);
+        final int widthReimpressao = Objects.requireNonNull(bitmapReimpressao).getWidth();
+        final int heightReimpressao = bitmapReimpressao.getHeight();
+        final int[] argbReimpressao = new int[widthReimpressao * heightReimpressao];
+        bitmapReimpressao.getPixels(argbReimpressao, 0, widthReimpressao, 0, 0, widthReimpressao, heightReimpressao);
+        bitmapReimpressao.recycle();*/
+
+        //Unidades unidades;
+        //elementosUnidade = bd.getUnidades();
+        AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
+
+        //Log.e("impressora", pinpad.getAid() + " - " + pinpad.getRequestId() + " - " + pinpad.getServiceCode());
+
+        //
+        String txtCompPag = "Via do Lojista";
+        //ppp.addLine(txtCompPag);
+        //ppp.addLine("REIMPRESSÃO");
+
+        //
+        /*String txtCompPag2 = cAux.removerAcentos(pinpad.getNomeEmpresa()) + "\n" +
+                cAux.removerAcentos(pinpad.getEnderecoEmpresa()) + "\n" +
+                cAux.exibirData(pinpad.getDate()) + " " + pinpad.getTime() + " CNPJ:" + pinpad.getCnpjEmpresa() + "\n" +
+                "------------------------------------------\n" +
+                pinpad.getTypeOfTransactionEnum() + "                                         RS " + pinpad.getAmount() + "\n" +
+                "------------------------------------------\n" +
+                pinpad.getCardBrand() + " - " + pinpad.getCardHolderNumber().substring(pinpad.getCardHolderNumber().length() - 8) + "  AUT: " + pinpad.getAuthorizationCode() + "\n" +
+                pinpad.getCardHolderName() + "\n" +
+                pinpad.getRecipientTransactionIdentification() + "\n" +
+                "Aprovado com senha\n" +
+                "SN: " + prefs.getString("serial_app", "") + " - " + BuildConfig.VERSION_NAME + "\n";
+        //ppp.addLine(txtCompPag2);
+
+        TextView txtReimpressao = findViewById(R.id.txtReimpressao);
+        txtReimpressao.setText(txtCompPag2);
+
+        LinearLayout impressora1 = findViewById(R.id.printReimpressao);
+        Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 190, 200);*/
+
+
+        ppp.setConnectionCallback(new StoneCallbackInterface() {
+            @Override
+            public void onSuccess() {
+                liberarImpressora();
+            }
+
+            @Override
+            public void onError() {
+                liberarImpressora();
+                Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        //ppp.addBitmap(bitmap2);
+        ppp.addLine("Comprovante Pix");
+        ppp.execute();
     }
 
     //

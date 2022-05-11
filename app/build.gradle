@@ -19,8 +19,8 @@ android {
         applicationId "br.com.zenitech.emissorweb"
         minSdkVersion 21
         targetSdk 31
-        versionCode 54
-        versionName '3.5.4'
+        versionCode 56
+        versionName '3.5.6'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.config
@@ -59,6 +59,7 @@ android {
     }
     ndkVersion '23.1.7779620'
     buildToolsVersion '32.0.0'
+    namespace 'br.com.zenitech.emissorweb'
 }
 
 dependencies {

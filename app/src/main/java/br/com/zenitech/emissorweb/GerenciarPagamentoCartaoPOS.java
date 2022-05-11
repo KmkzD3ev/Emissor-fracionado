@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -112,6 +114,9 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     int transactionId;
     TextView txtFalha;
 
+    // COFIGURAÇÃO PARA INTEGRAÇÃO COM O APP DO SIAC
+    String appSiac = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,6 +199,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
             Bundle params = intent.getExtras();
             if (params != null) {
                 //
+                appSiac = params.getString("siac");
                 cpfCnpj_cliente = params.getString("cpfCnpj_cliente");
                 formaPagamento = cAux.removerAcentos(params.getString("formaPagamento"));
                 produto = params.getString("produto");
@@ -232,7 +238,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     }
 
     // INICIAR UMA CAPTURA DE PAGAMENTO COM O POS
-    private void iniciarCaptura() {
+    public void iniciarCaptura() {
         btnEnviarTrazacao.setVisibility(View.GONE);
         //prossBarPag.setVisibility(View.VISIBLE);
         prossBarPag.setVisibility(View.GONE);
@@ -293,7 +299,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     private void imprimircomprovantePOS() {
 
 
-        PosPrintProvider pppCab = new PosPrintProvider(this);
+        /*PosPrintProvider pppCab = new PosPrintProvider(context);
         pppCab.addLine("Serial POS: " + prefs.getString("serial_app", ""));
         pppCab.setConnectionCallback(new StoneCallbackInterface() {
             final PrintController printMerchant = new PrintController(
@@ -311,16 +317,16 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                 printMerchant.print();
             }
         });
-        runOnUiThread(pppCab::execute);
+        runOnUiThread(pppCab::execute);*/
 
-        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
         builder.setCancelable(false);
         builder.setTitle("Transação aprovada! Deseja imprimir a via do cliente?");
 
         builder.setPositiveButton("Sim", (dialog, which) -> {
             final PrintController printClient =
-                    new PrintController(GerenciarPagamentoCartaoPOS.this,
-                            new PosPrintReceiptProvider(getApplicationContext(),
+                    new PrintController(context,
+                            new PosPrintReceiptProvider(context,
                                     transactionObject, ReceiptType.CLIENT));
             printClient.print();
             _finalizarPagamento();
@@ -456,6 +462,11 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
     private void _finalizarPagamento() {
         //
+        //Intent returnIntent = new Intent("br.com.zenitech.siacmobile.FinanceiroDaVenda", Uri.parse("content://result_uri"));
+        /*Intent returnIntent = getIntent();// new Intent();
+        PackageManager packageManager = getPackageManager();
+        String packageName = "br.com.zenitech.emissorweb";
+        returnIntent.setPackage(String.valueOf(packageManager.getLaunchIntentForPackage(packageName)));*/
         Intent returnIntent = new Intent();
         returnIntent.putExtra("result", "ok");
         // **
@@ -539,25 +550,25 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
         // Quando é retornado null, o SDK ainda não foi ativado
         //if (userList == null) {
-            ActiveApplicationProvider activeApplicationProvider = new ActiveApplicationProvider(context);
-            activeApplicationProvider.setDialogMessage("Ativando o Stone Code");
-            activeApplicationProvider.setDialogTitle("Aguarde");
-            activeApplicationProvider.useDefaultUI(true);
-            activeApplicationProvider.setConnectionCallback(new StoneCallbackInterface() {
+        ActiveApplicationProvider activeApplicationProvider = new ActiveApplicationProvider(context);
+        activeApplicationProvider.setDialogMessage("Ativando o Stone Code");
+        activeApplicationProvider.setDialogTitle("Aguarde");
+        activeApplicationProvider.useDefaultUI(true);
+        activeApplicationProvider.setConnectionCallback(new StoneCallbackInterface() {
 
-                public void onSuccess() {
-                    // SDK ativado com sucesso
-                    //Toast.makeText(context, "Stone Code:" + STONE_CODE + " ativado com sucesso!", Toast.LENGTH_SHORT).show();
+            public void onSuccess() {
+                // SDK ativado com sucesso
+                //Toast.makeText(context, "Stone Code:" + STONE_CODE + " ativado com sucesso!", Toast.LENGTH_SHORT).show();
 
-                    //makeText(context, "" + userList.get(0).getStoneCode(), LENGTH_SHORT).show();
-                    _pinpadAtivado();
-                }
+                //makeText(context, "" + userList.get(0).getStoneCode(), LENGTH_SHORT).show();
+                _pinpadAtivado();
+            }
 
-                public void onError() {
-                    Toast.makeText(context, "Não foi possível ativar o Stone Code:" + STONE_CODE, Toast.LENGTH_SHORT).show();
-                }
-            });
-            activeApplicationProvider.activate(STONE_CODE);
+            public void onError() {
+                Toast.makeText(context, "Não foi possível ativar o Stone Code:" + STONE_CODE, Toast.LENGTH_SHORT).show();
+            }
+        });
+        activeApplicationProvider.activate(STONE_CODE);
         /*} else {
             // O SDK já foi ativado.
             _pinpadAtivado();

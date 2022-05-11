@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="br.com.zenitech.emissorweb"
     android:installLocation="internalOnly" >
 
     <uses-feature
@@ -97,6 +96,7 @@
             android:name=".GerenciarPagamentoCartaoPOS"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_gerenciar_pagamento_cartao"
+            android:exported="true"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivityPrincipal"
