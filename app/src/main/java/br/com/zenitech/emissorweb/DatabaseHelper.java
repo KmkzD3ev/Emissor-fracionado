@@ -84,7 +84,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.i(TAG, "Error copying database: " + e.getMessage());
                 throw new Error("Error copying database");
             }
-        }else{
+        } else {
 
         }
     }
@@ -1766,11 +1766,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String chave;
 
         //CONTANTES CHAVE
-        String chave_cUF = null;                // Código da UF do emitente do Documento Fiscal
+        String chave_cUF = "";                // Código da UF do emitente do Documento Fiscal
         String chave_AAMM = aux.anoMesAtual();  // Ano e Mês de emissão da NF-e
-        String chave_CNPJ = null;               // CNPJ do emitente
+        String chave_CNPJ = "";               // CNPJ do emitente
         String chave_mod = "65";                // Modelo do Documento Fiscal
-        String chave_serie = null;              // Série do Documento Fiscal
+        String chave_serie = "";              // Série do Documento Fiscal
         String chave_nNF;                       // Número do Documento Fiscal
         String chave_tpEmis = "1";              // Forma de emissão da NF-e
         String chave_cNF;                       // Código Numérico que compõe a Chave de Acesso
@@ -1857,7 +1857,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //CLASSE AUXILIAR
         ClassAuxiliar aux = new ClassAuxiliar();
 
-        String serie = null;
+        String serie = "";
 
         //
         Cursor pos;
@@ -1876,7 +1876,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         pos.close();
 
         //VERIFICA A QUANTIDADE DE CARACTERES DA SERIE
-        switch (Objects.requireNonNull(serie).length()) {
+        switch (serie.length()) {
             case 1:
                 serie = "00" + serie;
                 break;
@@ -1920,7 +1920,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private Unidades cursorToUnidade(Cursor cursor) {
-        Unidades unidades = new Unidades(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        Unidades unidades = new Unidades(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         //
         unidades.setCodigo(cursor.getString(0));
         unidades.setRazao_social(cursor.getString(1));
@@ -1941,6 +1941,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         unidades.setIdCSC(cursor.getString(16));
         unidades.setCSC(cursor.getString(17));
         unidades.setUrl_qrcode(cursor.getString(18));
+        try {
+            unidades.setCliente_id_transfeera(cursor.getString(19));
+            unidades.setCliente_secret_transfeera(cursor.getString(20));
+            unidades.setPix_key_transfeera(cursor.getString(21));
+        } catch (Exception ignored) {
+
+        }
         return unidades;
     }
 
@@ -1967,15 +1974,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR POS
     private PosApp cursorToPos(Cursor cursor) {
-        PosApp posApp = new PosApp(null, null, null, null, null, null, null, null);
+        PosApp posApp = new PosApp(null, null, null, null, null, null, null, null, null);
 
         //
         posApp.setCodigo(cursor.getString(0));
         posApp.setSerial(cursor.getString(1));
-        posApp.setUnidade(cursor.getString(2));
-        posApp.setSerie(cursor.getString(3));
-        posApp.setUltnfce(cursor.getString(4));
-        posApp.setUltboleto(cursor.getString(5));
+        posApp.setCliente(cursor.getString(2));
+        posApp.setUnidade(cursor.getString(3));
+        posApp.setSerie(cursor.getString(4));
+        posApp.setUltnfce(cursor.getString(5));
+        posApp.setUltboleto(cursor.getString(6));
         return posApp;
     }
 

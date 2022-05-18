@@ -18,11 +18,14 @@ public class Unidades {
     private String codloja;
     private String api_key_asaas;
     private String cliente_cob_asaas;
+    private String cliente_id_transfeera = "";
+    private String cliente_secret_transfeera = "";
+    private String pix_key_transfeera = "";
     private String idCSC;
     private String CSC;
     private String url_qrcode;
 
-    public Unidades(String codigo, String razao_social, String cnpj, String endereco, String numero, String bairro, String cep, String telefone, String ie, String cidade, String uf, String codigo_ibge, String url_consulta, String codloja, String api_key_asaas, String cliente_cob_asaas, String idCSC, String CSC, String url_qrcode) {
+    public Unidades(String codigo, String razao_social, String cnpj, String endereco, String numero, String bairro, String cep, String telefone, String ie, String cidade, String uf, String codigo_ibge, String url_consulta, String codloja, String api_key_asaas, String cliente_cob_asaas, String cliente_id_transfeera, String cliente_secret_transfeera, String pix_key_transfeera, String idCSC, String CSC, String url_qrcode) {
         this.codigo = codigo;
         this.razao_social = razao_social;
         this.cnpj = cnpj;
@@ -39,6 +42,9 @@ public class Unidades {
         this.codloja = codloja;
         this.api_key_asaas = api_key_asaas;
         this.cliente_cob_asaas = cliente_cob_asaas;
+        this.cliente_id_transfeera = cliente_id_transfeera;
+        this.cliente_secret_transfeera = cliente_secret_transfeera;
+        this.pix_key_transfeera = pix_key_transfeera;
         this.idCSC = idCSC;
         this.CSC = CSC;
         this.url_qrcode = url_qrcode;
@@ -170,6 +176,30 @@ public class Unidades {
 
     public void setCliente_cob_asaas(String cliente_cob_asaas) {
         this.cliente_cob_asaas = cliente_cob_asaas;
+    }
+
+    public String getCliente_id_transfeera() {
+        return cliente_id_transfeera;
+    }
+
+    public void setCliente_id_transfeera(String cliente_id_transfeera) {
+        this.cliente_id_transfeera = cliente_id_transfeera;
+    }
+
+    public String getCliente_secret_transfeera() {
+        return cliente_secret_transfeera;
+    }
+
+    public void setCliente_secret_transfeera(String cliente_secret_transfeera) {
+        this.cliente_secret_transfeera = cliente_secret_transfeera;
+    }
+
+    public String getPix_key_transfeera() {
+        return pix_key_transfeera;
+    }
+
+    public void setPix_key_transfeera(String pix_key_transfeera) {
+        this.pix_key_transfeera = pix_key_transfeera;
     }
 
     public String getIdCSC() {

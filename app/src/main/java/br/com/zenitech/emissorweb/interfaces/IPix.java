@@ -21,7 +21,9 @@ public interface IPix {
             @Field("client_id") String client_id,
             @Field("client_secret") String client_secret,
             @Field("pedido") String pedido,
-            @Field("valor") String valor
+            @Field("valor") String valor,
+            @Field("cliente") String cliente,
+            @Field("user_agente") String user_agente
     );
 
     //SINCRONIZAR
@@ -32,7 +34,9 @@ public interface IPix {
             @Field("client_id") String client_id,
             @Field("client_secret") String client_secret,
             @Field("id") String id,
-            @Field("token_authorization") String token_authorization
+            @Field("token_authorization") String token_authorization,
+            @Field("cliente") String cliente,
+            @Field("user_agente") String user_agente
     );
 
     //SINCRONIZAR
@@ -43,7 +47,9 @@ public interface IPix {
             @Field("client_id") String client_id,
             @Field("client_secret") String client_secret,
             @Field("id") String id,
-            @Field("token_authorization") String token_authorization
+            @Field("token_authorization") String token_authorization,
+            @Field("cliente") String cliente,
+            @Field("user_agente") String user_agente
     );
 
     Retrofit retrofit = new Retrofit.Builder()

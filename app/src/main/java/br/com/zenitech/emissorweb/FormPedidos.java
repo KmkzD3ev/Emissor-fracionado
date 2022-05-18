@@ -481,11 +481,29 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         String val = aux.soNumeros(txtValorFormaPagamento.getText().toString());
 
+        //
+        String cliente_id_transfeera = "";
+        String cliente_secret_transfeera = "";
+        String pix_key_transfeera = "";
+        try {
+            if (unidades.getCliente_id_transfeera() != null) {
+                cliente_id_transfeera = unidades.getCliente_id_transfeera();
+                cliente_secret_transfeera = unidades.getCliente_secret_transfeera();
+                pix_key_transfeera = unidades.getPix_key_transfeera();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             ShowMsgToast("Selecione a forma de pagamento.");
         } else if (val.equalsIgnoreCase("") || val.equalsIgnoreCase("000")) {
             ShowMsgToast("Adicione um valor");
-        } else if (!unidades.getApi_key_asaas().equalsIgnoreCase("") && spFormasPagamento.getSelectedItem().toString().equalsIgnoreCase("PAGAMENTO INSTANTÂNEO (PIX)")) {
+        } else if (!cliente_id_transfeera.equalsIgnoreCase("") &&
+                !cliente_secret_transfeera.equalsIgnoreCase("") &&
+                !pix_key_transfeera.equalsIgnoreCase("") &&
+                spFormasPagamento.getSelectedItem().toString().equalsIgnoreCase("PAGAMENTO INSTANTÂNEO (PIX)")) {
+            // ASAAS -- } else if (!unidades.getApi_key_asaas().equalsIgnoreCase("") && spFormasPagamento.getSelectedItem().toString().equalsIgnoreCase("PAGAMENTO INSTANTÂNEO (PIX)")) {
             // PIX
             //AddFormaPagamentoPIX("","","");
             iniciarPagamentoPIX();

@@ -14,7 +14,7 @@ public interface ISincronizar {
 
     //SINCRONIZAR
     @FormUrlEncoded
-    @POST("sincronizar_banco_app_emissor_1.php")
+    @POST("sincronizar_banco_app_emissor_2.php")
     Call<Sincronizador> sincronizar(
             @Field("SERIAL") String SERIAL,
             @Field("modelo_pos_app") String modelo_pos_app,

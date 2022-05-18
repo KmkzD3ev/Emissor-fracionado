@@ -16,7 +16,7 @@ public class Configuracoes {
     // INFORMA SE O APARELHO UTILIZADO É UM POS
     // SEMPRE RETORNAR FALSE CONFORME FOR GERADO O BUILD PARA PLAYSTORE
     public boolean GetDevice() {
-        return false;
+        return true;
     }
 
     // RETORNASE O AMBIENTE É DE PRODUÇÃO OU DE TESTE

@@ -5,6 +5,7 @@ package br.com.zenitech.emissorweb.domains;
 public class PosApp {
     private String codigo;
     private String serial;
+    private String cliente;
     private String unidade;
     private String serie;
     private String ultnfce;
@@ -12,9 +13,10 @@ public class PosApp {
     private String nota_remessa;
     private String serie_remessa;
 
-    public PosApp(String codigo, String serial, String unidade, String serie, String ultnfce, String ultboleto, String nota_remessa, String serie_remessa) {
+    public PosApp(String codigo, String serial, String cliente, String unidade, String serie, String ultnfce, String ultboleto, String nota_remessa, String serie_remessa) {
         this.codigo = codigo;
         this.serial = serial;
+        this.cliente = cliente;
         this.unidade = unidade;
         this.serie = serie;
         this.ultnfce = ultnfce;
@@ -37,6 +39,14 @@ public class PosApp {
 
     public void setSerial(String serial) {
         this.serial = serial;
+    }
+
+    public String getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(String cliente) {
+        this.cliente = cliente;
     }
 
     public String getUnidade() {
