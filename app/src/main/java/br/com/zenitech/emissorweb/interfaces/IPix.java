@@ -1,5 +1,7 @@
 package br.com.zenitech.emissorweb.interfaces;
 
+import static br.com.zenitech.emissorweb.Configuracoes.okHttpClient;
+
 import br.com.zenitech.emissorweb.Configuracoes;
 import br.com.zenitech.emissorweb.domains.PixDomain;
 import br.com.zenitech.emissorweb.domains.Sincronizador;
@@ -14,7 +16,7 @@ public interface IPix {
 
     // CRIA UMA COBRANÇA E RECEBE O QRCODE
     @FormUrlEncoded
-    @POST("pixApp.php")
+    @POST("pixApp.php")//@POST("pixApp_teste.php")
     Call<PixDomain> getImgQrCode(
             @Field("opcao") String opcao,
             @Field("pix_key") String pix_key,
@@ -28,7 +30,7 @@ public interface IPix {
 
     //SINCRONIZAR
     @FormUrlEncoded
-    @POST("pixApp.php")
+    @POST("pixApp.php")//@POST("pixApp_teste.php")
     Call<PixDomain> getStatusCobranca(
             @Field("opcao") String opcao,
             @Field("client_id") String client_id,
@@ -41,7 +43,7 @@ public interface IPix {
 
     //SINCRONIZAR
     @FormUrlEncoded
-    @POST("pixApp.php")
+    @POST("pixApp.php")//@POST("pixApp_teste.php")
     Call<PixDomain> pegarQrCode(
             @Field("opcao") String opcao,
             @Field("client_id") String client_id,
@@ -54,6 +56,7 @@ public interface IPix {
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(String.format("%s%s", new Configuracoes().GetUrlServer(), "/POSSIAC/"))
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 }

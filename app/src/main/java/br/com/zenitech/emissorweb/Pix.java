@@ -2,12 +2,6 @@ package br.com.zenitech.emissorweb;
 
 import static br.com.zenitech.emissorweb.Configuracoes.token_authorization;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.appcompat.widget.LinearLayoutCompat;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,28 +9,27 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.LinearLayoutCompat;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import br.com.stone.posandroid.providers.PosPrintProvider;
-import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.PixDomain;
 import br.com.zenitech.emissorweb.domains.PosApp;
-import br.com.zenitech.emissorweb.domains.Sincronizador;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import br.com.zenitech.emissorweb.interfaces.IPix;
-import br.com.zenitech.emissorweb.interfaces.ISincronizar;
 import br.com.zenitech.emissorweb.util.MyCountDownTimer;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -127,6 +120,9 @@ public class Pix extends AppCompatActivity {
             consulta = true;
             espera();
         });
+
+        time = new MyCountDownTimer(this, tvTime, 300 * 1000, 1000); //300
+        time.start();
     }
 
     @Override
@@ -134,9 +130,6 @@ public class Pix extends AppCompatActivity {
         super.onResume();
         VerificarActivityAtiva.activityResumed();
         espera();
-
-        time = new MyCountDownTimer(this, tvTime, 300 * 1000, 1000);
-        time.start();
     }
 
     @Override
@@ -167,7 +160,7 @@ public class Pix extends AppCompatActivity {
                 posApp.getCliente(),
                 unidades.getRazao_social()
         );
-        call.enqueue(new Callback<PixDomain>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<PixDomain> call, @NonNull Response<PixDomain> response) {
 
@@ -201,14 +194,14 @@ public class Pix extends AppCompatActivity {
         final IPix iPix = IPix.retrofit.create(IPix.class);
         final Call<PixDomain> call = iPix.getStatusCobranca(
                 "status",
-                "ffb2238a-b401-416d-aff0-fbf4590e5055",
-                "b35a024c-d05c-4b64-bfe2-302060739197da137d51-da87-4eca-9a80-ca33bdba25e1",
+                unidades.getCliente_id_transfeera(),
+                unidades.getCliente_secret_transfeera(),
                 id,
                 token_authorization,
                 posApp.getCliente(),
                 unidades.getRazao_social()
         );
-        call.enqueue(new Callback<PixDomain>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<PixDomain> call, @NonNull Response<PixDomain> response) {
                 try {
@@ -251,18 +244,18 @@ public class Pix extends AppCompatActivity {
     }
 
     private void verificarPagamento(String id) {
-        Toast.makeText(this, token_authorization, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, token_authorization, Toast.LENGTH_SHORT).show();
         final IPix iPix = IPix.retrofit.create(IPix.class);
         final Call<PixDomain> call = iPix.getStatusCobranca(
                 "status",
-                "ffb2238a-b401-416d-aff0-fbf4590e5055",
-                "b35a024c-d05c-4b64-bfe2-302060739197da137d51-da87-4eca-9a80-ca33bdba25e1",
+                unidades.getCliente_id_transfeera(),
+                unidades.getCliente_secret_transfeera(),
                 id,
                 token_authorization,
                 posApp.getCliente(),
                 unidades.getRazao_social()
         );
-        call.enqueue(new Callback<PixDomain>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<PixDomain> call, @NonNull Response<PixDomain> response) {
                 try {
@@ -311,14 +304,14 @@ public class Pix extends AppCompatActivity {
         final IPix iPix = IPix.retrofit.create(IPix.class);
         final Call<PixDomain> call = iPix.pegarQrCode(
                 "pegar_qrcode",
-                "ffb2238a-b401-416d-aff0-fbf4590e5055",
-                "b35a024c-d05c-4b64-bfe2-302060739197da137d51-da87-4eca-9a80-ca33bdba25e1",
+                unidades.getCliente_id_transfeera(),
+                unidades.getCliente_secret_transfeera(),
                 id,
                 token_authorization,
                 posApp.getCliente(),
                 unidades.getRazao_social()
         );
-        call.enqueue(new Callback<PixDomain>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<PixDomain> call, @NonNull Response<PixDomain> response) {
                 try {
@@ -365,7 +358,8 @@ public class Pix extends AppCompatActivity {
         ClassAuxiliar aux = new ClassAuxiliar();
         ppp.addLine("        Comprovante Pix\n");
         ppp.addLine("        Via do Lojista");
-        ppp.addLine("Pedido: " + pedido);
+        //ppp.addLine("Pedido: " + pedido);
+        ppp.addLine("");
         ppp.addLine("Identificador: \n" + idPagamento);
         ppp.addLine("Valor: " + aux.maskMoney(new BigDecimal(valor)));
         ppp.addLine("Data/Hora: " + aux.exibirDataAtual() + " - " + aux.horaAtual());
@@ -390,7 +384,7 @@ public class Pix extends AppCompatActivity {
             new Handler().postDelayed(() -> {
                 if (VerificarActivityAtiva.isActivityVisible()) {
 
-                    Log.e("PIX", "\n" + idLisForPag + "\n" + valor + "\n" + apiKey + "\n" + cliCob + "\n" + pedido + "\n" + idForPagPix + "\n" + idPagamento + "\n");
+                    //Log.e("PIX", "\n" + idLisForPag + "\n" + valor + "\n" + apiKey + "\n" + cliCob + "\n" + pedido + "\n" + idForPagPix + "\n" + idPagamento + "\n");
                     getStatusPayment(idPagamento);
                 }
             }, 5000);

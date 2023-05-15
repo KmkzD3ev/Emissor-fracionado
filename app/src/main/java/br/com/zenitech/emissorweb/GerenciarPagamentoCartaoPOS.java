@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -33,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import br.com.stone.posandroid.providers.PosPrintProvider;
 import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
 import br.com.stone.posandroid.providers.PosTransactionProvider;
 import br.com.zenitech.emissorweb.controller.LogCartaoControllerKT;
@@ -297,44 +294,55 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
     // IMPRIMIR COMPROVANTE
     private void imprimircomprovantePOS() {
-
+        try {
 
         /*PosPrintProvider pppCab = new PosPrintProvider(context);
+
         pppCab.addLine("Serial POS: " + prefs.getString("serial_app", ""));
         pppCab.setConnectionCallback(new StoneCallbackInterface() {
-            final PrintController printMerchant = new PrintController(
-                    context, new PosPrintReceiptProvider(
-                    context, transactionObject, ReceiptType.MERCHANT)
-            );
+
 
             @Override
             public void onSuccess() {
-                printMerchant.print();
             }
 
             @Override
             public void onError() {
-                printMerchant.print();
             }
         });
         runOnUiThread(pppCab::execute);*/
 
-        final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-        builder.setCancelable(false);
-        builder.setTitle("Transação aprovada! Deseja imprimir a via do cliente?");
+            // IMPRIME
 
-        builder.setPositiveButton("Sim", (dialog, which) -> {
-            final PrintController printClient =
-                    new PrintController(context,
-                            new PosPrintReceiptProvider(context,
-                                    transactionObject, ReceiptType.CLIENT));
-            printClient.print();
+            final PrintController printMerchant = new PrintController(
+                    context, new PosPrintReceiptProvider(
+                    context, transactionObject, ReceiptType.MERCHANT),
+                    "Serial POS: " + prefs.getString("serial_app", "")
+            );
+
+            runOnUiThread(printMerchant::print);
+
+            final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+            builder.setCancelable(false);
+            builder.setTitle("Transação aprovada! Deseja imprimir a via do cliente?");
+
+            builder.setPositiveButton("Sim", (dialog, which) -> {
+                final PrintController printClient =
+                        new PrintController(context,
+                                new PosPrintReceiptProvider(context,
+                                        transactionObject, ReceiptType.CLIENT),
+                                "Serial POS: " + prefs.getString("serial_app", "")
+                        );
+                printClient.print();
+                _finalizarPagamento();
+            });
+
+            builder.setNegativeButton("Não", (dialog, which) -> _finalizarPagamento());
+
+            runOnUiThread(builder::show);
+        } catch (Exception e) {
             _finalizarPagamento();
-        });
-
-        builder.setNegativeButton("Não", (dialog, which) -> _finalizarPagamento());
-
-        runOnUiThread(builder::show);
+        }
     }
 
     // ENVIAR COMPROVANTE POR EMAIL
@@ -516,7 +524,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     // Iniciar o Stone
     void iniciarStone() {
         // O primeiro passo é inicializar o SDK.
-        StoneStart.init(context);
+        userList = StoneStart.init(context);
         /*Em seguida, é necessário chamar o método setAppName da classe Stone,
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));
@@ -526,7 +534,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
         //Stone.setEnvironment((Environment.PRODUCTION));
 
         // Esse método deve ser executado para inicializar o SDK
-        List<UserModel> userList = StoneStart.init(context);
+        //List<UserModel> userList = StoneStart.init(context);
         //makeText(context, "" + userList.size(), LENGTH_SHORT).show();
         //makeText(context, "" + userList.get(0).getStoneCode(), LENGTH_SHORT).show();
         ativarStoneCode();
@@ -546,7 +554,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     //
     void ativarStoneCode() {
         // Esse método deve ser executado para inicializar o SDK
-        userList = StoneStart.init(context);
+        //userList = StoneStart.init(context);
 
         // Quando é retornado null, o SDK ainda não foi ativado
         //if (userList == null) {
@@ -566,6 +574,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
 
             public void onError() {
                 Toast.makeText(context, "Não foi possível ativar o Stone Code:" + STONE_CODE, Toast.LENGTH_SHORT).show();
+                sair();
             }
         });
         activeApplicationProvider.activate(STONE_CODE);
@@ -694,9 +703,9 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
                 txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação negada pelo cartão."));
             }
             //
-            else if (to.getTransactionStatus() == TransactionStatusEnum.PARTIAL_APPROVED) {
+            /*else if (to.getTransactionStatus() == TransactionStatusEnum.PARTIAL_APPROVED) {
                 txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação foi parcialmente aprovada."));
-            }
+            }*/
             //
             else if (to.getTransactionStatus() == TransactionStatusEnum.TECHNICAL_ERROR) {
                 txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Erro técnico (ocorreu um erro ao processar a mensagem no autorizador)."));

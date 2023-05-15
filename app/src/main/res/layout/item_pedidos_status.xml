@@ -40,6 +40,14 @@
             android:text="Val. Unit." />
 
         <TextView
+            android:id="@+id/txtValDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="Desc" />
+
+        <TextView
             android:id="@+id/txtTotal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -236,7 +236,8 @@ public class GerenciarBancoProducao extends AppCompatActivity {
             //
             pedidos = elementosPedidos.get(linhaPed);
             //
-            elementosItens = bd.getItensPedido(pedidos.getId());
+            //elementosItens = bd.getItensPedido(pedidos.getId());
+            elementosItens = bd.getItensPedidoTransmitir(pedidos.getId());
 
             try {
                 if (elementosItens.size() != 0) {
@@ -275,10 +276,11 @@ public class GerenciarBancoProducao extends AppCompatActivity {
                             valorFormaPGPedido,
                             nAutoCartao,
                             bandeiraFPG,
-                            pedidos.getFracionado()
+                            pedidos.getFracionado(),
+                            itensPedidos.getDesconto()
                     );
 
-                    call.enqueue(new Callback<ValidarNFCe>() {
+                    call.enqueue(new Callback<>() {
                         @Override
                         public void onResponse(@NonNull Call<ValidarNFCe> call, @NonNull Response<ValidarNFCe> response) {
 

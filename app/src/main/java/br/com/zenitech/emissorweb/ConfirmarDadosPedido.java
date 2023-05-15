@@ -49,7 +49,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
     ConfirmarDadosPedido mActivity;
 
     TextView cpfCnpj_cliente, formaPagamento, produto, qnt, vlt, vltTotal,
-            statusNota, protocoloNota, dataHoraNota;
+            statusNota, protocoloNota, dataHoraNota, desconto;
 
     //
     private SharedPreferences prefs;
@@ -120,7 +120,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         posApp = elementosPos.get(0);
 
         // SE O SERIAL FOR DE TESTE ATIVA O MODO TESTE
-        if (posApp.getSerial().equals("005000002")) {
+        if (posApp.getSerial().equals("005000002*")) {
             modo_teste = true;
         }
 
@@ -138,6 +138,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         qnt = findViewById(R.id.qnt);
         vlt = findViewById(R.id.vlt);
         vltTotal = findViewById(R.id.vltTotal);
+        desconto = findViewById(R.id.desconto);
 
         //
         Intent intent = getIntent();
@@ -180,6 +181,11 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     produto.setText(params.getString("produto"));
                     qnt.setText(params.getString("qnt"));
                     vlt.setText(params.getString("vlt"));
+                    Log.e("Desconto", bd.getItensPedido(bd.getUltimoIdPedido()).get(0).getDesconto());
+                    //String vD = String.valueOf(cAux.converterValores(params.getString("desconto")));
+                    //String[] multiplicarDesc = {vD, params.getString("qnt")};
+                    //String des = String.valueOf(cAux.multiplicar(multiplicarDesc));
+                    desconto.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(bd.getItensPedido(bd.getUltimoIdPedido()).get(0).getDesconto()))));//des
                     //idFormaPagamento = cAux.getIdFormaPagamento(params.getString("formaPagamento"));
                     idFormaPagamento = bd.getFormasPagamentoPedido(bd.getUltimoIdPedido());
 
@@ -195,10 +201,12 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 //MULTIPLICA O VALOR PELA QUANTIDADE
                 String[] multiplicar = {valorUnit, qnt.getText().toString()};
                 total = String.valueOf(cAux.multiplicar(multiplicar));
-                vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(total))));
+
+                String[] subtrairTotDesc = {total, String.valueOf(cAux.converterValores(desconto.getText().toString()))};
+                String totalComDesconto = String.valueOf(cAux.subitrair(subtrairTotDesc));
+                vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(totalComDesconto))));
 
                 quantidade = Integer.parseInt(qnt.getText().toString());
-
 
                 btnPrint = findViewById(R.id.btnPrint);
                 btnPrint.setOnClickListener(this);
@@ -230,18 +238,20 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
         findViewById(R.id.btn_transmitir).setOnClickListener(v -> {
             //TRANSMITIR
-            if (verificarOnline.isOnline(contexto))
+            transmitirNota();
+            /*if (verificarOnline.isOnline(contexto))
                 transmitirNota();
             else
-                Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();*/
         });
 
         findViewById(R.id.btn_reTransmitir).setOnClickListener(v -> {
             //TRANSMITIR
-            if (verificarOnline.isOnline(contexto))
+            transmitirNota();
+            /*if (verificarOnline.isOnline(contexto))
                 transmitirNota();
             else
-                Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();
+                Toast.makeText(contexto, "Sem Internet", Toast.LENGTH_SHORT).show();*/
         });
 
         findViewById(R.id.btn_sair).setOnClickListener(v -> {
@@ -343,7 +353,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
             //
             pedidos = elementosPedidos.get(linhaPed);
             //
-            elementosItens = bd.getItensPedido(pedidos.getId());
+            //elementosItens = bd.getItensPedido(pedidos.getId());
+            elementosItens = bd.getItensPedidoTransmitir(pedidos.getId());
 
             try {
                 if (elementosItens.size() != 0) {
@@ -383,10 +394,11 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                             valorFormaPGPedido,
                             nAutoCartao,
                             bandeiraFPG,
-                            pedidos.getFracionado()
+                            pedidos.getFracionado(),
+                            itensPedidos.getDesconto()
                     );
 
-                    call.enqueue(new Callback<ValidarNFCe>() {
+                    call.enqueue(new Callback<>() {
                         @Override
                         public void onResponse(@NonNull Call<ValidarNFCe> call, @NonNull Response<ValidarNFCe> response) {
 
@@ -419,6 +431,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
                                             Toast.makeText(contexto, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
                                         } else {
+
+                                            Log.e("NOTA", sincronizacao.getErro());
 
                                             //
                                             /*bd.upadtePedidosTransmissao(
@@ -493,7 +507,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
             }
         } else {
             if (erroTransmitir) {
-                Toast.makeText(contexto, "Encontramos erro ao transmitir uma mais notas!", Toast.LENGTH_LONG).show();
+                Toast.makeText(contexto, "Encontramos erro ao transmitir uma ou mais notas!", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -584,7 +598,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                             valorFormaPGPedido,
                             nAutoCartao,
                             bandeiraFPG,
-                            pedidos.getFracionado()
+                            pedidos.getFracionado(),
+                            desconto.getText().toString()
                     );
 
                     call.enqueue(new Callback<ValidarNFCe>() {
@@ -754,8 +769,9 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 String.valueOf(id),//ID PEDIDO
                 bd.getIdProduto(produto.getText().toString()),
                 quantidade,
-                cAux.soNumeros(String.valueOf(cAux.converterValores(vlt.getText().toString()))),
-                null
+                "" + cAux.converterValores(vlt.getText().toString()),
+                null,
+                ""
         ));
     }
 
@@ -806,7 +822,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                                     protocoloNota.getText().toString() + " - " + dataHoraNota.getText().toString()
                     ));
                     i.putExtra("quantidade", qnt.getText().toString());
-                    i.putExtra("valor", cAux.maskMoney(new BigDecimal(String.valueOf(total))));
+                    i.putExtra("valor", cAux.maskMoney(new BigDecimal(total)));
+                    i.putExtra("valorComDesconto", cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(vltTotal.getText().toString())))));
                     i.putExtra("valorUnit", cAux.maskMoney(new BigDecimal(String.valueOf(valorUnit))));
                     i.putExtra("tributos", cAux.maskMoney(new BigDecimal(String.valueOf(tributo))));
                     i.putExtra("tributosN", cAux.maskMoney(new BigDecimal(String.valueOf(tributoN))));
@@ -814,6 +831,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     i.putExtra("tributosM", cAux.maskMoney(new BigDecimal(String.valueOf(tributoM))));
                     //i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
                     i.putExtra("form_pagamento", bd.getFormasPagamentoPedidoPrint(bd.getUltimoIdPedido()));
+                    i.putExtra("desconto", cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(desconto.getText().toString())))));
                     //bd.getFormasPagamentoPedidoPrint(String.valueOf(id));
 
                     Log.e(TAG,

@@ -1,6 +1,11 @@
 package br.com.zenitech.emissorweb;
 
+import android.content.Context;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -617,5 +622,17 @@ public class ClassAuxiliar {
         }
 
         return idFormaPagamento;
+    }
+
+    public void ShowMsgSnackbar(View view, String msg) {
+        Snackbar.make(view, msg, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+    }
+
+    public void ShowMsgToast(Context context, String msg) {
+        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+    }
+
+    public void ShowMsgLog(String tag, String msg) {
+        Log.e(tag, msg);
     }
 }

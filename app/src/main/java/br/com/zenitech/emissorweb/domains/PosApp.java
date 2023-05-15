@@ -12,8 +12,9 @@ public class PosApp {
     private String ultboleto;
     private String nota_remessa;
     private String serie_remessa;
+    private String desconto_app_emissor;
 
-    public PosApp(String codigo, String serial, String cliente, String unidade, String serie, String ultnfce, String ultboleto, String nota_remessa, String serie_remessa) {
+    public PosApp(String codigo, String serial, String cliente, String unidade, String serie, String ultnfce, String ultboleto, String nota_remessa, String serie_remessa, String desconto_app_emissor) {
         this.codigo = codigo;
         this.serial = serial;
         this.cliente = cliente;
@@ -23,6 +24,7 @@ public class PosApp {
         this.ultboleto = ultboleto;
         this.nota_remessa = nota_remessa;
         this.serie_remessa = serie_remessa;
+        this.desconto_app_emissor = desconto_app_emissor;
     }
 
     public String getCodigo() {
@@ -95,5 +97,13 @@ public class PosApp {
 
     public void setSerie_remessa(String serie_remessa) {
         this.serie_remessa = serie_remessa;
+    }
+
+    public String getDesconto_app_emissor() {
+        return desconto_app_emissor;
+    }
+
+    public void setDesconto_app_emissor(String desconto_app_emissor) {
+        this.desconto_app_emissor = desconto_app_emissor;
     }
 }

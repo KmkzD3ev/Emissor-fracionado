@@ -56,6 +56,7 @@ import br.com.zenitech.emissorweb.domains.FormaPagamentoPedido;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosTemp;
+import br.com.zenitech.emissorweb.domains.PosApp;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import stone.application.StoneStart;
 import stone.application.interfaces.StoneCallbackInterface;
@@ -84,7 +85,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             "BOLETO"
     };
     String[] listaFormasPagamentoDinheiro = {
-            "DINHEIRO"
+            "DINHEIRO",
+            "PAGAMENTO INSTANTÂNEO (PIX)"
     };
     ArrayAdapter<String> adapterFormasPagamentoDinheiro;
     ArrayList<String> listaCredenciadoras;
@@ -110,10 +112,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     private RecyclerView rvFinanceiro;
 
     private Spinner spProduto, spFormasPagamento, spDescricaoCredenciadora, spBandeiraCredenciadora;
-    private EditText cpf_cnpj_cliente, etQuantidade, etPreco, etCodAutorizacao, etNsuCeara;
+    private EditText cpf_cnpj_cliente, etQuantidade, etPreco, etCodAutorizacao, etNsuCeara, etDesconto;
     private TextInputLayout TiNsuCeara;
-    private LinearLayout llCredenciadora, infoDadosPedido, formFinanceiroPedido;
-    private LinearLayoutCompat llFormAddFormasPag, formDadosPedido;
+    LinearLayout llCredenciadora, infoDadosPedido, formFinanceiroPedido;
+    LinearLayoutCompat llFormAddFormasPag, formDadosPedido;
 
     private Toolbar toolbar;
     AlertDialog alerta;
@@ -147,6 +149,11 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     // SE 1 INFORMA QUE A NOTA FOI FRACIONADA
     String NotaFracionada = "0";
 
+    boolean calcularDescto = true;
+
+    ArrayList<PosApp> elementosPos;
+    PosApp posApp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -163,6 +170,9 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //
         bd = new DatabaseHelper(this);
         aux = new ClassAuxiliar();
+
+        elementosPos = bd.getPos();
+        posApp = elementosPos.get(0);
 
         //
         rvFinanceiro = findViewById(R.id.rvFinanceiro);
@@ -245,6 +255,19 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //
         etPreco = findViewById(R.id.etPreco);
         etPreco.addTextChangedListener(new FormPedidos.MoneyTextWatcher(etPreco));
+
+        //
+        etDesconto = findViewById(R.id.etDesconto);
+        etDesconto.addTextChangedListener(new FormPedidos.MoneyTextWatcher(etDesconto));
+        etDesconto.setText("0,00");
+        try {
+            if (posApp.getDesconto_app_emissor().equalsIgnoreCase("1")) {
+                etDesconto.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception ignored) {
+
+        }
+
 
         //
         btnAddFormPag = findViewById(R.id.btnAddFormPag);
@@ -577,6 +600,9 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     void atualizarListaFormPag() {
         //
+        bd.deleteFormPagPIX();
+
+        //
         listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
         adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos);
         rvFinanceiro.setAdapter(adapter);
@@ -839,6 +865,11 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             valEtPreco = String.valueOf(aux.converterValores(etPreco.getText().toString()));
         }
 
+        String valEtDesconto = "";
+        if (!etDesconto.getText().toString().equals("")) {
+            valEtDesconto = String.valueOf(aux.converterValores(etDesconto.getText().toString()));
+        }
+
         //
         if (spProduto.getSelectedItem().toString().equals("PRODUTO")) {
             ShowMsgToast("Selecione um produto.");
@@ -852,6 +883,25 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 || valEtPreco.equals("0.00")) {
             ShowMsgToast("Informe o valor unitário.");
         } else {
+
+            if (calcularDescto) {
+
+                if (!precoMinimo.equals("0.0")) {
+                    //Objects.requireNonNull(getSupportActionBar()).setSubtitle("Preço Mín. " + aux.maskMoney(new BigDecimal(precoMinimo)) + " | Max. " + aux.maskMoney(new BigDecimal(precoMaximo)));
+
+                    String _valUnitario = String.valueOf(aux.converterValores(etPreco.getText().toString()));
+                    String _valDesconto = String.valueOf(aux.converterValores(etDesconto.getText().toString()));
+                    String[] desc = {_valUnitario, _valDesconto};
+
+                    if (aux.subitrair(desc).floatValue() > Float.parseFloat(precoMaximo) || aux.subitrair(desc).floatValue() < Float.parseFloat(precoMinimo)) {
+                        aux.ShowMsgToast(this, "O valor informado não pode ultrapassar o preço mínimo ou máximo!");
+
+                        return;
+                    } else {
+                        aux.ShowMsgToast(this, "Menor: " + aux.subitrair(desc).toString() + " | " + Float.parseFloat(precoMaximo));
+                    }
+                }
+            }
 
             String[] ars = {precoMinimo, String.valueOf(aux.converterValores(etPreco.getText().toString()))};
             int vComp = aux.comparar(ars);
@@ -897,10 +947,19 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //MULTIPLICA O VALOR PELA QUANTIDADE
         String[] multiplicar = {valorUnit, etQuantidade.getText().toString()};
         String total = String.valueOf(aux.multiplicar(multiplicar));
+
+        String valorDesc = String.valueOf(aux.converterValores(etDesconto.getText().toString()));
+        String[] multiplicarDesc = {valorDesc, etQuantidade.getText().toString()};
+        String desconto = String.valueOf(aux.multiplicar(multiplicarDesc));
+
+        String[] subtrair = {total, desconto};
+        total = String.valueOf(aux.subitrair(subtrair));
+
         //
         txtCpfCnpjCli.setText(String.format("Cpf/Cnpj: %s", cpf_cnpj_cliente.getText().toString()));
         txtProduto.setText(String.format("Produto: %s", spProduto.getSelectedItem().toString()));
         txtQuant.setText(String.format("Quantidade: %s", etQuantidade.getText().toString()));
+        //
         txtTotalFinanceiro.setText(aux.maskMoney(new BigDecimal(total)));
         txtValorFormaPagamento.setText(aux.maskMoney(new BigDecimal(total)));
         //
@@ -1003,6 +1062,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             i.putExtra("bandeira", aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()));
             i.putExtra("cod_aut", etCodAutorizacao.getText().toString());
             i.putExtra("nsu", etNsuCeara.getText().toString());
+            i.putExtra("desconto", etDesconto.getText().toString());
 
             startActivity(i);
             finish();
@@ -1511,11 +1571,12 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         //
         bd.addItensPedidos(new ItensPedidos(
-                String.valueOf(id),//ID PEDIDO
-                bd.getIdProduto(spProduto.getSelectedItem().toString()),
-                quantidade,
-                aux.soNumeros(String.valueOf(aux.converterValores(etPreco.getText().toString()))),
-                null
+                "" + id,//ID PEDIDO
+                "" + bd.getIdProduto(spProduto.getSelectedItem().toString()),
+                "" + quantidade,
+                "" + aux.converterValores(etPreco.getText().toString()),//aux.soNumeros(String.valueOf(aux.converterValores(etPreco.getText().toString()))),
+                "" + aux.converterValores(aux.soNumeros(etDesconto.getText().toString())),
+                "" // + aux.converterValores(aux.soNumeros(etDesconto.getText().toString()))
         ));
     }
 }

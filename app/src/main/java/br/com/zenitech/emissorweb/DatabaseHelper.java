@@ -28,7 +28,9 @@ import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosNFE;
 import br.com.zenitech.emissorweb.domains.PedidosTemp;
+import br.com.zenitech.emissorweb.domains.PixDomain;
 import br.com.zenitech.emissorweb.domains.PosApp;
+import br.com.zenitech.emissorweb.domains.PrintPixDomain;
 import br.com.zenitech.emissorweb.domains.Produtos;
 import br.com.zenitech.emissorweb.domains.StatusPedidos;
 import br.com.zenitech.emissorweb.domains.StatusPedidosNFE;
@@ -526,13 +528,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private ItensPedidos cursorToItensPedidos(Cursor cursor) {
-        ItensPedidos itensPedidos = new ItensPedidos(null, null, null, null, null);
+        ItensPedidos itensPedidos = new ItensPedidos(null, "", null, null, null, null);
         //
         itensPedidos.setPedido(cursor.getString(0));
         itensPedidos.setProduto(cursor.getString(1));
         itensPedidos.setQuantidade(cursor.getString(2));
         itensPedidos.setValor(cursor.getString(3));
-        itensPedidos.setTotal(cursor.getString(4));
+        try {
+            itensPedidos.setDesconto(cursor.getString(4));
+        } catch (Exception ignored) {
+        }
+        itensPedidos.setTotal(cursor.getString(5));
         return itensPedidos;
     }
 
@@ -565,21 +571,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ArrayList<ItensPedidos> listaItensPedidos = new ArrayList<>();
 
-        String query = "SELECT *, (valor * quantidade) AS total FROM itens_pedidos WHERE pedido = '" + nPedido + "'";
+        String query = "SELECT pedido, produto, quantidade, valor, (desconto * quantidade) AS desconto, (valor * quantidade) - (desconto * quantidade) AS total FROM itens_pedidos WHERE pedido = '" + nPedido + "'";
 
         myDataBase = this.getReadableDatabase();
         Cursor cursor = myDataBase.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
-                ItensPedidos itensPedidos = cursorToItensPedidos(cursor);
-                listaItensPedidos.add(itensPedidos);
+                //ItensPedidos itensPedidos = cursorToItensPedidos(cursor);
+                listaItensPedidos.add(cursorToItensPedidos(cursor));
             } while (cursor.moveToNext());
         }
 
         cursor.close();
 
         return listaItensPedidos;
+    }
+
+    //
+    ArrayList<ItensPedidos> getItensPedidoTransmitir(String nPedido) {
+        //String id = null;
+
+        ArrayList<ItensPedidos> listaItensPedidos = new ArrayList<>();
+
+        String query = "SELECT pedido, produto, quantidade, valor * 100 AS valor, (desconto * quantidade) AS desconto, (valor * quantidade) - (desconto * quantidade) AS total FROM itens_pedidos WHERE pedido = '" + nPedido + "'";
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                //ItensPedidos itensPedidos = cursorToItensPedidos(cursor);
+                listaItensPedidos.add(cursorToItensPedidos(cursor));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        return listaItensPedidos;
+    }
+
+    //
+    String testeCampoDesconto() {
+        String id = "";
+
+        String query = "SELECT SUM(desconto) AS desconto FROM itens_pedidos";
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+        cursor.close();
+
+        return id;
     }
 
     //########## AUTORIZAÇÕES ############
@@ -937,6 +979,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Cursor cursor = myDataBase.rawQuery(query, null);
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
+                autorizacoesPinpad = new AutorizacoesPinpad(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+
                 autorizacoesPinpad = cursorToAutorizacoesPinpad(cursor);
             }
 
@@ -1051,6 +1095,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put("produto", itensPedidos.getProduto());
             values.put("quantidade", itensPedidos.getQuantidade());
             values.put("valor", itensPedidos.getValor());
+            values.put("desconto", itensPedidos.getDesconto());
             myDataBase.insert("itens_pedidos", null, values);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
@@ -1312,7 +1357,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private StatusPedidos cursorToStatusPedidos(Cursor cursor) {
-        StatusPedidos pedidos = new StatusPedidos(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        StatusPedidos pedidos = new StatusPedidos("", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         //
         pedidos.setId(cursor.getString(0));
         pedidos.setSituacao(cursor.getString(1));
@@ -1327,8 +1372,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         pedidos.setPedido(cursor.getString(10));
         pedidos.setProduto(cursor.getString(11));
         pedidos.setQuantidade(cursor.getString(12));
-        pedidos.setValor(cursor.getString(13));
-        pedidos.setNome(cursor.getString(14));
+        try {
+            pedidos.setDesconto(cursor.getString(13));
+        } catch (Exception ignored) {
+
+        }
+        pedidos.setValor(cursor.getString(14));
+        pedidos.setNome(cursor.getString(15));
         return pedidos;
     }
 
@@ -1336,13 +1386,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<StatusPedidos> getStatusPedidos() {
         ArrayList<StatusPedidos> listaPedidos = new ArrayList<>();
 
-        String query = "SELECT ped.id, ped.situacao, ped.protocolo, ped.data, ped.hora, ped.valor_total, ped.data_protocolo, ped.hora_protocolo, ped.cpf_cliente, ped.forma_pagamento, ipe.pedido, ipe.produto, \n" +
-                "ipe.quantidade, ipe.valor, pro.nome FROM " + TABELA_PEDIDOS + " ped " +
+        String query = "SELECT ped.id, ped.situacao, ped.protocolo, ped.data, ped.hora, (ped.valor_total - (desconto * quantidade)) AS valor_total, ped.data_protocolo, ped.hora_protocolo, ped.cpf_cliente, ped.forma_pagamento, ipe.pedido, ipe.produto, \n" +
+                "ipe.quantidade, (desconto * quantidade) AS desconto, ipe.valor * 100 as valor, pro.nome FROM " + TABELA_PEDIDOS + " ped " +
                 " INNER JOIN itens_pedidos ipe ON ipe.pedido = ped.id " +
                 " INNER JOIN produtos pro ON pro.codigo = ipe.produto " +
                 " ORDER BY " + ID_PEDIDOS + " DESC";
 
-        Log.i("QUERY", query);
+        Log.i("KLEILSON QUERY", query);
 
         myDataBase = this.getReadableDatabase();
         Cursor cursor = myDataBase.rawQuery(query, null);
@@ -1369,7 +1419,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String total = "0.00", totalNFE = "0.00";
 
         try {
-            String query = "SELECT SUM((ipe.valor * ipe.quantidade)) / 100 " +
+            String query = "SELECT SUM((ipe.valor * ipe.quantidade) - (ipe.desconto * ipe.quantidade)) " + // / 100
                     "FROM " + TABELA_PEDIDOS + " ped " +
                     " INNER JOIN itens_pedidos ipe ON ipe.pedido = ped.id " +
                     " INNER JOIN produtos pro ON pro.codigo = ipe.produto " +
@@ -1672,9 +1722,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //LISTAR TODOS OS PEDIDOS A TRANSMITIR
     public Boolean getVerificarFinanceiroUltimoPedido() {
 
-        int totPad = 0;
-        int totFin = 0;
-
+        float totPad = 0;
+        float totFin = 0;
+        // * 100
         String query = "SELECT (" +
                 "           SELECT itp.valor * itp.quantidade" +
                 "             FROM itens_pedidos itp" +
@@ -1682,7 +1732,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "       )" +
                 "       valor_total," +
                 "       (" +
-                "           SELECT SUM(fpp.valor) * 100" +
+                "           SELECT SUM(fpp.valor)" +
                 "             FROM formas_pagamento_pedidos fpp" +
                 "            WHERE fpp.id_pedido = ped.id_pedido_temp AND fpp.status_pix = '0'" +
                 "       )" +
@@ -1700,8 +1750,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                totPad = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow("valor_total")));
-                totFin = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow("val_financeiro")));
+                totPad = Float.parseFloat(cursor.getString(cursor.getColumnIndexOrThrow("valor_total")));
+                totFin = Float.parseFloat(cursor.getString(cursor.getColumnIndexOrThrow("val_financeiro")));
             } while (cursor.moveToNext());
         }
 
@@ -1797,14 +1847,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //
         Cursor pos;
-        String query_pos = "SELECT * FROM pos";
+        String query_pos = "SELECT * FROM pos Limit 1";
         pos = myDataBase.rawQuery(query_pos, null);
         if (pos.moveToFirst()) {
-            do {
-                if (pos.getColumnIndexOrThrow("serie") == 3) {
-                    chave_serie = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serie")));
-                }
-            } while (pos.moveToNext());
+            chave_serie = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serie")));
         }
 
         pos.close();
@@ -1823,7 +1869,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         chave_nNF = String.format("%09d", numeroNota);
 
         //ACRESENTA ZEROS NA FRENTE DO NÚMERO DA NOTA PARA COMPLETAR 9 CARACTERES
-        int NF = (numeroNota * 13001);
+        int NF = (numeroNota * 133);//13001
         //NF = String.format("%08d", NF);
         //NF = NF.substring(0, 8);
         Log.e("CHAVE", String.valueOf(NF));
@@ -1861,16 +1907,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //
         Cursor pos;
-        String query_pos = "SELECT * FROM pos";
+        String query_pos = "SELECT * FROM pos Limit 1";
         pos = myDataBase.rawQuery(query_pos, null);
         if (pos.moveToFirst()) {
-            do {
-
-                if (pos.getColumnIndexOrThrow("serie") == 3) {
-                    serie = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serie")));
-                }
-
-            } while (pos.moveToNext());
+            serie = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serie")));
         }
 
         pos.close();
@@ -1900,17 +1940,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //
         Cursor pos;
-        String query_pos = "SELECT serial FROM pos";
+        String query_pos = "SELECT serial FROM pos Limit 1";
         pos = myDataBase.rawQuery(query_pos, null);
         if (pos.moveToFirst()) {
-            do {
-
-               /* if (pos.getColumnIndexOrThrow("serial") == 3) {
-                    serie = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serie")));
-                }*/
-                serial = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serial")));
-
-            } while (pos.moveToNext());
+            serial = aux.soNumeros(pos.getString(pos.getColumnIndexOrThrow("serial")));
         }
 
         pos.close();
@@ -1974,7 +2007,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR POS
     private PosApp cursorToPos(Cursor cursor) {
-        PosApp posApp = new PosApp(null, null, null, null, null, null, null, null, null);
+        PosApp posApp = new PosApp(null, null, null, null, null, null, null, null, null, null);
 
         //
         posApp.setCodigo(cursor.getString(0));
@@ -1984,6 +2017,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         posApp.setSerie(cursor.getString(4));
         posApp.setUltnfce(cursor.getString(5));
         posApp.setUltboleto(cursor.getString(6));
+        posApp.setNota_remessa(cursor.getString(7));
+        posApp.setSerie_remessa(cursor.getString(8));
+        try {
+            posApp.setDesconto_app_emissor(cursor.getString(9));
+        } catch (Exception ignored) {
+
+        }
         return posApp;
     }
 
@@ -2127,7 +2167,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                formasPag.append(aux.getNomeFormaPagamento(cursor.getString(0))).append(",");
+                if (!formasPag.toString().contains(aux.getNomeFormaPagamento(cursor.getString(0))))
+                    formasPag.append(aux.getNomeFormaPagamento(cursor.getString(0))).append(", ");
             } while (cursor.moveToNext());
         }
 
@@ -2325,7 +2366,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String IdEditarPedido() {
 
         myDataBase = this.getReadableDatabase();
-        String selectQuery = "SELECT ped.id FROM pedidos ped WHERE ped.situacao = 'OFF' LIMIT 1";
+        String selectQuery = "SELECT ped.id FROM pedidos ped WHERE ped.situacao = 'OFF' ORDER BY  ped.id DESC LIMIT 1";
 
         Cursor cursor = myDataBase.rawQuery(selectQuery, null);
 
@@ -2540,6 +2581,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
+    }
+
+    //
+    PrintPixDomain ultimoPIX() {
+        PrintPixDomain printPixDomain = null;
+        myDataBase = this.getReadableDatabase();
+        String query = "SELECT fpp.id_pedido, fpp.valor, fpp.id_cobranca_pix, ped.data, ped.hora " +
+                "FROM formas_pagamento_pedidos fpp " +
+                "INNER JOIN pedidos ped ON ped.id = fpp.id_pedido " +
+                "WHERE fpp.id_cobranca_pix != '' AND fpp.status_pix = '0' " +
+                "ORDER BY fpp.id DESC " +
+                "LIMIT 1";
+        Cursor cursor = myDataBase.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            printPixDomain = new PrintPixDomain();
+            do {
+                printPixDomain.id_pedido = cursor.getString(cursor.getColumnIndexOrThrow("id_pedido"));
+                printPixDomain.valor = cursor.getString(cursor.getColumnIndexOrThrow("valor"));
+                printPixDomain.id_cobranca_pix = cursor.getString(cursor.getColumnIndexOrThrow("id_cobranca_pix"));
+                printPixDomain.data = cursor.getString(cursor.getColumnIndexOrThrow("data"));
+                printPixDomain.hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        return printPixDomain;
     }
 
     //

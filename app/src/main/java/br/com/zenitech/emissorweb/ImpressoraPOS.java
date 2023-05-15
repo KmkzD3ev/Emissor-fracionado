@@ -39,16 +39,23 @@ import java.util.List;
 import java.util.Objects;
 
 import br.com.stone.posandroid.providers.PosPrintProvider;
+import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
+import br.com.stone.posandroid.providers.PosReprintReceiptProvider;
 import br.com.stone.posandroid.providers.PosTransactionProvider;
+import br.com.zenitech.emissorweb.controller.PrintController;
+import br.com.zenitech.emissorweb.controller.PrintControllerReprint;
 import br.com.zenitech.emissorweb.controller.PrintViewHelper;
 import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosNFE;
+import br.com.zenitech.emissorweb.domains.PixDomain;
+import br.com.zenitech.emissorweb.domains.PrintPixDomain;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import stone.application.StoneStart;
 import stone.application.enums.Action;
 import stone.application.enums.InstalmentTransactionEnum;
+import stone.application.enums.ReceiptType;
 import stone.application.enums.TypeOfTransactionEnum;
 import stone.application.interfaces.StoneActionCallback;
 import stone.application.interfaces.StoneCallbackInterface;
@@ -68,7 +75,8 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
     //DADOS PARA IMPRESSÃO
     String pedido, cliente, id_produto, produto, protocolo, chave, quantidade,
-            valor, valorUnit, tributos, tributosN, tributosE, tributosM, posicao, tipoImpressao, form_pagamento;
+            valor, valorUnit, tributos, tributosN, tributosE, tributosM, posicao,
+            tipoImpressao, form_pagamento, desconto, valorComDesconto;
 
     TextView total;
     public TextView imprimindo;
@@ -154,6 +162,8 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 tributosM = params.getString("tributosM");
                 tipoImpressao = params.getString("imprimir");
                 form_pagamento = params.getString("form_pagamento");
+                desconto = params.getString("desconto");
+                valorComDesconto = params.getString("valorComDesconto");
 
                 linhaProduto = new String[]{
                         "1 " + id_produto + "      " + produto,
@@ -172,11 +182,13 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                         tributosN,
                         tributosE,
                         tributosM,
-                        id_produto, // 16
-                        produto,    // 17
-                        quantidade, // 18
-                        valorUnit,  // 19
-                        valor       // 20
+                        id_produto,         // 16
+                        produto,            // 17
+                        quantidade,         // 18
+                        valorUnit,          // 19
+                        valor,              // 20
+                        desconto,           // 21
+                        valorComDesconto    // 22
                 };
 
                 // COMPROVANTE CANCELAMENTO CARTÃO
@@ -215,14 +227,19 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 //Imprimir comprovante do pagamento cartão
             } else if (tipoImpressao.equals("comprovante_pix")) {
                 ComprovantePix();
+            } else if (tipoImpressao.equals("comprovante_pix_reimp")) {
+
+                ComprovantePixReimpressao();
             } else {
 
                 //Imprimir nota fiscal eletronica
                 printNFCE(linhaProduto);
             }
-        } catch (FileNotFoundException e) {
+        } catch (
+                FileNotFoundException e) {
             e.printStackTrace();
         }
+
     }
 
     @Override
@@ -268,43 +285,42 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
     // --------------------     REIMPRESSÃO             --------------------------------------------
     private void reimpressaoComprovante() {
-        PosPrintProvider ppp = new PosPrintProvider(this);
+        try {
+            //
+            AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
 
-        /*final BitmapFactory.Options optionsStone = new BitmapFactory.Options();
-        optionsStone.inScaled = false;
+            //
+            PrintControllerReprint reprint = new PrintControllerReprint(
+                    context,
+                    new PosReprintReceiptProvider(context, pinpad.getRecipientTransactionIdentification(), ReceiptType.MERCHANT),
+                    "Serial POS: " + prefs.getString("serial_app", "")
+            );
+            runOnUiThread(reprint::print);
 
-        // Logo Stone
-        final AssetManager assetManagerStone = getApplicationContext().getAssets();
-        final Bitmap bitmapStone = BitmapFactory.decodeStream(assetManagerStone.open("stone.png"),
-                null, optionsStone);
-        final int widthStone = Objects.requireNonNull(bitmapStone).getWidth();
-        final int heightStone = bitmapStone.getHeight();
-        final int[] argbStone = new int[widthStone * heightStone];
-        bitmapStone.getPixels(argbStone, 0, widthStone, 0, 0, widthStone, heightStone);
-        bitmapStone.recycle();
+            final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+            builder.setCancelable(false);
+            builder.setTitle("Deseja reimprimir a via do cliente?");
 
-        //printer.reset();
-        printer.printImage(argbStone, widthStone, heightStone, Printer.ALIGN_CENTER, true);
-        printer.feedPaper(0);*/
+            builder.setPositiveButton("Sim", (dialog, which) -> {
+                PrintControllerReprint reprintCli = new PrintControllerReprint(
+                        context,
+                        new PosReprintReceiptProvider(context, pinpad.getRecipientTransactionIdentification(), ReceiptType.CLIENT),
+                        "Serial POS: " + prefs.getString("serial_app", "")
+                );
+                runOnUiThread(reprintCli::print);
+                liberarImpressora();
+            });
 
-        // Reimpressao
-        /*final BitmapFactory.Options optionsReimpressao = new BitmapFactory.Options();
-        optionsReimpressao.inScaled = false;
-        final AssetManager assetManagerReimpressao = getApplicationContext().getAssets();
-        final Bitmap bitmapReimpressao = BitmapFactory.decodeStream(assetManagerReimpressao.open("reimpressao.png"),
-                null, optionsReimpressao);
-        final int widthReimpressao = Objects.requireNonNull(bitmapReimpressao).getWidth();
-        final int heightReimpressao = bitmapReimpressao.getHeight();
-        final int[] argbReimpressao = new int[widthReimpressao * heightReimpressao];
-        bitmapReimpressao.getPixels(argbReimpressao, 0, widthReimpressao, 0, 0, widthReimpressao, heightReimpressao);
-        bitmapReimpressao.recycle();*/
+            builder.setNegativeButton("Não", (dialog, which) -> liberarImpressora());
 
-        //Unidades unidades;
-        //elementosUnidade = bd.getUnidades();
-        AutorizacoesPinpad pinpad = bd.getAutorizacaoPinpad();
+            runOnUiThread(builder::show);
+        } catch (Exception e) {
+            Toast.makeText(context, "Erro: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            liberarImpressora();
+        }
 
-        //Log.e("impressora", pinpad.getAid() + " - " + pinpad.getRequestId() + " - " + pinpad.getServiceCode());
-
+        //liberarImpressora();
+        /*PosPrintProvider ppp = new PosPrintProvider(this);
         //
         String txtCompPag = "Via do Lojista";
         //ppp.addLine(txtCompPag);
@@ -344,7 +360,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
             }
         });
         ppp.addBitmap(bitmap2);
-        ppp.execute();
+        ppp.execute();*/
     }
 
     // --------------------     IMPRESSÃO DE NFC-e      --------------------------------------------
@@ -431,12 +447,14 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         TextView txtDescQuant = findViewById(R.id.txtDescQuant);
         TextView txtDescValUnit = findViewById(R.id.txtDescValUnit);
         TextView txtDescValTot = findViewById(R.id.txtDescValTot);
+        TextView txtInfoValDesconto = findViewById(R.id.txtInfoValDesconto);
         //
         txtDescCod.setText(texto[16]);
         txtDescDesc.setText(texto[17]);
         txtDescQuant.setText(texto[18]);
         txtDescValUnit.setText(texto[19]);
         txtDescValTot.setText(texto[20]);
+        txtInfoValDesconto.setText(texto[21]);
 
         // ********************** INFOR. VALORES
         TextView txtInfoVal1 = findViewById(R.id.txtInfoVal1);
@@ -444,10 +462,10 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         TextView txtInfoVal3 = findViewById(R.id.txtInfoVal3);
         TextView txtInfoVal4 = findViewById(R.id.txtInfoVal4);
         //
-        txtInfoVal1.setText(quantidade);
-        txtInfoVal2.setText(texto[2]);
+        txtInfoVal1.setText("1"); //quantidade
+        txtInfoVal2.setText(texto[22]);
         txtInfoVal3.setText(cAux.removerAcentos(texto[12]));
-        txtInfoVal4.setText(texto[2]);
+        txtInfoVal4.setText(texto[22]);
 
         // ********************** TRIBUTOS TOTAIS
         TextView txtTributos = findViewById(R.id.txtTributos);
@@ -755,9 +773,12 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 String c = bd.gerarChave(Integer.parseInt(pedidos.getId()));
                 txtCorpoRel3.setText(c);
 
+                //Log.e("Kleilson: - ", itensPedidos.getTotal());
+
                 //IMPRIMIR TEXTO
                 txtCorpoRel5.setText(String.format("%s               %s", itensPedidos.getProduto(), bd.getProduto(itensPedidos.getProduto())));
-                txtCorpoRel6.setText(String.format("%s          UN          %s          %s", itensPedidos.getQuantidade(), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getTotal()))))));
+                //txtCorpoRel6.setText(String.format("%s          UN          %s          %s", itensPedidos.getQuantidade(), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))), cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getTotal()))))));
+                txtCorpoRel6.setText(String.format("%s          UN          %s      %s     %s", itensPedidos.getQuantidade(), cAux.maskMoney(new BigDecimal(itensPedidos.getValor())), cAux.maskMoney(new BigDecimal(itensPedidos.getDesconto())), cAux.maskMoney(new BigDecimal(itensPedidos.getTotal()))));
 
                 LinearLayout impressora1 = findViewById(R.id.printRel2);
                 Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 190, 120);
@@ -977,6 +998,36 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         });
         //ppp.addBitmap(bitmap2);
         ppp.addLine("Comprovante Pix");
+        ppp.execute();
+    }
+
+    void ComprovantePixReimpressao() {
+        // --------------------     COMPROVANTE PIX         --------------------------------------------
+
+        PosPrintProvider ppp = new PosPrintProvider(this);
+        ppp.setConnectionCallback(new StoneCallbackInterface() {
+            @Override
+            public void onSuccess() {
+                liberarImpressora();
+            }
+
+            @Override
+            public void onError() {
+                liberarImpressora();
+                Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        PrintPixDomain printPixDomain = bd.ultimoPIX();
+
+        ClassAuxiliar aux = new ClassAuxiliar();
+        ppp.addLine("        Comprovante Pix\n");
+        ppp.addLine("        Via do Lojista");
+        ppp.addLine("          REIMPRESSAO\n");
+        ppp.addLine("Pedido: " + printPixDomain.id_pedido);
+        ppp.addLine("Identificador: \n" + printPixDomain.id_cobranca_pix);
+        ppp.addLine("Valor: " + aux.maskMoney(new BigDecimal(printPixDomain.valor)));
+        ppp.addLine("Data/Hora: " + aux.exibirData(printPixDomain.data) + " - " + printPixDomain.hora);
         ppp.execute();
     }
 

@@ -1,5 +1,7 @@
 package br.com.zenitech.emissorweb.interfaces;
 
+import static br.com.zenitech.emissorweb.Configuracoes.okHttpClient;
+
 import br.com.zenitech.emissorweb.Configuracoes;
 import br.com.zenitech.emissorweb.domains.ValidarNFCe;
 import retrofit2.Call;
@@ -28,11 +30,13 @@ public interface IValidarNFCe {
             @Field("VLRFORMAP") String vlrformap,
             @Field("NAUTOCARTAO") String nautocartao,
             @Field("BANDEIRA") String bandeira,
-            @Field("FRACIONADA") String fracionada
+            @Field("FRACIONADA") String fracionada,
+            @Field("DESCONTO") String desconto
     );
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(String.format("%s%s", new Configuracoes().GetUrlServer(), "/POSSIAC/AUTORIZADOR/"))
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

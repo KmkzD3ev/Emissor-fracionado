@@ -346,18 +346,19 @@ public class Sincronizar extends AppCompatActivity {
 
     // VERIFICA AS PERMISSÕES DO APP
     boolean _verificarPermissoes() {
-        //VERIFICA SE O USUÁRIO DEU PERMISSÃO PARA ACESSAR O SDCARD
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // O dispositivo está executando o Android 33.0 ou superior
+        } else {
+            // O dispositivo está executando uma versão anterior do Android
 
-            /*if (ActivityCompat.shouldShowRequestPermissionRationale(Sincronizar.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                callDialog(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE});
-            } else {
-                ActivityCompat.requestPermissions(Sincronizar.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS_CODE);
-            }*/
+            //VERIFICA SE O USUÁRIO DEU PERMISSÃO PARA ACESSAR O SDCARD
+            var WRITE_EXTERNAL_STORAGE = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (WRITE_EXTERNAL_STORAGE != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSIONS_CODE);
 
-            return false;
+                return false;
+            }
         }
 
         return true;
@@ -464,7 +465,8 @@ public class Sincronizar extends AppCompatActivity {
         } else {
             serialMaquinaStone = Stone.getPosAndroidDevice().getPosAndroidSerialNumber();
             manufacture = Stone.getPosAndroidDevice().getPosAndroidManufacturer();
-            txt = manufacture + "\n" + serialMaquinaStone;;// Build.MANUFACTURER + " " + Build.MODEL + ", Datecs API " + BuildInfo.VERSION;
+            txt = manufacture + "\n" + serialMaquinaStone;
+            ;// Build.MANUFACTURER + " " + Build.MODEL + ", Datecs API " + BuildInfo.VERSION;
         }
 
 
@@ -476,7 +478,7 @@ public class Sincronizar extends AppCompatActivity {
                 manufacture,
                 serialMaquinaStone,
                 new ClassAuxiliar().exibirDataAtual());
-        call.enqueue(new Callback<Sincronizador>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Sincronizador> call, @NonNull Response<Sincronizador> response) {
 
@@ -508,11 +510,12 @@ public class Sincronizar extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Sincronizador> call, @NonNull Throwable t) {
 
+                makeText(Sincronizar.this, Objects.requireNonNull(t.getMessage()), Toast.LENGTH_LONG).show();
                 Log.i(TAG, Objects.requireNonNull(t.getMessage()));
 
                 //
                 erro = true;
-                msgErro = "Não foi possível gerar o banco.";
+                msgErro = "Não foi possível gerar o banco. 1";
                 _limparDadosSincronizacao(false);
                 _resetarSincronismo(3000, true);
             }
@@ -520,9 +523,7 @@ public class Sincronizar extends AppCompatActivity {
     }
 
     private void esperarParaIniciarDownload(String serial) {
-        new Handler().postDelayed(() -> {
-            startDownload(serial);
-        }, 10000);
+        new Handler().postDelayed(() -> startDownload(serial), 30000);
     }
 
     // LIMPA OS DADOS DA SINCRONIZAÇÃO

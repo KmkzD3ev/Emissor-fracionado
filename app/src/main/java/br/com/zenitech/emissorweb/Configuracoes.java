@@ -3,10 +3,13 @@ package br.com.zenitech.emissorweb;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 
+import okhttp3.OkHttpClient;
 import stone.environment.Environment;
 
 import static stone.environment.Environment.PRODUCTION;
 import static stone.environment.Environment.SANDBOX;
+
+import java.util.concurrent.TimeUnit;
 
 public class Configuracoes {
 
@@ -17,6 +20,7 @@ public class Configuracoes {
     // SEMPRE RETORNAR FALSE CONFORME FOR GERADO O BUILD PARA PLAYSTORE
     public boolean GetDevice() {
         return true;
+        //return false;
     }
 
     // RETORNASE O AMBIENTE É DE PRODUÇÃO OU DE TESTE
@@ -43,4 +47,12 @@ public class Configuracoes {
 
     //
     public static String token_authorization;
+
+
+
+    public static OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(2, TimeUnit.MINUTES)
+            .readTimeout(2, TimeUnit.MINUTES)
+            .writeTimeout(2, TimeUnit.MINUTES)
+            .build();
 }

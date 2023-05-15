@@ -1,16 +1,19 @@
 package br.com.zenitech.emissorweb;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import java.util.Set;
 
@@ -20,7 +23,7 @@ import stone.utils.PinpadObject;
 
 public class DevicesActivityPinPad extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private boolean btConnected = false;
     private ListView listView;
 
@@ -32,6 +35,27 @@ public class DevicesActivityPinPad extends AppCompatActivity implements AdapterV
         listView.setOnItemClickListener(this);
         turnBluetoothOn();
         listBluetoothDevices();
+        CheckPermissionn();
+    }
+
+    private void CheckPermissionn() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+                != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                        != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                        128);
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_ADMIN}, 128);
+        }
+
+    }
+
+    private void PedirPermissao() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_ADMIN}, 128);
     }
 
     public void listBluetoothDevices() {
@@ -40,6 +64,16 @@ public class DevicesActivityPinPad extends AppCompatActivity implements AdapterV
         ArrayAdapter<String> btArrayAdapter = new ArrayAdapter<>(this, R.layout.list_item_bluetooths);
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                        128);
+                return;
+            }
+        }
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 
         // Lista todos os dispositivos pareados.
@@ -55,6 +89,19 @@ public class DevicesActivityPinPad extends AppCompatActivity implements AdapterV
 
     public void turnBluetoothOn() {
         try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+
+
+                PedirPermissao();
+                return;
+            }
             mBluetoothAdapter.enable();
             do {
             } while (!mBluetoothAdapter.isEnabled());

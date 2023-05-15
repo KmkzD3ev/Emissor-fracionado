@@ -1,6 +1,7 @@
 package br.com.zenitech.emissorweb;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -54,6 +55,7 @@ public class CancelarPagamentoCartaoPOS extends AppCompatActivity {
     AutorizacoesPinpad pinpad;
 
     ClassAuxiliar cAux;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class CancelarPagamentoCartaoPOS extends AppCompatActivity {
 
         context = this;
         bd = new DatabaseHelper(this);
+        prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         cAux = new ClassAuxiliar();
         pinpad = bd.getAutorizacaoPinpad();
 
@@ -183,7 +186,8 @@ public class CancelarPagamentoCartaoPOS extends AppCompatActivity {
                 final PrintController printMerchant =
                         new PrintController(context,
                                 new PosPrintReceiptProvider(context,
-                                        _transactionObject, ReceiptType.MERCHANT));
+                                        _transactionObject, ReceiptType.MERCHANT),
+                                "Serial POS: " + prefs.getString("serial_app", ""));
 
                 printMerchant.print();
             }

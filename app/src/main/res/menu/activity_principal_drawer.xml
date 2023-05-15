@@ -57,6 +57,18 @@
                 android:title="Cancelar Pagamento" />
         </menu>
     </item>
+
+    <item
+        android:id="@+id/menuPix"
+        android:title="Pix"
+        android:visible="true">
+        <menu>
+            <item
+                android:id="@+id/nav_reimprimir_pix"
+                android:icon="@drawable/ic_print"
+                android:title="Reimprimir Comp. Pix" />
+        </menu>
+    </item>
     <item android:title="@string/configuracoes">
         <menu>
             <item

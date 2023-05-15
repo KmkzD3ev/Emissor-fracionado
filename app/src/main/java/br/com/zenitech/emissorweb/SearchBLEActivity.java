@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class SearchBLEActivity extends Activity implements OnClickListener, IOCallBack, LeScanCallback {
 
     private LinearLayout linearlayoutdevices;

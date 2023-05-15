@@ -83,7 +83,8 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
             "BOLETO"
     };
     String[] listaFormasPagamentoDinheiro = {
-            "DINHEIRO"
+            "DINHEIRO",
+            "PAGAMENTO INSTANTÂNEO (PIX)"
     };
     ArrayAdapter<String> adapterFormasPagamentoDinheiro;
     ArrayList<String> listaCredenciadoras;
@@ -109,7 +110,7 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
     private RecyclerView rvFinanceiro;
 
     private Spinner spProduto, spFormasPagamento, spDescricaoCredenciadora, spBandeiraCredenciadora;
-    private EditText cpf_cnpj_cliente, etQuantidade, etPreco, etCodAutorizacao, etNsuCeara;
+    private EditText cpf_cnpj_cliente, etQuantidade, etPreco, etCodAutorizacao, etNsuCeara, etDesconto;
     private TextInputLayout TiNsuCeara;
     private LinearLayout llCredenciadora, infoDadosPedido, formFinanceiroPedido;
     private LinearLayoutCompat llFormAddFormasPag, formDadosPedido;
@@ -569,6 +570,9 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
 
     void atualizarListaFormPag() {
         //
+        bd.deleteFormPagPIX();
+
+        //
         listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
         adapter = new FormasPagamentoEditarPedidosAdapter(this, listaFinanceiroCliente, elementos);
         rvFinanceiro.setAdapter(adapter);
@@ -994,13 +998,14 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
         i.putExtra("formaPagamento", pedidos.getForma_pagamento());// spFormasPagamento.getSelectedItem().toString());
         i.putExtra("produto", bd.getProduto(bd.getItensPedido(pedidos.getId()).get(0).getProduto()));//spProduto.getSelectedItem().toString());
         i.putExtra("qnt", bd.getItensPedido(pedidos.getId()).get(0).getQuantidade());
-        i.putExtra("vlt", aux.maskMoney(aux.converterValores(bd.getItensPedido(pedidos.getId()).get(0).getValor())));
-
+        i.putExtra("vlt", aux.maskMoney(new BigDecimal(bd.getItensPedido(pedidos.getId()).get(0).getValor())));
+        // aux.converterValores()
         // kleilson analisar código
         i.putExtra("credenciadora", idCredenciadoras.get(spDescricaoCredenciadora.getSelectedItemPosition()));//spDescricaoCredenciadora.getSelectedItem().toString()
         i.putExtra("bandeira", aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()));
         i.putExtra("cod_aut", etCodAutorizacao.getText().toString());
         i.putExtra("nsu", etNsuCeara.getText().toString());
+        i.putExtra("desconto", aux.maskMoney(new BigDecimal(bd.getItensPedido(pedidos.getId()).get(0).getDesconto())));
 
         startActivity(i);
         finish();
@@ -1418,7 +1423,8 @@ public class EditarPedido extends AppCompatActivity implements AdapterView.OnIte
                 bd.getIdProduto(spProduto.getSelectedItem().toString()),
                 quantidade,
                 aux.soNumeros(String.valueOf(aux.converterValores(txtValorFormaPagamento.getText().toString()))),
-                null
+                bd.getItensPedido(pedidos.getId()).get(0).getDesconto(),
+                ""
         ));
     }
 }

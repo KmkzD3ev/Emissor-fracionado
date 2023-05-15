@@ -6,13 +6,15 @@ public class ItensPedidos {
     private String produto;
     private String quantidade;
     private String valor;
+    private String desconto;
     private String total;
 
-    public ItensPedidos(String pedido, String produto, String quantidade, String valor, String total) {
+    public ItensPedidos(String pedido, String produto, String quantidade, String valor, String desconto, String total) {
         this.pedido = pedido;
         this.produto = produto;
         this.quantidade = quantidade;
         this.valor = valor;
+        this.desconto = desconto;
         this.total = total;
     }
 
@@ -46,6 +48,14 @@ public class ItensPedidos {
 
     public void setValor(String valor) {
         this.valor = valor;
+    }
+
+    public String getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(String desconto) {
+        this.desconto = desconto;
     }
 
     public String getTotal() {

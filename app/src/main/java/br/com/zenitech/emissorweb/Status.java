@@ -107,7 +107,6 @@ public class Status extends AppCompatActivity {
             recyclerViewNFE.setAdapter(adapterNFE);
         }
 
-        //
         //txtTotal.setText(bd.getValorTotal());
         //txtQuant.setText(bd.getQuantTotal());
 

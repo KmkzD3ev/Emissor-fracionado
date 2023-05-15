@@ -114,6 +114,7 @@ public class Principal extends AppCompatActivity
 
     TextView textView, txtTransmitida, txtContigencia, txtStatusTransmissao, txtVersao, txtEmpresa, txtCodUnidade, txtDataUltimoSinc;
     AppBarConfiguration appBarConfiguration;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -355,6 +356,9 @@ public class Principal extends AppCompatActivity
         //
         userList = StoneStart.init(context);
 
+        // APAGA TODOS OS PAGAMENTOS PIX COM STATUS 1
+        bd.deleteFormPagPIX();
+
         atualizar();
 
         //startActivity(new Intent(this, TesteConexaoImpressora.class));
@@ -370,7 +374,55 @@ public class Principal extends AppCompatActivity
 
     // GRAVAR NOVO PEDIDO NO BANCO DE DADOS
     private void NovaNFCe() {
-        startActivity(new Intent(getBaseContext(), FormPedidos.class));
+        try {
+            bd.testeCampoDesconto();
+        } catch (Exception e) {
+            alertaAtualizarBancoDeDados();
+            Log.e("testeCampoDesconto:", e.getMessage());
+            return;
+        }
+        startActivity(new Intent(context, FormPedidos.class));
+    }
+
+    private void alertaAtualizarBancoDeDados() {
+
+        //
+        //Cria o gerador do AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.logo_emissor_web);
+        builder.setCancelable(true);
+        //define o titulo
+        builder.setTitle("Atenção!");
+        //define a mensagem
+        builder.setMessage("Uma nova versão do banco de dados do app está disponível, pedimos que atualize antes de iniciar uma nova NFC-e!");
+
+        if (bd.getPedidosTransmitirFecharDia().size() == 0) {
+            //define um botão como positivo
+            builder.setPositiveButton("Finalizar Remessa e Atualizar", (arg0, arg1) -> {
+                _finalizarApp(true);
+            });
+        } else {
+
+            //define um botão como negativo.
+            builder.setNegativeButton("Sincronizar NFC-e", (arg0, arg1) -> {
+                Intent i = new Intent(context, GerenciarBancoProducao.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+                finish();
+            });
+        }
+
+        //define um botão como negativo.
+        /*builder.setNeutralButton("Depois", (arg0, arg1) -> {
+            //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
+            //prefs.edit().putBoolean("naoPerguntarImpressora", true).apply();
+        });*/
+
+        //cria o AlertDialog
+        alerta = builder.create();
+
+        //Exibe
+        alerta.show();
     }
 
     private void totNFE() {
@@ -454,7 +506,7 @@ public class Principal extends AppCompatActivity
             if (bd.getVerificarFinanceiroUltimoPedido()) {
                 pedidoNaoFinalizadoDialog();
             }
-        }catch (Exception ignored){
+        } catch (Exception ignored) {
 
         }
     }
@@ -624,7 +676,8 @@ public class Principal extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            startActivity(new Intent(getBaseContext(), FormPedidos.class));
+            NovaNFCe();
+            //startActivity(new Intent(getBaseContext(), FormPedidos.class));
         } else if (id == R.id.nav_nfe) {
             if (verificarOnline.isOnline(context)) {
                 _verificarPermNFE();
@@ -674,17 +727,38 @@ public class Principal extends AppCompatActivity
         }
         // Reimprimir comprovante pagamento logista
         else if (id == R.id.nav_reimprimir) {
+            if (bd.getAutorizacaoPinpad() != null) {
+                Configuracoes configuracoes = new Configuracoes();
+                if (configuracoes.GetDevice()) {
+                    Intent i = new Intent(context, ImpressoraPOS.class);
+                    i.putExtra("imprimir", "reimpressao_comprovante");
+                    startActivity(i);
+                } else {
+                    //
+                    Intent i = new Intent(context, Impressora.class);
+                    i.putExtra("imprimir", "reimpressao_comprovante");
+                    startActivity(i);
+                }
+            } else
+                makeText(context, "Nada para imprimir", LENGTH_SHORT).show();
+        }
+        // Reimprimir comprovante pagamento logista
+        else if (id == R.id.nav_reimprimir_pix) {
             Configuracoes configuracoes = new Configuracoes();
-            if (configuracoes.GetDevice()) {
-                Intent i = new Intent(context, ImpressoraPOS.class);
-                i.putExtra("imprimir", "reimpressao_comprovante");
-                startActivity(i);
-            } else {
+
+            if (bd.ultimoPIX() != null) {
+                if (configuracoes.GetDevice()) {
+                    Intent i = new Intent(context, ImpressoraPOS.class);
+                    i.putExtra("imprimir", "comprovante_pix_reimp");
+                    startActivity(i);
+                }/* else {
                 //
                 Intent i = new Intent(context, Impressora.class);
                 i.putExtra("imprimir", "reimpressao_comprovante");
                 startActivity(i);
-            }
+            }*/
+            } else
+                makeText(context, "Nada para imprimir", LENGTH_SHORT).show();
         }
         // Cancelar pagamento cartão
         else if (id == R.id.nav_cancelar_pag) {
@@ -755,7 +829,7 @@ public class Principal extends AppCompatActivity
         builder.setMessage(str);
 
         //define um botão como positivo
-        builder.setPositiveButton("Sim", (arg0, arg1) -> _finalizarApp());
+        builder.setPositiveButton("Sim", (arg0, arg1) -> _finalizarApp(false));
 
         //define um botão como negativo.
         builder.setNeutralButton("Não", (arg0, arg1) -> {
@@ -799,7 +873,7 @@ public class Principal extends AppCompatActivity
     }
 
     // FINALIZAR REMESSA
-    private void _finalizarApp() {
+    private void _finalizarApp(boolean initAuto) {
         //
         final ISincronizar iSincronizar = ISincronizar.retrofit.create(ISincronizar.class);
 
@@ -830,6 +904,9 @@ public class Principal extends AppCompatActivity
                             context.deleteDatabase("emissorwebDB");
                             //Intent i = new Intent(context, Sincronizar.class);
                             Intent i = new Intent(context, AppFinalizado.class);
+                            if(initAuto){
+                                i.putExtra("initAuto", true);
+                            }
                             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(i);
                             finish();

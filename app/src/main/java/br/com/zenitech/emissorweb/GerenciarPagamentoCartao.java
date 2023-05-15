@@ -844,9 +844,9 @@ public class GerenciarPagamentoCartao extends AppCompatActivity implements Stone
                     txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação negada pelo cartão."));
                 }
                 //
-                else if (to.getTransactionStatus() == TransactionStatusEnum.PARTIAL_APPROVED) {
+                /*else if (to.getTransactionStatus() == TransactionStatusEnum.PARTIAL_APPROVED) {
                     txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Transação foi parcialmente aprovada."));
-                }
+                }*/
                 //
                 else if (to.getTransactionStatus() == TransactionStatusEnum.TECHNICAL_ERROR) {
                     txtMsgCausaErro.setText(String.format("%s\n%s", to.getActionCode(), "Erro técnico (ocorreu um erro ao processar a mensagem no autorizador)."));

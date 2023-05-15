@@ -1,8 +1,11 @@
 package br.com.zenitech.emissorweb;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -10,6 +13,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import android.util.Log;
 import android.view.MenuItem;
@@ -76,12 +80,30 @@ public class Relatorios extends AppCompatActivity {
             }
         });
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.BLUETOOTH_SCAN},
+                        128);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                        128);
+            }
+        }
+
 
         // SE O APARELHO FOR UM POS
-        if (configuracoes.GetDevice()) {
+        /*if (configuracoes.GetDevice()) {
             //
             iniciarStone();
-        } else new AtivarDesativarBluetooth().enableBT();
+        } else new AtivarDesativarBluetooth().enableBT(context, this);*/
     }
 
     // Iniciar o Stone
@@ -166,7 +188,7 @@ public class Relatorios extends AppCompatActivity {
     }
 
     void Sair() {
-        new AtivarDesativarBluetooth().disableBT();
+        new AtivarDesativarBluetooth().disableBT(context,this);
 
         Intent i = new Intent(this, Principal.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);

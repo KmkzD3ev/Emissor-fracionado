@@ -96,7 +96,7 @@
     <string name="informe_um_serial">Informe um serial válido!</string>
     <string name="sincronizado">POS Iniciado!</string>
     <string name="oops">Oops!</string>
-    <string name="txt_app_finalizado">App Finalizado!\nPressione \"BAIXAR BANCO DE DADOS\", para iniciar a remessa</string>
+    <string name="txt_app_finalizado">App Finalizado!\nPressione \"INICIAR POS\", para iniciar a remessa</string>
     <string name="nova_nota">Nova NFC-e</string>
     <string name="nova_nfe">Nova NFE</string>
     <string name="consultar_nfe">Consultar NFE</string>

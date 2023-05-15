@@ -60,6 +60,7 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
         TextView txtProduto = holder.txtProduto;
         TextView txtQuant = holder.txtQuant;
         TextView txtValUni = holder.txtValUni;
+        TextView txtValDesc = holder.txtValDesc;
         TextView txtTotal = holder.txtTotal;
 
         if (pedidos.getSituacao().equalsIgnoreCase("") || pedidos.getSituacao().equalsIgnoreCase("OFF")) {
@@ -69,6 +70,8 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
         }
         txtQuant.setText(pedidos.getQuantidade());
 
+        txtValDesc.setText(aux.maskMoney(new BigDecimal(pedidos.getDesconto())));
+
         //
         String valorUnit = String.valueOf(aux.converterValores(pedidos.getValor()));
         txtValUni.setText(String.format("%s", aux.maskMoney(new BigDecimal(valorUnit))));
@@ -76,7 +79,8 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
         //MULTIPLICA O VALOR PELA QUANTIDADE
         String[] multiplicar = {valorUnit, pedidos.getQuantidade()};
         String total = String.valueOf(aux.multiplicar(multiplicar));
-        txtTotal.setText(String.format("%s", aux.maskMoney(new BigDecimal(total))));
+        //txtTotal.setText(String.format("%s", aux.maskMoney(new BigDecimal(total))));
+        txtTotal.setText(String.format("%s", aux.maskMoney(new BigDecimal(pedidos.getValor_total()))));//valor_total
 
 
         /*/
@@ -100,7 +104,7 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView txtProduto, txtQuant, txtValUni, txtTotal;
+        TextView txtProduto, txtQuant, txtValUni, txtValDesc, txtTotal;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -108,6 +112,7 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
             txtProduto = itemView.findViewById(R.id.txtProduto);
             txtQuant = itemView.findViewById(R.id.txtQuant);
             txtValUni = itemView.findViewById(R.id.txtValUni);
+            txtValDesc = itemView.findViewById(R.id.txtValDesc);
             txtTotal = itemView.findViewById(R.id.txtTotal);
         }
     }

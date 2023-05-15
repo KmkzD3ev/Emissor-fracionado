@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:installLocation="internalOnly" >
+    android:installLocation="internalOnly">
 
     <uses-feature
         android:name="android.hardware.wifi"
@@ -20,7 +20,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <!--<uses-permission android:name="android.permission.BLUETOOTH_SCAN" />-->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -52,7 +52,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:replace="allowBackup"
-        tools:targetApi="n" >
+        tools:targetApi="n">
         <activity
             android:name=".Pix"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -95,8 +95,8 @@
         <activity
             android:name=".GerenciarPagamentoCartaoPOS"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/title_activity_gerenciar_pagamento_cartao"
             android:exported="true"
+            android:label="@string/title_activity_gerenciar_pagamento_cartao"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MainActivityPrincipal"
@@ -148,7 +148,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:screenOrientation="fullSensor"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

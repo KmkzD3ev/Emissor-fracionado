@@ -18,12 +18,13 @@ public class StatusPedidos {
     private String pedido;
     private String produto;
     private String quantidade;
+    private String desconto;
     private String valor;
 
     // Tabela Produtos
     private String nome;
 
-    public StatusPedidos(String id, String situacao, String protocolo, String data, String hora, String valor_total, String data_protocolo, String hora_protocolo, String cpf_cliente, String forma_pagamento, String pedido, String produto, String quantidade, String valor, String nome) {
+    public StatusPedidos(String id, String situacao, String protocolo, String data, String hora, String valor_total, String data_protocolo, String hora_protocolo, String cpf_cliente, String forma_pagamento, String pedido, String produto, String quantidade, String desconto, String valor, String nome) {
         this.id = id;
         this.situacao = situacao;
         this.protocolo = protocolo;
@@ -37,6 +38,7 @@ public class StatusPedidos {
         this.pedido = pedido;
         this.produto = produto;
         this.quantidade = quantidade;
+        this.desconto = desconto;
         this.valor = valor;
         this.nome = nome;
     }
@@ -143,6 +145,14 @@ public class StatusPedidos {
 
     public void setQuantidade(String quantidade) {
         this.quantidade = quantidade;
+    }
+
+    public String getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(String desconto) {
+        this.desconto = desconto;
     }
 
     public String getValor() {

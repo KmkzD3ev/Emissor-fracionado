@@ -1,5 +1,7 @@
 package br.com.zenitech.emissorweb;
 
+import static br.com.zenitech.emissorweb.ClassAuxiliar.getSha1Hex;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -17,19 +19,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import com.datecs.api.BuildInfo;
 import com.datecs.api.card.FinancialCard;
@@ -44,15 +43,14 @@ import com.datecs.api.rfid.ISO15693Card;
 import com.datecs.api.rfid.RC663;
 import com.datecs.api.rfid.STSRICard;
 import com.datecs.api.universalreader.UniversalReader;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,8 +69,6 @@ import br.com.zenitech.emissorweb.domains.PedidosNFE;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import br.com.zenitech.emissorweb.network.PrinterServer;
 import br.com.zenitech.emissorweb.util.HexUtil;
-
-import static br.com.zenitech.emissorweb.ClassAuxiliar.getSha1Hex;
 
 public class Impressora extends AppCompatActivity {
 
@@ -236,6 +232,8 @@ public class Impressora extends AppCompatActivity {
         elementosPedidos = bd.getPedidosRelatorio();
         elementosPedidosNFE = bd.getPedidosRelatorioNFE();
 
+        CheckPermission();
+
         ativarBluetooth();
 
         if (!prefs.getString("enderecoBlt", "").equalsIgnoreCase("")) {
@@ -247,8 +245,27 @@ public class Impressora extends AppCompatActivity {
         tempo(1000);
     }
 
+    private void CheckPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+                != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                        != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                        128);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BLUETOOTH_ADMIN},
+                    128);
+        }
+    }
+
     private void ativarBluetooth() {
-        new AtivarDesativarBluetooth().enableBT();
+        new AtivarDesativarBluetooth().enableBT(context, this);
     }
 
     public void tempo(int tempo) {
@@ -607,6 +624,13 @@ public class Impressora extends AppCompatActivity {
         final Thread t = new Thread(() -> {
             Log.d(LOG_TAG, "BluetoothConnection - Conectando à " + address + "...");
 
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.BLUETOOTH_SCAN},
+                            128);
+                }
+            }
             btAdapter.cancelDiscovery();
 
             try {
@@ -617,6 +641,13 @@ public class Impressora extends AppCompatActivity {
                 OutputStream out;
 
                 try {
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                                    128);
+                        }
+                    }
                     BluetoothSocket btSocket = btDevice.createRfcommSocketToServiceRecord(uuid);
                     btSocket.connect();
 
@@ -1061,7 +1092,7 @@ public class Impressora extends AppCompatActivity {
 
     // DESATIVAR BLUETOOTH
     private void desativarBluetooth() {
-        new AtivarDesativarBluetooth().disableBT();
+        new AtivarDesativarBluetooth().disableBT(context, this);
     }
 
     /***************************** - IMPRESSÃO - *********************************/

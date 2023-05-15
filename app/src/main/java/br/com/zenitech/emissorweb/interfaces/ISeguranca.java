@@ -1,5 +1,7 @@
 package br.com.zenitech.emissorweb.interfaces;
 
+import static br.com.zenitech.emissorweb.Configuracoes.okHttpClient;
+
 import br.com.zenitech.emissorweb.Configuracoes;
 import br.com.zenitech.emissorweb.domains.SegurancaDomain;
 import br.com.zenitech.emissorweb.domains.Sincronizador;
@@ -22,6 +24,7 @@ public interface ISeguranca {
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(String.format("%s%s", new Configuracoes().GetUrlServer(), "POSSIAC/"))
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 }
