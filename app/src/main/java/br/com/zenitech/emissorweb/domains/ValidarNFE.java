@@ -1,5 +1,7 @@
 package br.com.zenitech.emissorweb.domains;
 
+import java.util.List;
+
 public class ValidarNFE {
     private String protocolo;
     private String erro;
@@ -11,7 +13,7 @@ public class ValidarNFE {
     private String nnf;
     private String serie;
     private String chave;
-    private String prods_nota;
+    private List<Produtos> prods_nota;
     private String total_nota;
     private String inf_cpl;
 
@@ -32,7 +34,7 @@ public class ValidarNFE {
     'total_nota' =>
     */
 
-    public ValidarNFE(String protocolo, String erro, String cnpj_dest, String ie_dest, String barcode, String nome, String endereco_dest, String nnf, String serie, String chave, String prods_nota, String total_nota, String infCpl) {
+    public ValidarNFE(String protocolo, String erro, String cnpj_dest, String ie_dest, String barcode, String nome, String endereco_dest, String nnf, String serie, String chave, List<Produtos> prods_nota, String total_nota, String inf_cpl) {
         this.protocolo = protocolo;
         this.erro = erro;
         this.cnpj_dest = cnpj_dest;
@@ -45,7 +47,7 @@ public class ValidarNFE {
         this.chave = chave;
         this.prods_nota = prods_nota;
         this.total_nota = total_nota;
-        this.inf_cpl = infCpl;
+        this.inf_cpl = inf_cpl;
     }
 
     public String getProtocolo() {
@@ -128,11 +130,11 @@ public class ValidarNFE {
         this.chave = chave;
     }
 
-    public String getProds_nota() {
+    public List<Produtos> getProds_nota() {
         return prods_nota;
     }
 
-    public void setProds_nota(String prods_nota) {
+    public void setProds_nota(List<Produtos> prods_nota) {
         this.prods_nota = prods_nota;
     }
 

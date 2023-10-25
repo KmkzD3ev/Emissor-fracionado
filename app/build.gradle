@@ -19,26 +19,26 @@ android {
 
         // REDE ITAÚ
         debug {
-            storeFile file('E:\\Projetos de Jogos\\SSD\\Arquivos SSD W\\APP_ZENITECH_INTEGRACAO\\ZENITECH_INTEGRACAO\\development_gertecdeveloper_customer_app_29_19.JKS')
+            storeFile file('F:\\Projetos de Jogos\\SSD\\Arquivos SSD W\\APP_ZENITECH_INTEGRACAO\\ZENITECH_INTEGRACAO\\development_gertecdeveloper_customer_app_29_19.JKS')
             storePassword 'Development@GertecDeveloper2018'
             keyPassword 'Development@GertecDeveloper2018'
             keyAlias 'developmentgertecdeveloper_customerapp'
         }
         config {
-            storeFile file('E:\\Projetos de jogos\\SSD\\Arquivos SSD W\\APP_ZENITECH_INTEGRACAO\\ZENITECH_INTEGRACAO\\development_gertecdeveloper_customer_app_29_19.JKS')
+            storeFile file('F:\\Projetos de jogos\\SSD\\Arquivos SSD W\\APP_ZENITECH_INTEGRACAO\\ZENITECH_INTEGRACAO\\development_gertecdeveloper_customer_app_29_19.JKS')
             storePassword 'Development@GertecDeveloper2018'
             keyPassword 'Development@GertecDeveloper2018'
             keyAlias 'developmentgertecdeveloper_customerapp'
         }
     }
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "br.com.zenitech.emissorweb"
         minSdkVersion 21
-        targetSdk 33
-        versionCode 72
-        versionName '3.7.2'
+        targetSdk 34
+        versionCode 77
+        versionName '3.7.7'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.debug
@@ -67,8 +67,8 @@ android {
         }
     }
 
-    ndkVersion '23.1.7779620'
-    buildToolsVersion '33.0.0'
+    ndkVersion '25.2.9519653'
+    buildToolsVersion '34.0.0'
     namespace 'br.com.zenitech.emissorweb'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -78,16 +78,16 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.4'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.4'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.5.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -112,11 +112,11 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0@aar'
 
     /*/ Stone POS - PIN PAD ***/
-    implementation 'br.com.stone:stone-sdk:4.5.6'
-    implementation 'br.com.stone:stone-sdk-posandroid:4.5.6'
-    implementation 'br.com.stone:stone-sdk-posandroid-ingenico:4.5.6'
-    implementation 'br.com.stone:stone-sdk-posandroid-sunmi:4.5.6'
-    implementation 'br.com.stone:stone-sdk-posandroid-gertec:4.5.6'
+    implementation 'br.com.stone:stone-sdk:4.7.7'
+    implementation 'br.com.stone:stone-sdk-posandroid:4.7.7'
+    implementation 'br.com.stone:stone-sdk-posandroid-ingenico:4.7.7'
+    implementation 'br.com.stone:stone-sdk-posandroid-sunmi:4.7.7'
+    implementation 'br.com.stone:stone-sdk-posandroid-gertec:4.7.7'
 
     // Multidex **
     implementation 'androidx.multidex:multidex:2.0.1'

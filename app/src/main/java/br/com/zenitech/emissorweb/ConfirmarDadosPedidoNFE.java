@@ -27,6 +27,7 @@ import java.util.Objects;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.PedidosNFE;
 import br.com.zenitech.emissorweb.domains.PosApp;
+import br.com.zenitech.emissorweb.domains.ProdutosPedidoDomain;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import br.com.zenitech.emissorweb.domains.ValidarNFE;
 import br.com.zenitech.emissorweb.interfaces.IValidarNFE;
@@ -131,7 +132,7 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
             if (params != null) {
 
                 cpfCnpj_cliente.setText(params.getString("cpfCnpj_cliente"));
-                formaPagamento.setText(params.getString("formaPagamento"));
+                /*formaPagamento.setText(params.getString("formaPagamento"));
                 produto.setText(params.getString("produto"));
                 qnt.setText(params.getString("qnt"));
                 vlt.setText(params.getString("vlt"));
@@ -151,8 +152,13 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                 vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(total))));
 
 
-                quantidade = Integer.parseInt(qnt.getText().toString());
+                quantidade = Integer.parseInt(qnt.getText().toString());*/
 
+                String pro = bd.getNomeProdutosPedidoNFe("1");
+                produto.setText(pro);
+
+                String v =  bd.getValorTotalPedidoNFe("1");
+                vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(v))));
 
                 btnPrint = findViewById(R.id.btnPrint);
                 btnPrint.setOnClickListener(this);
@@ -201,19 +207,47 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
 
             try {
 
+                String valorFormaPGPedido = bd.getValoresFinanceiroNFe("1").replace(".", "");
+                String idFormaPGPedido = bd.getIdsFormasPagamentoNFe("1").replace(".", "");
+                String bandeiraFPG = bd.getBandeirasFinanceiroNFe("1").replace(".", "");
+                String nAutoCartao = bd.getNAutFinanceiroNfe("1").replace(".", "");
+
+                String idPedidNFe = "1";// bd.getUltimoIdPedidoNFe();
+                String idsProdutosPedido = bd.getIdsProdutosPedidoNFe(idPedidNFe).replace(".", "");
+                String quantidadesProdutosPedido = bd.getQuantidadesProdutosPedidoNFe(idPedidNFe).replace(".", "");
+                String valorProdutosPedido = bd.getValorProdutosPedidoNFe(idPedidNFe).replace(".", "");
+
+                String credenciadora = "";
+                // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
+                if (!unidades.getCodloja().equalsIgnoreCase("")) {
+                    credenciadora = "STONE";
+                }
+
+                Log.e("Dados NFe", "idsProdutosPedido: " + idsProdutosPedido);
+                Log.e("Dados NFe", "quantidadesProdutosPedido: " + quantidadesProdutosPedido);
+                Log.e("Dados NFe", "valorProdutosPedido: " + valorProdutosPedido);
+                Log.e("Dados NFe", "valorFormaPGPedido: " + valorFormaPGPedido);
+                Log.e("Dados NFe", "idFormaPGPedido: " + idFormaPGPedido);
+                Log.e("Dados NFe", "bandeiraFPG: " + bandeiraFPG);
+                Log.e("Dados NFe", "nAutoCartao: " + nAutoCartao);
                 //
                 final IValidarNFE iValidarNFE = IValidarNFE.retrofit.create(IValidarNFE.class);
                 final Call<ValidarNFE> call = iValidarNFE.validarNotaNFE(
                         "779",
-                        qnt.getText().toString(),
+                        quantidadesProdutosPedido,//qnt.getText().toString()
                         posApp.getSerial(),
-                        bd.getIdProduto(produto.getText().toString()),
-                        cAux.soNumeros(vlt.getText().toString()),
-                        "1",
-                        cpfCnpj_cliente.getText().toString()
+                        idsProdutosPedido,//bd.getIdProduto(produto.getText().toString())
+                        valorProdutosPedido,//cAux.soNumeros(vlt.getText().toString())
+                        idFormaPGPedido,
+                        cpfCnpj_cliente.getText().toString(),
+                        valorFormaPGPedido,
+                        credenciadora,
+                        nAutoCartao,
+                        bandeiraFPG,
+                        76
                 );
 
-                call.enqueue(new Callback<ValidarNFE>() {
+                call.enqueue(new Callback<>() {
                     @Override
                     public void onResponse(@NonNull Call<ValidarNFE> call, @NonNull Response<ValidarNFE> response) {
 
@@ -250,7 +284,13 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                                     prefs.edit().putString("nnf", sincronizacao.getNnf()).apply();
                                     prefs.edit().putString("serie", sincronizacao.getSerie()).apply();
                                     prefs.edit().putString("chave", sincronizacao.getChave()).apply();
-                                    prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
+                                    StringBuilder textBuffer = new StringBuilder();
+                                    for (int ind = 0; ind < sincronizacao.getProds_nota().size(); ind++) {
+                                        textBuffer.append(sincronizacao.getProds_nota().get(ind).getNome()).append("{br}");
+                                    }
+                                    prefs.edit().putString("prods_nota", textBuffer.toString()).apply();
+                                    //prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
+                                    //prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
                                     prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
                                     prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
 
@@ -343,14 +383,25 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
         ));
 
         //
-        bd.addItensPedidosNFE(new ItensPedidos(
+        /*bd.addItensPedidosNFE(new ItensPedidos(
                 idPed,//ID PEDIDO
                 bd.getIdProduto(produto.getText().toString()),
                 quantidade + "",
                 cAux.soNumeros(String.valueOf(cAux.converterValores(vlt.getText().toString()))),
                 null,
                 ""
-        ));
+        ));*/
+
+        for (ProdutosPedidoDomain produto : bd.getProdutosPedidoNFe("1")) {
+            bd.addItensPedidosNFE(new ItensPedidos(
+                    idPed,//ID PEDIDO
+                    produto.id_produto,
+                    produto.quantidade,
+                    cAux.soNumeros(produto.valor),
+                    null,
+                    ""
+            ));
+        }
     }
 
     @Override

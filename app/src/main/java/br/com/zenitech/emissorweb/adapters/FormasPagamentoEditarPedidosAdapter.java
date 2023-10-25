@@ -46,6 +46,7 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
     ArrayList<Unidades> elementosUnidades;
     Unidades unidades;
     AlertDialog alerta;
+    int iDTemp;
 
     /*String getId;
     String getId_pedido;
@@ -53,10 +54,11 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
     String codigoAutorizacao;
     int positionItem;*/
 
-    public FormasPagamentoEditarPedidosAdapter(Context context, ArrayList<FormaPagamentoPedido> elementos, ArrayList<Unidades> elementosUnidades) {
+    public FormasPagamentoEditarPedidosAdapter(Context context, ArrayList<FormaPagamentoPedido> elementos, ArrayList<Unidades> elementosUnidades, int idtemp) {
         this.context = context;
         this.elementos = elementos;
         this.elementosUnidades = elementosUnidades;
+        this.iDTemp = idtemp;
     }
 
     // Easy access to the context object in the recyclerview
@@ -94,13 +96,18 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
         llFormPg.setBackgroundResource(R.color.transparente);
         holder.btnExcluirFinanceiro.setVisibility(View.VISIBLE);
 
-        if (!fPP.getId_cobranca_pix().equals("")) {
-            holder.btnExcluirFinanceiro.setVisibility(View.GONE);
-        }
-        if (fPP.status_pix.equals("1")) {
-            llFormPg.setBackgroundResource(R.color.erro);
-            llFormPg.setOnClickListener(view -> mostrarMsg(fPP.id, fPP.valor, unidades.getApi_key_asaas(), unidades.getCliente_cob_asaas(),
-                    fPP.id_pedido, fPP.id_forma_pagamento, fPP.id_cobranca_pix));
+        try {
+            if (!fPP.getId_cobranca_pix().equals("")) {
+                holder.btnExcluirFinanceiro.setVisibility(View.GONE);
+            }
+            
+            if (fPP.status_pix.equals("1")) {
+                llFormPg.setBackgroundResource(R.color.erro);
+                llFormPg.setOnClickListener(view -> mostrarMsg(fPP.id, fPP.valor, unidades.getApi_key_asaas(), unidades.getCliente_cob_asaas(),
+                        fPP.id_pedido, fPP.id_forma_pagamento, fPP.id_cobranca_pix));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         //
@@ -160,7 +167,7 @@ public class FormasPagamentoEditarPedidosAdapter extends RecyclerView.Adapter<Fo
     }
 
     public void excluirItem(String codigo, String codigo_financeiro_app, String totalVenda, int position, boolean api_asaas) {
-        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, null, null, null, null, null, null, null, null);
+        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, "" + iDTemp, null, null, null, null, null, null, null);
         DatabaseHelper bd;
         bd = new DatabaseHelper(context);
         bd.deleteItemFormPagPedido(formaPagamentoPedido);

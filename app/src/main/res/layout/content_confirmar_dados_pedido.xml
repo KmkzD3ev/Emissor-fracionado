@@ -46,14 +46,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="4dp"
-                            android:text="060.328.534-11"
+                            android:text="000.000.000-00"
                             android:textSize="18sp" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
-                            android:text="Forma de Pagamento:"
+                            android:text="Forma(s) de Pagamento:"
                             android:textColor="@color/colorAccent" />
 
                         <TextView
@@ -61,14 +61,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="4dp"
-                            android:text="DINHEIRO"
+                            android:text=""
                             android:textSize="18sp" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
-                            android:text="Produto:"
+                            android:text="Produto(s):"
                             android:textColor="@color/colorAccent" />
 
                         <TextView
@@ -76,10 +76,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="4dp"
-                            android:text="P-13"
+                            android:text=""
                             android:textSize="18sp" />
 
                         <TextView
+                            android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -87,6 +88,7 @@
                             android:textColor="@color/colorAccent" />
 
                         <TextView
+                            android:visibility="gone"
                             android:id="@+id/qnt"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -95,6 +97,7 @@
                             android:textSize="18sp" />
 
                         <TextView
+                            android:visibility="gone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -102,6 +105,7 @@
                             android:textColor="@color/colorAccent" />
 
                         <TextView
+                            android:visibility="gone"
                             android:id="@+id/vlt"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -136,7 +140,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="4dp"
-                            android:text="R$ 8,63"
+                            android:text="R$ 0,00"
                             android:textSize="18sp" />
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>

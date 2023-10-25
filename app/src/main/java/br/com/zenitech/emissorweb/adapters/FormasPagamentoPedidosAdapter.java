@@ -46,6 +46,7 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
     ArrayList<Unidades> elementosUnidades;
     Unidades unidades;
     AlertDialog alerta;
+    int iDTemp;
 
     /*String getId;
     String getId_pedido;
@@ -53,10 +54,11 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
     String codigoAutorizacao;
     int positionItem;*/
 
-    public FormasPagamentoPedidosAdapter(Context context, ArrayList<FormaPagamentoPedido> elementos, ArrayList<Unidades> elementosUnidades) {
+    public FormasPagamentoPedidosAdapter(Context context, ArrayList<FormaPagamentoPedido> elementos, ArrayList<Unidades> elementosUnidades, int idtemp) {
         this.context = context;
         this.elementos = elementos;
         this.elementosUnidades = elementosUnidades;
+        this.iDTemp = idtemp;
     }
 
     // Easy access to the context object in the recyclerview
@@ -158,7 +160,7 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
     }
 
     public void excluirItem(String codigo, String codigo_financeiro_app, String totalVenda, int position, boolean api_asaas) {
-        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, null, null, null, null, null, null, null, null);
+        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, "" + iDTemp, null, null, null, null, null, null, null);
         DatabaseHelper bd;
         bd = new DatabaseHelper(context);
         bd.deleteItemFormPagPedido(formaPagamentoPedido);

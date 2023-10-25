@@ -19,8 +19,8 @@ import br.com.zenitech.emissorweb.domains.Pedidos;
 public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHolder> {
 
     private ClassAuxiliar classAuxiliar;
-    private Context context;
-    private ArrayList<Pedidos> elementos;
+    private final Context context;
+    private final ArrayList<Pedidos> elementos;
 
     public PedidosAdapter(Context context, ArrayList<Pedidos> elementos) {
         this.context = context;
@@ -91,7 +91,7 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
 
-            txtCodigo = (TextView) itemView.findViewById(R.id.txtSubTituloTimeLine);
+            txtCodigo = itemView.findViewById(R.id.txtSubTituloTimeLine);
             /*/
             llRelatorioVendas = (LinearLayout) itemView.findViewById(R.id.llRelatorioVendas);
             txtProduto = (TextView) itemView.findViewById(R.id.txtProduto);

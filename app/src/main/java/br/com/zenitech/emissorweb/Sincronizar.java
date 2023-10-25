@@ -523,7 +523,7 @@ public class Sincronizar extends AppCompatActivity {
     }
 
     private void esperarParaIniciarDownload(String serial) {
-        new Handler().postDelayed(() -> startDownload(serial), 30000);
+        new Handler().postDelayed(() -> startDownload(serial), 60000);
     }
 
     // LIMPA OS DADOS DA SINCRONIZAÇÃO

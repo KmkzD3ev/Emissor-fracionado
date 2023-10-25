@@ -1,23 +1,21 @@
 package br.com.zenitech.emissorweb.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import br.com.zenitech.emissorweb.ClassAuxiliar;
+import br.com.zenitech.emissorweb.DatabaseHelper;
 import br.com.zenitech.emissorweb.R;
-import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.StatusPedidos;
 
 public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdapter.ViewHolder> {
@@ -25,10 +23,12 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
     private ClassAuxiliar aux;
     private Context context;
     private ArrayList<StatusPedidos> elementos;
+    private DatabaseHelper dBhelper;
 
-    public StatusPedidosAdapter(Context context, ArrayList<StatusPedidos> elementos) {
+    public StatusPedidosAdapter(Context context, ArrayList<StatusPedidos> elementos, DatabaseHelper bd) {
         this.context = context;
         this.elementos = elementos;
+        this.dBhelper = bd;
     }
 
     // Easy access to the context object in the recyclerview
@@ -64,9 +64,9 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
         TextView txtTotal = holder.txtTotal;
 
         if (pedidos.getSituacao().equalsIgnoreCase("") || pedidos.getSituacao().equalsIgnoreCase("OFF")) {
-            txtProduto.setText(String.format("* %s  |  %s", pedidos.getPedido(), pedidos.getNome()));
+            holder.txtIdPedido.setText(String.format("* %s", pedidos.getPedido()/*, pedidos.getNome()*/));
         } else {
-            txtProduto.setText(String.format("%s  |  %s", pedidos.getPedido(), pedidos.getNome()));
+            holder.txtIdPedido.setText(String.format("%s", pedidos.getPedido()/*, pedidos.getNome()*/));
         }
         txtQuant.setText(pedidos.getQuantidade());
 
@@ -82,19 +82,15 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
         //txtTotal.setText(String.format("%s", aux.maskMoney(new BigDecimal(total))));
         txtTotal.setText(String.format("%s", aux.maskMoney(new BigDecimal(pedidos.getValor_total()))));//valor_total
 
+        ArrayList<StatusPedidos> descItens;
+        descItens = dBhelper.getDescricaoItensStatusPedidos(pedidos.getPedido());
+        //Toast.makeText(context, "" + descItens.size(), Toast.LENGTH_SHORT).show();
+        DescricaoItensPedidoAdapter adapter = new DescricaoItensPedidoAdapter(aux, descItens);
 
-        /*/
-        TextView produto = holder.txtProduto;
-        produto.setText(pedidos.getProtocolo());
-        //
-        TextView codigo = holder.txtQuantidade;
-        codigo.setText(pedidos.getSituacao());
-        //
-        String[] vls_media = {pedidos.getValor_total()};
-        String media = String.valueOf(classAuxiliar.somar(vls_media));
-        TextView total = holder.txtTotal;
-        total.setText("R$ " + classAuxiliar.maskMoney(new BigDecimal(media)));
-        */
+        RecyclerView rvDescItensPedido = holder.rvDescItensPedido;
+        rvDescItensPedido.setLayoutManager(new LinearLayoutManager(context));
+        rvDescItensPedido.setNestedScrollingEnabled(false);
+        rvDescItensPedido.setAdapter(adapter);
     }
 
     @Override
@@ -104,16 +100,19 @@ public class StatusPedidosAdapter extends RecyclerView.Adapter<StatusPedidosAdap
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView txtProduto, txtQuant, txtValUni, txtValDesc, txtTotal;
+        TextView txtIdPedido, txtProduto, txtQuant, txtValUni, txtValDesc, txtTotal;
+        RecyclerView rvDescItensPedido;
 
         ViewHolder(View itemView) {
             super(itemView);
 
+            txtIdPedido = itemView.findViewById(R.id.txtIdPedido);
             txtProduto = itemView.findViewById(R.id.txtProduto);
             txtQuant = itemView.findViewById(R.id.txtQuant);
             txtValUni = itemView.findViewById(R.id.txtValUni);
             txtValDesc = itemView.findViewById(R.id.txtValDesc);
             txtTotal = itemView.findViewById(R.id.txtTotal);
+            rvDescItensPedido = itemView.findViewById(R.id.rvDescItensPedido);
         }
     }
 }

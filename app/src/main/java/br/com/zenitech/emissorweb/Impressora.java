@@ -1208,15 +1208,41 @@ public class Impressora extends AppCompatActivity {
 
             //INFOR. PEDIDO
             textBuffer.append("{reset}").append(tamFont).append("# CODIGO DESCRICAO QTDE. UN.  VL.UNIT.  VL.TOTAL{br}");
-            textBuffer.append("{reset}{left}").append(tamFont).append(texto[0]).append("{br}");
-            textBuffer.append("{reset}{right}").append(tamFont).append(texto[1]).append("{br}");
+            //PRODUTOS
+            elementosItens = bd.getItensPedido(pedido);
+            for (int i = 0; i < elementosItens.size(); i++) {
+                itensPedidos = elementosItens.get(i);
+                String produto = bd.getProduto(itensPedidos.getProduto());
+                /*
+                "1 " + id_produto + "      " + produto,
+                        "" + quantidade + "     " + "UN     " + valorUnit + "   " + valor
+                * */
+                textBuffer.append(tamFont).
+                        append(i + 1).
+                        append(" ").
+                        append(itensPedidos.getProduto()).
+                        append("  ").
+                        append(produto).append("  ").
+                        append(itensPedidos.getQuantidade()).
+                        append("  ").
+                        append("UN  ").
+                        append(cAux.maskMoney(new BigDecimal(itensPedidos.getValor()))).
+                        append("  ").
+                        append(cAux.maskMoney(new BigDecimal(itensPedidos.getTotal()))).
+                        append("{br}");
+            }
+            //textBuffer.append(tamFont).append(texto[0]).append("{br}");
+            //textBuffer.append(tamFont).append(texto[1]).append("{br}");
+
+            /*textBuffer.append("{reset}{left}").append(tamFont).append(texto[0]).append("{br}");
+            textBuffer.append("{reset}{right}").append(tamFont).append(texto[1]).append("{br}");*/
             textBuffer.append("{reset}").append(tamFont).append("------------------------------------------------{br}");
 
             //INFOR. VALORES
-            textBuffer.append("{reset}").append(tamFont).append("Qtde. Total de Itens                           ").append(quantidade).append("{br}");
-            textBuffer.append("{reset}").append(tamFont).append("Valor Total                             ").append(texto[2].trim()).append("{br}");
+            textBuffer.append("{reset}").append(tamFont).append("Qtde. Total de Itens                           ").append(elementosItens.size()).append("{br}");//quantidade
+            textBuffer.append("{reset}").append(tamFont).append("Valor Total                           ").append(texto[2].trim()).append("{br}");
             textBuffer.append("{reset}").append(tamFont).append("FORMA DE PAGAMENTO                    VALOR PAGO{br}");
-            textBuffer.append("{reset}").append(tamFont).append(cAux.removerAcentos(texto[12])).append("                                ").append(texto[2].trim()).append("{br}");
+            textBuffer.append("{reset}").append(tamFont).append(cAux.removerAcentos(texto[12])).append("                              ").append(texto[2].trim()).append("{br}");
             textBuffer.append("{reset}").append(tamFont).append("------------------------------------------------{br}");
 
             //TRIBUTOS TOTAIS
@@ -1296,8 +1322,6 @@ public class Impressora extends AppCompatActivity {
         //Log.d(LOG_TAG, "Print NFC-e");
 
         runTask((dialog, printer) -> {
-            //printer.reset();
-
             String serie = bd.getSeriePOS();
             elementosUnidade = bd.getUnidades();
 
@@ -1349,20 +1373,6 @@ public class Impressora extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            // Retorna o caminho da imagem do qrcode
-            /*File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
-            File dir = new File(sdcard, "Emissor_Web/");
-
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = false;
-
-            FileInputStream inputStream;
-            BufferedInputStream bufferedInputStream;
-
-            inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
-            bufferedInputStream = new BufferedInputStream(inputStream);
-            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);*/
-
             StringBuilder textBuffer = new StringBuilder();
 
             //IMPRIMIR CABEÇALHO
@@ -1381,15 +1391,38 @@ public class Impressora extends AppCompatActivity {
 
             //INFOR. PEDIDO
             textBuffer.append(tamFont).append("# COD. DESC. QTDE. UN.  VL.UNIT.  VL.TOTAL{br}");
-            textBuffer.append(tamFont).append(texto[0]).append("{br}");
-            textBuffer.append(tamFont).append(texto[1]).append("{br}");
+            //PRODUTOS
+            elementosItens = bd.getItensPedido(pedido);
+            for (int i = 0; i < elementosItens.size(); i++) {
+                itensPedidos = elementosItens.get(i);
+                String produto = bd.getProduto(itensPedidos.getProduto());
+                /*
+                "1 " + id_produto + "      " + produto,
+                        "" + quantidade + "     " + "UN     " + valorUnit + "   " + valor
+                * */
+                textBuffer.append(tamFont).
+                        append(i + 1).
+                        append(" ").
+                        append(itensPedidos.getProduto()).
+                        append("  ").
+                        append(produto).append("  ").
+                        append(itensPedidos.getQuantidade()).
+                        append("  ").
+                        append("UN  ").
+                        append(cAux.maskMoney(new BigDecimal(itensPedidos.getValor()))).
+                        append("  ").
+                        append(cAux.maskMoney(new BigDecimal(itensPedidos.getTotal()))).
+                        append("{br}");
+            }
+            //textBuffer.append(tamFont).append(texto[0]).append("{br}");
+            //textBuffer.append(tamFont).append(texto[1]).append("{br}");
             textBuffer.append(tamFont).append("-----------------------------------------{br}");
 
             //INFOR. VALORES
-            textBuffer.append(tamFont).append("Qtde. Total de Itens                  ").append(quantidade).append("{br}");
-            textBuffer.append(tamFont).append("Valor Total                        ").append(texto[2].trim()).append("{br}");
+            textBuffer.append(tamFont).append("Qtde. Total de Itens                  ").append(elementosItens.size()).append("{br}");//quantidade
+            textBuffer.append(tamFont).append("Valor Total                     ").append(texto[2].trim()).append("{br}");
             textBuffer.append(tamFont).append("FORMA DE PAGAMENTO            VALOR PAGO{br}");
-            textBuffer.append(tamFont).append(cAux.removerAcentos(texto[12])).append("                         ").append(texto[2].trim()).append("{br}");
+            textBuffer.append(tamFont).append(cAux.removerAcentos(texto[12])).append("                       ").append(texto[2].trim()).append("{br}");
             textBuffer.append(tamFont).append("-----------------------------------------{br}");
 
             //TRIBUTOS TOTAIS
@@ -1412,11 +1445,7 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append("Chave de Acesso{br}");
             String chaveNota = bd.gerarChave(Integer.parseInt(pedido));
             textBuffer.append(tamFont).append(chaveNota).append("{br}");
-            /*String c = texto[6];
-            String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
-            String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
-            textBuffer.append(tamFont).append(cl1).append("{br}");
-            textBuffer.append(tamFont).append(cl2).append("{br}");*/
+
             textBuffer.append(tamFont).append(" {br}");
             textBuffer.append(tamFont).append("Protocolo de autorizacao{br}");
             textBuffer.append(tamFont).append(texto[3]).append("{br}");
@@ -1426,7 +1455,6 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append(texto[4]).append("{br}");
             textBuffer.append(tamFont).append("-----------------------------------------");
 
-            //printer.reset();
             printer.selectPageMode();
             printer.setPageXY(0, 0);
             printer.setAlign(1);
@@ -1440,14 +1468,9 @@ public class Impressora extends AppCompatActivity {
             bp.getPixels(argb, 0, width, 0, 0, width, height);
             bp.recycle();
 
-            //printer.reset();
             printer.printImage(argb, width, height, Printer.ALIGN_CENTER, true);
             printer.feedPaper(120);
             printer.flush();
-
-            // Apaga a imgem anterior
-            /*File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();*/
 
             if ((cAux.removerAcentos(texto[12]).contains("CARTAO DE CREDITO") || cAux.removerAcentos(texto[12]).contains("CARTAO DE DEBITO")) && !unidades.getCodloja().equalsIgnoreCase("")) {
                 //
@@ -1786,16 +1809,8 @@ public class Impressora extends AppCompatActivity {
             tamFont = "{s}";
             String linhas = "---------------";
 
-            String serie = bd.getSeriePOS();
             elementosUnidade = bd.getUnidades();
-
-            String urlConsulta, urlQRCode, idCSC, CSC, hashSHA1;
             unidades = elementosUnidade.get(0);
-
-            urlConsulta = unidades.getUrl_consulta();
-            urlQRCode = unidades.getUrl_qrcode();
-            idCSC = unidades.getIdCSC();
-            CSC = unidades.getCSC();
 
             StringBuilder textBuffer;
             textBuffer = new StringBuilder();
@@ -1842,20 +1857,6 @@ public class Impressora extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            // Retorna o caminho da imagem do qrcode
-            /*File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
-            File dir = new File(sdcard, "Emissor_Web/");
-
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = false;
-
-            FileInputStream inputStream;
-            BufferedInputStream bufferedInputStream;
-
-            inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
-            bufferedInputStream = new BufferedInputStream(inputStream);
-            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);*/
-
             final int width = Objects.requireNonNull(bp).getWidth();
             final int height = bp.getHeight();
             final int[] argb = new int[width * height];
@@ -1866,12 +1867,7 @@ public class Impressora extends AppCompatActivity {
             printer.printImage(argb, width, height, Printer.ALIGN_CENTER, true);
             printer.feedPaper(38);
 
-            // Apaga a imgem anterior
-            /*File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();*/
-
             textBuffer = new StringBuilder();
-            //textBuffer.append("{reset}{center}").append(tamFont).append(prefs.getString("barcode", "")).append("{br}");
             textBuffer.append("{reset}{center}").append(tamFont).append(linhas).append("------------------------------------------------{br}");
             //
             textBuffer.append("{reset}{center}").append("DADOS DO EMITENTE{br}");
@@ -1902,6 +1898,7 @@ public class Impressora extends AppCompatActivity {
             //
             textBuffer.append("{reset}{center}").append("PRODUTOS{br}");
             textBuffer.append("{reset}{center}").append("DESC PROD | UN | QTD | VL UN | VL TOTAL{br}");
+
             textBuffer.append("{reset}{center}").append(prefs.getString("prods_nota", "")).append("{br}{br}");
             textBuffer.append("{reset}{center}").append("VALOR TOTAL DA NOTA => ").append(prefs.getString("total_nota", "")).append("{br}");
             //
@@ -1948,16 +1945,8 @@ public class Impressora extends AppCompatActivity {
             //tamFont = "{s}";
             String linhas = "";
 
-            String serie = bd.getSeriePOS();
             elementosUnidade = bd.getUnidades();
-
-            String urlConsulta, urlQRCode, idCSC, CSC, hashSHA1;
             unidades = elementosUnidade.get(0);
-
-            urlConsulta = unidades.getUrl_consulta();
-            urlQRCode = unidades.getUrl_qrcode();
-            idCSC = unidades.getIdCSC();
-            CSC = unidades.getCSC();
 
             StringBuilder textBuffer;
             textBuffer = new StringBuilder();
@@ -1969,14 +1958,6 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append("{br}");
             textBuffer.append(tamFont).append(linhas).append("___________________ _____/_____/________{br}");
             textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
-
-            /*// IMPRIMIR CABECALHO
-            printer.reset();
-            printer.selectPageMode();
-            printer.setPageXY(0, 0);
-            printer.setAlign(1);
-            printer.printTaggedText(textBuffer.toString(), "UTF-8");
-            printer.feedPaper(38);*/
 
             textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
 
@@ -2011,20 +1992,6 @@ public class Impressora extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            // Retorna o caminho da imagem do qrcode
-            /*File sdcard = Environment.getExternalStorageDirectory().getAbsoluteFile();
-            File dir = new File(sdcard, "Emissor_Web/");
-
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = false;
-
-            FileInputStream inputStream;
-            BufferedInputStream bufferedInputStream;
-
-            inputStream = new FileInputStream(dir.getPath() + "/qrcode.png");
-            bufferedInputStream = new BufferedInputStream(inputStream);
-            Bitmap bitmap = BitmapFactory.decodeStream(bufferedInputStream, null, options);*/
-
             final int width = Objects.requireNonNull(bp).getWidth();
             final int height = bp.getHeight();
             final int[] argb = new int[width * height];
@@ -2035,10 +2002,6 @@ public class Impressora extends AppCompatActivity {
             printer.reset();
             printer.printImage(argb, width, height, Printer.ALIGN_CENTER, true);
             printer.feedPaper(38);
-
-            // Apaga a imgem anterior
-            /*File imgQrC = new File(sdcard, "Emissor_Web/qrcode.png");
-            imgQrC.delete();*/
 
             textBuffer = new StringBuilder();
             textBuffer.append(tamFont).append("");
@@ -2283,21 +2246,23 @@ public class Impressora extends AppCompatActivity {
             elementosUnidade = bd.getUnidades();
             unidades = elementosUnidade.get(0);
             StringBuilder textBuffer = new StringBuilder();
+            StringBuilder textBufferCabecalho = new StringBuilder();
 
             int posicaoNota;
 
             //IMPRIMIR CABEÇALHO
-            textBuffer.append("{s}{br}");
-            textBuffer.append(tamFont).append(unidades.getRazao_social()).append("{br}");
-            textBuffer.append(tamFont).append("CNPJ: ").append(unidades.getCnpj()).append(" I.E.: ").append(unidades.getIe()).append("{br}");
-            textBuffer.append(tamFont).append(unidades.getEndereco()).append(", ").append(unidades.getNumero()).append("{br}");
-            textBuffer.append(tamFont).append(unidades.getBairro()).append(", ").append(unidades.getCidade()).append(", ").append(unidades.getUf()).append("{br}");
-            textBuffer.append(tamFont).append("CEP: ").append(unidades.getCep()).append("  ").append(unidades.getTelefone()).append("{br}");
+            textBufferCabecalho.append(tamFont).append("{br}");
+            textBufferCabecalho.append(tamFont).append(unidades.getRazao_social()).append("{br}");
+            textBufferCabecalho.append(tamFont).append("CNPJ: ").append(unidades.getCnpj()).append(" I.E.: ").append(unidades.getIe()).append("{br}");
+            textBufferCabecalho.append(tamFont).append(unidades.getEndereco()).append(", ").append(unidades.getNumero()).append("{br}");
+            textBufferCabecalho.append(tamFont).append(unidades.getBairro()).append(", ").append(unidades.getCidade()).append(", ").append(unidades.getUf()).append("{br}");
+            textBufferCabecalho.append(tamFont).append("CEP: ").append(unidades.getCep()).append("  ").append(unidades.getTelefone()).append("{br}");
 
-            textBuffer.append(tamFont).append("-----------------------------------------{br}");
-            textBuffer.append(tamFont).append("Serie: ").append(serie).append("  ").append(unidades.getTelefone()).append("{br}");
-            textBuffer.append(tamFont).append("-----------------------------------------{br}");
+            textBufferCabecalho.append(tamFont).append("-----------------------------------------{br}");
+            textBufferCabecalho.append(tamFont).append("Serie: ").append(serie).append("  ").append(unidades.getTelefone()).append("{br}");
+            textBufferCabecalho.append(tamFont).append("-----------------------------------------{br}");
 
+            textBuffer.append(tamFont).append("{br}");
             textBuffer.append(tamFont).append("NFC-e").append("{br}{br}");
 
             // TOTAL DE PRODUTOS
@@ -2313,7 +2278,7 @@ public class Impressora extends AppCompatActivity {
                     //DADOS DOS PEDIDO
                     pedidos = elementosPedidos.get(n);
                     elementosItens = bd.getItensPedido(pedidos.getId());
-                    itensPedidos = elementosItens.get(0);
+
 
                     Log.i("auxKle", pedidos.getData() + " - " + pedidos.getHora());
 
@@ -2321,29 +2286,44 @@ public class Impressora extends AppCompatActivity {
                     String horaEmissao = pedidos.getHora();
 
                     //
-                    textBuffer.append(tamFont).append("Numero:").append(pedidos.getId()).append("      Emissao:").append(dataEmissao).append(" ").append(horaEmissao).append("{br}");
+                    textBuffer.append(tamFont).append("Numero:").append(pedidos.getId()).append("   Emissao:").append(dataEmissao).append(" ").append(horaEmissao).append("{br}");
                     textBuffer.append(tamFont).append("Protocolo: ").append(pedidos.getProtocolo().equals(" ") ? "EMITIDA EM CONTIGENCIA" : pedidos.getProtocolo()).append("{br}");
-                    textBuffer.append(tamFont).append("Chave: ").append("{br}");
+                    textBuffer.append(tamFont).append("Chave: ");
                     //textBuffer.append(tamFont).append(bd.gerarChave(Integer.parseInt(pedidos.getId()))).append("{br}");
 
-                    String c = bd.gerarChave(Integer.parseInt(pedidos.getId()));
+                    /*String c = bd.gerarChave(Integer.parseInt(pedidos.getId()));
                     String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
                     String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
-                    textBuffer.append(tamFont).append(cl1).append("{br}");
-                    textBuffer.append(tamFont).append(cl2).append("{br}");
+                    textBuffer.append(tamFont).append(cl1);
+                    textBuffer.append(tamFont).append(cl2).append("{br}");*/
 
+                    String chaveNota = bd.gerarChave(Integer.parseInt(pedidos.getId()));
+                    textBuffer.append(tamFont).append(chaveNota).append("{br}");
+
+                    textBuffer.append(tamFont).append("# COD. PROD. QTD. UN.  V.UNI.  DESC  TOTAL{br}");
+                    textBuffer.append(tamFont).append(n + 1);
+                    for (int i = 0; i < elementosItens.size(); i++) {
+                        itensPedidos = elementosItens.get(i);
+                        String vUnit, vDesc, vTotal;
+                        vUnit = cAux.maskMoney(new BigDecimal(itensPedidos.getValor()));
+                        vDesc = cAux.maskMoney(new BigDecimal(itensPedidos.getDesconto()));
+                        vTotal = cAux.maskMoney(new BigDecimal(itensPedidos.getTotal()));
+                        textBuffer.append(tamFont).append("  ").append(itensPedidos.getProduto()).append("    ").append(bd.getProduto(itensPedidos.getProduto())).append("{br}");
+                        textBuffer.append(tamFont).append("    ").append(itensPedidos.getQuantidade()).append("     ").append("UN     ").append(vUnit).append(" ").append(vDesc).append(" ").append(vTotal).append("{br}");
+
+                        totalProdutos += Integer.parseInt(itensPedidos.getQuantidade());
+                    }
                     //
-                    linhaProduto = new String[]{
+                    /*linhaProduto = new String[]{
                             "1 " + itensPedidos.getProduto() + "      " + bd.getProduto(itensPedidos.getProduto()) + "\n",
                             "" + itensPedidos.getQuantidade() + "     " + "UN     " + cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))) + "   " +
                                     cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(pedidos.getValor_total())))) + "\n"
                     };
 
                     //IMPRIMIR TEXTO
-                    textBuffer.append(tamFont).append("# CODIGO DESC. QTDE. UN.  VL.UNIT.  VL.TOTAL{br}");
                     textBuffer.append(tamFont).append(linhaProduto[0]);
-                    textBuffer.append(tamFont).append(linhaProduto[1]);
-                    textBuffer.append(tamFont).append("-----------------------------------------{br}");
+                    textBuffer.append(tamFont).append(linhaProduto[1]);*/
+                    textBuffer.append(tamFont).append("------------------------------------------{br}");
 
                     try {
                         String[] sum = {String.valueOf(n), "1"};
@@ -2351,7 +2331,6 @@ public class Impressora extends AppCompatActivity {
                     } catch (Exception ignored) {
 
                     }
-                    totalProdutos += Integer.parseInt(itensPedidos.getQuantidade());
                 }
             }
 
@@ -2363,25 +2342,41 @@ public class Impressora extends AppCompatActivity {
 
                     //DADOS DOS PEDIDO
                     pedidosNFE = elementosPedidosNFE.get(n);
-                    elementosItens = bd.getItensPedidoNFE(pedidosNFE.getId());
-                    itensPedidos = elementosItens.get(0);
+                    ArrayList<ItensPedidos> itensNFe = bd.getItensPedidoNFE(pedidosNFE.getId());
 
-                    String dataEmissao = pedidosNFE.getData();//cAux.exibirData(pedidosNFE.getData());
+                    String dataEmissao = pedidosNFE.getData();
                     String horaEmissao = pedidosNFE.getHora();
 
                     //
                     textBuffer.append(tamFont).append("Numero:").append(pedidosNFE.getId()).append("      Emissao:").append(dataEmissao).append(" ").append(horaEmissao).append("{br}");
                     textBuffer.append(tamFont).append("Protocolo: ").append(pedidosNFE.getProtocolo()).append("{br}");
-                    textBuffer.append(tamFont).append("Chave: ").append("{br}");
+                    textBuffer.append(tamFont).append("Chave: ");
                     //textBuffer.append(tamFont).append(bd.gerarChave(Integer.parseInt(pedidos.getId()))).append("{br}");
 
-                    String c = bd.gerarChave(Integer.parseInt(pedidosNFE.getId()));
+                    /*String c = bd.gerarChave(Integer.parseInt(pedidosNFE.getId()));
                     String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20);
                     String cl2 = c.substring(20, 24) + " " + c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36);
                     textBuffer.append(tamFont).append(cl1).append("{br}");
-                    textBuffer.append(tamFont).append(cl2).append("{br}");
+                    textBuffer.append(tamFont).append(cl2).append("{br}");*/
 
-                    //
+                    String chaveNota = bd.gerarChave(Integer.parseInt(pedidosNFE.getId()));
+                    textBuffer.append(tamFont).append(chaveNota).append("{br}");
+
+                    textBuffer.append(tamFont).append("# COD. DESC. QTDE. UN.  VL.UNIT.  VL.TOTAL{br}");
+                    textBuffer.append(tamFont).append(n + 1);
+
+                    for (int i = 0; i < itensNFe.size(); i++) {
+                        itensPedidos = itensNFe.get(i);
+                        String vUnit, vTotal;
+                        vUnit = cAux.maskMoney(new BigDecimal(itensPedidos.getValor()));
+                        vTotal = cAux.maskMoney(new BigDecimal(itensPedidos.getTotal()));
+                        textBuffer.append(tamFont).append("  ").append(itensPedidos.getProduto()).append("    ").append(bd.getProduto(itensPedidos.getProduto())).append("{br}");
+                        textBuffer.append(tamFont).append("    ").append(itensPedidos.getQuantidade()).append("     ").append("UN     ").append(vUnit).append(" ").append(vTotal).append("{br}");
+
+                        totalProdutosNFE += Integer.parseInt(itensPedidos.getQuantidade());
+                    }
+
+                    /*//
                     linhaProduto = new String[]{
                             "1 " + itensPedidos.getProduto() + "      " + bd.getProduto(itensPedidos.getProduto()) + "\n",
                             "" + itensPedidos.getQuantidade() + "     " + "UN     " + cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(itensPedidos.getValor())))) + "   " +
@@ -2389,32 +2384,35 @@ public class Impressora extends AppCompatActivity {
                     };
 
                     //IMPRIMIR TEXTO
-                    textBuffer.append(tamFont).append("# CODIGO DESC. QTDE. UN.  VL.UNIT.  VL.TOTAL{br}");
                     textBuffer.append(tamFont).append(linhaProduto[0]);
-                    textBuffer.append(tamFont).append(linhaProduto[1]);
-                    textBuffer.append(tamFont).append("-----------------------------------------{br}");
+                    textBuffer.append(tamFont).append(linhaProduto[1]);*/
+                    textBuffer.append(tamFont).append("------------------------------------------{br}");
 
-                    try {
-                        String[] sum = {String.valueOf(n), "1"};
-                        imprimindo.setText(String.valueOf(cAux.somar(sum)));
+                    /*try {
+                        //String[] sum = {String.valueOf(n), "1"};
+                        //imprimindo.setText(String.valueOf(cAux.somar(sum)));
                     } catch (Exception ignored) {
 
-                    }
-                    totalProdutosNFE += Integer.parseInt(itensPedidos.getQuantidade());
+                    }*/
                 }
             }
 
-            textBuffer.append(tamFont).append("{reset}Total de Produtos NFC-e: ").append(totalProdutos).append("{br}");
-            textBuffer.append(tamFont).append("{reset}Total de Produtos NF-e: ").append(totalProdutosNFE).append("{br}");
+            textBuffer.append(tamFont).append("Total de Produtos NFC-e: ").append(totalProdutos).append("{br}");
+            textBuffer.append(tamFont).append("Total de Produtos NF-e: ").append(totalProdutosNFE).append("{br}");
             String[] somar = {String.valueOf(totalProdutos), String.valueOf(totalProdutosNFE)};
-            textBuffer.append("{reset}Total de Produtos: ").append(Math.round(Float.parseFloat(String.valueOf(cAux.somar(somar))))).append("{br}");
+            textBuffer.append(tamFont).append("Total de Produtos: ").append(Math.round(Float.parseFloat(String.valueOf(cAux.somar(somar))))).append("{br}");
 
-            textBuffer.append("{reset}{br}");
+            textBuffer.append("{br}");
 
             printer.reset();
             printer.selectPageMode();
             printer.setPageXY(0, 0);
+            //
             printer.setAlign(1);
+            printer.printTaggedText(textBufferCabecalho.toString());
+
+            //
+            printer.setAlign(0);
             printer.printTaggedText(textBuffer.toString());
             printer.feedPaper(100);
             printer.flush();

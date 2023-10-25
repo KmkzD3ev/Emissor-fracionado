@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "br.com.zenitech.emissorweb",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 76,
+      "versionName": "3.7.6",
+      "outputFile": "app-release.apk"
+    }
+  ],
+  "elementType": "File"
+}

@@ -9,12 +9,27 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.os.Environment;
+import android.os.StatFs;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -22,40 +37,17 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Environment;
-import android.os.StatFs;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
-import android.util.Log;
-import android.view.View;
-
-import com.google.android.material.navigation.NavigationView;
-
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.adapters.PedidosAdapter;
-import br.com.zenitech.emissorweb.databinding.ActivityMainBinding;
 import br.com.zenitech.emissorweb.domains.DomainPrincipal;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
@@ -69,37 +61,25 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import stone.application.StoneStart;
-import stone.application.enums.ReceiptType;
-import stone.application.interfaces.StoneCallbackInterface;
-import stone.database.transaction.TransactionDAO;
-import stone.database.transaction.TransactionObject;
 import stone.user.UserModel;
-import stone.utils.Stone;
 
 public class Principal extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private String TAG = "Principal";
+    private final String TAG = "Principal";
     private DatabaseHelper bd;
     ClassAuxiliar aux;
     SharedPreferences prefs;
     SharedPreferences.Editor ed;
     AlertDialog alerta;
     VerificarOnline verificarOnline;
-
-    //
     Toolbar toolbar;
     DrawerLayout drawer;
     ActionBarDrawerToggle toggle;
-    FloatingActionButton fabNovoPedido;
-
-    //
     ArrayList<PedidosNFE> pedidosNFE;
     private ArrayList<Pedidos> pedidos;
     PedidosAdapter adapter;
     RecyclerView recyclerView;
     private Context context;
-
-    //
     ArrayList<Pedidos> elementosPedidos;
     ArrayList<ItensPedidos> elementosItens;
     ArrayList<PosApp> elementosPos;
@@ -111,7 +91,6 @@ public class Principal extends AppCompatActivity
     TextView txtNFCeVinculada, txtTotMemoria;
     RelativeLayout LLlistaPedidos;
     List<UserModel> userList;
-
     TextView textView, txtTransmitida, txtContigencia, txtStatusTransmissao, txtVersao, txtEmpresa, txtCodUnidade, txtDataUltimoSinc;
     AppBarConfiguration appBarConfiguration;
 
@@ -128,18 +107,6 @@ public class Principal extends AppCompatActivity
         verificarOnline = new VerificarOnline();
 
         imgEmissor = findViewById(R.id.imgEmissor);
-        /*
-        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-        try {
-            BitMatrix bitMatrix = multiFormatWriter.encode("Teste", BarcodeFormat.QR_CODE, 400, 400);
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-            //imgEmissor.setImageBitmap(bitmap);
-        } catch (WriterException e) {
-            e.printStackTrace();
-        }
-         */
-
         LLlistaPedidos = findViewById(R.id.LLlistaPedidos);
 
         txtNFCeVinculada = findViewById(R.id.txtNFCeVinculada);
@@ -155,10 +122,6 @@ public class Principal extends AppCompatActivity
         //
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         ed = prefs.edit();
-
-        //prefs.edit().putInt("id_pedido", 0).apply();
-
-        Log.e("NameApp", new Configuracoes().getApplicationName(context));
 
         //
         bd = new DatabaseHelper(this);
@@ -200,12 +163,6 @@ public class Principal extends AppCompatActivity
         adapter = new PedidosAdapter(this, pedidos);
         recyclerView.setAdapter(adapter);
 
-        /*fabNovoPedido = findViewById(R.id.fabNovoPedido);
-        fabNovoPedido.setOnClickListener(v -> {
-            startActivity(new Intent(getBaseContext(), FormPedidos.class));
-            //startActivity(new Intent(getBaseContext(), Impressora.class));
-        });*/
-
         // NAVIGATION DRAWER
         drawer = findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
@@ -215,14 +172,6 @@ public class Principal extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        /*if (prefs.getInt("introPrincipal", 0) == 0) {
-            //
-            ed.putInt("introPrincipal", 1).apply();
-
-            //INCIAR INTRODUÇÃO
-            //introducao();
-        }*/
 
         // BOTTOM NAVIGATION
 
@@ -237,45 +186,20 @@ public class Principal extends AppCompatActivity
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
 
-
-        //double v = 50.00;
-        //double v1 = 30.75 / 100;
-        //double tributo = v - (v - (v1 * v));
-
-        //TextView txt = findViewById(R.id.txtchave);
-        //txt.setText(bd.gerarChave(2787) + " - " + bd.gerarChave(2787).length() + "\n" + aux.getSha1Hex("24/04/17 06:02:36")
-        //        + "\nTributos: 50,00 30.75% = " + tributo);
-
-        //txt.setText(getChave("2417040824891600076265001000002787100002787"));
-
         //
         elementosPos = bd.getPos();
         posApp = elementosPos.get(0);
         if (posApp.getNota_remessa() != null) {
             txtNFCeVinculada.setText(String.format("Vinculado à NFC-e: %s", posApp.getNota_remessa()));
         }
-        //txt.setText(posApp.getSerial());
-
-        //
         elementosPedidos = bd.getPedidosTransmitirFecharDia();
-
         elementosUnidades = bd.getUnidades();
         unidades = elementosUnidades.get(0);
         Objects.requireNonNull(getSupportActionBar()).setTitle("PRINCIPAL");
-        /*if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
-            Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " não transmitida(s)");
-        } else {
-            Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " contigências");
-        }*/
-        //Log.i("Serial => ", posApp.getSerial());
-        //getSupportActionBar().setSubtitle(String.format("Serial: %s", posApp.getSerial()));
-
         btnSincronizarNotasPrincipal = findViewById(R.id.btnSincronizarNotasPrincipal);
-
         if (elementosPedidos.size() != 0) {
             btnSincronizarNotasPrincipal.setVisibility(View.VISIBLE);
         }
-
         findViewById(R.id.btnSincronizarNotasNFC).setOnClickListener(v2 -> {
             //
             Intent i = new Intent(context, GerenciarBancoProducao.class);
@@ -290,12 +214,9 @@ public class Principal extends AppCompatActivity
         if (intent != null) {
             Bundle params = intent.getExtras();
             if (params != null) {
-                //posicao = params.getString("enderecoBlt");
                 if (!Objects.requireNonNull(prefs.getString("enderecoBlt", "")).equalsIgnoreCase(params.getString("enderecoBlt"))) {
                     prefs.edit().putBoolean("naoPerguntarImpressora", false).apply();
                 }
-                //prefs.edit().putBoolean("naoPerguntarImpressora", false).apply();
-                //prefs.edit().putString("enderecoBlt", "").apply();
 
                 if (!Objects.requireNonNull(params.getString("enderecoBlt")).equalsIgnoreCase("") &&
                         !prefs.getBoolean("naoPerguntarImpressora", false)) {
@@ -304,7 +225,6 @@ public class Principal extends AppCompatActivity
                         callDialog(params.getString("enderecoBlt"));
                     }
                 }
-
             }
         }
 
@@ -338,19 +258,10 @@ public class Principal extends AppCompatActivity
         txtDataUltimoSinc = findViewById(R.id.txtDataUltimoSinc);
         txtDataUltimoSinc.setText(prefs.getString("data_sincronizado", ""));
 
-        //
-        /*elementosPedidos = bd.getPedidosTransmitirFecharDia();
-
-        elementosUnidades = bd.getUnidades();
-        unidades = elementosUnidades.get(0);*/
-
-
         if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
             txtStatusTransmissao.setText("Não Transmitida(s)");
-            //Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " não transmitida(s)");
         } else {
             txtStatusTransmissao.setText("Contigências");
-            //Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " contigências");
         }
 
         //
@@ -360,8 +271,6 @@ public class Principal extends AppCompatActivity
         bd.deleteFormPagPIX();
 
         atualizar();
-
-        //startActivity(new Intent(this, TesteConexaoImpressora.class));
     }
 
 
@@ -411,17 +320,7 @@ public class Principal extends AppCompatActivity
                 finish();
             });
         }
-
-        //define um botão como negativo.
-        /*builder.setNeutralButton("Depois", (arg0, arg1) -> {
-            //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-            //prefs.edit().putBoolean("naoPerguntarImpressora", true).apply();
-        });*/
-
-        //cria o AlertDialog
         alerta = builder.create();
-
-        //Exibe
         alerta.show();
     }
 
@@ -432,24 +331,14 @@ public class Principal extends AppCompatActivity
     }
 
     private void atualizar() {
-        bd.PedidoFracionadosSemFinanceiro();
+        //bd.PedidoFracionadosSemFinanceiro();
         bd.listPedidosSemPagamento();
 
         //
         pedidos = bd.getPedidos();
         elementosPedidos = bd.getPedidosTransmitirFecharDia();
-
-        /*if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
-            Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " não transmitida(s)");
-        } else {
-            Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " contigências");
-        }
-        //Objects.requireNonNull(getSupportActionBar()).setTitle(elementosPedidos.size() + "/" + pedidos.size() + " contigências");
-        getSupportActionBar().setSubtitle("Serial: " + posApp.getSerial());*/
-
         btnSincronizarNotasPrincipal = findViewById(R.id.btnSincronizarNotasPrincipal);
         txtTransmitida.setText(String.valueOf(pedidos.size() - elementosPedidos.size()));
-        //txtContigencia.setText(String.valueOf(elementosPedidos.size()));
 
         if (elementosPedidos.size() != 0) {
             txtContigencia.setText(String.valueOf(elementosPedidos.size()));
@@ -472,7 +361,7 @@ public class Principal extends AppCompatActivity
         //define o titulo
         builder.setTitle("Atenção!");
         //define a mensagem
-        builder.setMessage("Econtramos um pedido não finalizado!");
+        builder.setMessage("Encontramos um pedido não finalizado!");
 
         //define um botão como positivo
         builder.setPositiveButton("Finalizar Pedido", (arg0, arg1) -> {
@@ -480,23 +369,7 @@ public class Principal extends AppCompatActivity
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
         });
-
-        //define um botão como negativo.
-        /*builder.setNegativeButton("Não", (arg0, arg1) -> {
-            //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-            prefs.edit().putBoolean("naoPerguntarImpressora", true).apply();
-        });*/
-
-        //define um botão como negativo.
-        /*builder.setNeutralButton("Depois", (arg0, arg1) -> {
-            //Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-            //prefs.edit().putBoolean("naoPerguntarImpressora", true).apply();
-        });*/
-
-        //cria o AlertDialog
         alerta = builder.create();
-
-        //Exibe
         alerta.show();
     }
 

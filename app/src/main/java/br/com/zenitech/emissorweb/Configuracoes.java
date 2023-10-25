@@ -19,8 +19,8 @@ public class Configuracoes {
     // INFORMA SE O APARELHO UTILIZADO É UM POS
     // SEMPRE RETORNAR FALSE CONFORME FOR GERADO O BUILD PARA PLAYSTORE
     public boolean GetDevice() {
-        return true;
-        //return false;
+        //return true;
+        return false;
     }
 
     // RETORNASE O AMBIENTE É DE PRODUÇÃO OU DE TESTE
@@ -39,7 +39,7 @@ public class Configuracoes {
         return "CE";
     }
 
-    public String getApplicationName(Context context) {
+    public static String getApplicationName(Context context) {
         ApplicationInfo applicationInfo = context.getApplicationInfo();
         int stringId = applicationInfo.labelRes;
         return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);

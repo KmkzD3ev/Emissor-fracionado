@@ -33,6 +33,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -45,14 +46,19 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.adapters.ClientesNfeAdapter;
+import br.com.zenitech.emissorweb.adapters.ProdutosPedidoAdapter;
+import br.com.zenitech.emissorweb.adapters.ProdutosPedidoNFeAdapter;
 import br.com.zenitech.emissorweb.domains.ClientesNFE;
 import br.com.zenitech.emissorweb.domains.DomainPrincipal;
+import br.com.zenitech.emissorweb.domains.ProdutosPedidoDomain;
 import br.com.zenitech.emissorweb.interfaces.IPrincipal;
+import br.com.zenitech.emissorweb.interfaces.IProdutosPedidoObserver;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
+        IProdutosPedidoObserver {
 
     private String TAG = "FormPedidosNFE";
     String[] listaFormasPagamento = {"DINHEIRO"};
@@ -64,14 +70,19 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
     SharedPreferences.Editor ed;
     AlertDialog alerta;
 
-    private String precoMinimo, precoMaximo;
+    private String precoMinimo, precoMaximo, idTemp;
     private ClassAuxiliar aux;
     private Context context;
     private int quant = 0;
 
-    RecyclerView rvClienteNFE;
+    RecyclerView rvClienteNFE, rvProdutosPedido;
     ClientesNfeAdapter adapter;
     public static LinearLayoutCompat llClienteNFE, llIdNomeCli;
+    Button btnAddProdutoLista;
+
+    // LISTA PRODUTOS
+    private ArrayList<ProdutosPedidoDomain> listaProdutosPedido;
+    ProdutosPedidoNFeAdapter produtosPedidoAdapter;
 
     public static String idCli = "";
     public static TextView txtNomeCliente;
@@ -93,6 +104,9 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
         bd = new DatabaseHelper(this);
         aux = new ClassAuxiliar();
 
+        // APAGA OS PRODUTOS DO PEDIDO ANTERIOR PARA INICIAR UM NOVO
+        bd.resetProdutosPedidoNFe();
+
 
         txtNomeCliente = findViewById(R.id.txtNomeCliente);
         nome_cliente = findViewById(R.id.nome_cliente);
@@ -102,6 +116,10 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
 
         llClienteNFE = findViewById(R.id.llClienteNFE);
         llIdNomeCli = findViewById(R.id.llIdNomeCli);
+        //
+        rvProdutosPedido = findViewById(R.id.rvProdutosPedido);
+        rvProdutosPedido.setLayoutManager(new LinearLayoutManager(this));
+
 
         //
         //LISTA DE PRODUTOS
@@ -140,11 +158,15 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
 
             }
         });
+        btnAddProdutoLista = findViewById(R.id.btnAddProdutoLista);
 
-        ArrayAdapter adapterFormasPagamento = new ArrayAdapter(this, android.R.layout.simple_spinner_item, listaFormasPagamento);
+        // ADD PRODUTO AO PEDIDO
+        btnAddProdutoLista.setOnClickListener(v -> ValidarCampFormPedido());
+
+        /*ArrayAdapter adapterFormasPagamento = new ArrayAdapter(this, android.R.layout.simple_spinner_item, listaFormasPagamento);
         adapterFormasPagamento.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spFormasPagamento = findViewById(R.id.spFormasPagamento);
-        spFormasPagamento.setAdapter(adapterFormasPagamento);
+        spFormasPagamento.setAdapter(adapterFormasPagamento);*/
 
         //
         cpf_cnpj_cliente = findViewById(R.id.cpf_cnpj_cliente);
@@ -177,12 +199,15 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> VerificarCamposIniciarPedido());
 
-        findViewById(R.id.btnSincronizarNFE).setOnClickListener(view -> VerificarCamposIniciarPedido());
+        findViewById(R.id.btnPagamentoForm).setOnClickListener(view -> VerificarCamposIniciarPedido());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+
+        atualizarListaProdutos();
     }
 
     private void ConsultarCodCliente() {
@@ -287,6 +312,8 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
     }
 
     private void VerificarCamposIniciarPedido() {
+        confirmar();
+
         //ESCODER O TECLADO
         // TODO Auto-generated method stub
         try {
@@ -297,9 +324,10 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
         }
 
         //
-        if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
+        /*if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             Toast.makeText(getBaseContext(), "Selecione a forma de pagamento.", Toast.LENGTH_LONG).show();
-        } else if (spProduto.getSelectedItem().toString().equals("PRODUTO")) {
+        } else */
+        /*if (spProduto.getSelectedItem().toString().equals("PRODUTO")) {
             Toast.makeText(getBaseContext(), "Selecione um produto.", Toast.LENGTH_LONG).show();
         } else if (etQuantidade.getText().toString().equals("") || etQuantidade.getText().toString().equals("0")) {
             Toast.makeText(getBaseContext(), "Informe a quantidade.", Toast.LENGTH_LONG).show();
@@ -334,26 +362,100 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
             } else {
                 confirmar();
             }
-            /*// Verifica se o valor informado é igual ou maior ao preço minimo
-            else if (vComp > 0) {
-                Toast.makeText(getBaseContext(), "O Valor não pode ser menor que o preço mínimo!", Toast.LENGTH_LONG).show();
-            }
-            else if (vCompMax == -1) {
-                Toast.makeText(getBaseContext(), "O Valor não pode ser maior que o preço máximo!", Toast.LENGTH_LONG).show();
-            } else {
+        }*/
+    }
 
-                Intent i = new Intent(getBaseContext(), ConfirmarDadosPedidoNFE.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
-                i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
-                i.putExtra("produto", spProduto.getSelectedItem().toString());
-                i.putExtra("qnt", etQuantidade.getText().toString());
-                i.putExtra("vlt", etPreco.getText().toString());
-
-                startActivity(i);
-                finish();
-            }*/
+    private void ValidarCampFormPedido() {
+        //ESCODER O TECLADO
+        try {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            Objects.requireNonNull(imm).hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        String valEtPreco = "";
+        if (!etPreco.getText().toString().equals("")) {
+            valEtPreco = String.valueOf(aux.converterValores(etPreco.getText().toString()));
+        }
+
+        //
+        if (spProduto.getSelectedItem().toString().equals("PRODUTO")) {
+            ShowMsgToast("Selecione um produto.");
+        } else if (etQuantidade.getText().toString().equals("") || etQuantidade.getText().toString().equals("0")) {
+            ShowMsgToast("Informe a quantidade.");
+        } else if (Integer.parseInt(etQuantidade.getText().toString()) > quant) {
+            ShowMsgToast("Restam apenas " + quant + " itens. Diminua a quantidade!");
+        } else if (etPreco.getText().toString().equals("")
+                || valEtPreco.equals("R$ 0,00")
+                || valEtPreco.equals("0.0")
+                || valEtPreco.equals("0.00")) {
+            ShowMsgToast("Informe o valor unitário.");
+        } else {
+
+            String[] ars = {precoMinimo, String.valueOf(aux.converterValores(etPreco.getText().toString()))};
+            int vComp = aux.comparar(ars);
+            //
+            String[] arsMax = {precoMaximo, String.valueOf(aux.converterValores(etPreco.getText().toString()))};
+            int vCompMax = aux.comparar(arsMax);
+
+            if (!precoMinimo.equalsIgnoreCase("0.0")) {
+
+                if (vComp > 0) {
+                    ShowMsgToast("O Valor não pode ser menor que o preço mínimo!");
+                } else if (vCompMax == -1) {
+                    ShowMsgToast("O Valor não pode ser maior que o preço máximo!");
+                } else {
+                    AddProdutoPedido();
+                }
+            } else {
+                AddProdutoPedido();
+            }
+        }
+    }
+
+    //
+    private void AddProdutoPedido() {
+        ProdutosPedidoDomain produto = new ProdutosPedidoDomain();
+
+        //
+        String valorUnit = String.valueOf(aux.converterValores(etPreco.getText().toString()));
+
+        //MULTIPLICA O VALOR PELA QUANTIDADE
+        String[] multiplicar = {valorUnit, etQuantidade.getText().toString()};
+        String total = String.valueOf(aux.multiplicar(multiplicar));
+
+        /*String valorDesc = String.valueOf(aux.converterValores(etDesconto.getText().toString()));
+        String[] multiplicarDesc = {valorDesc, etQuantidade.getText().toString()};
+        String desconto = String.valueOf(aux.multiplicar(multiplicarDesc));
+
+        String[] subtrair = {total, desconto};
+        total = String.valueOf(aux.subitrair(subtrair));*/
+
+        produto.id_pedido = "1";
+        produto.produto = spProduto.getSelectedItem().toString();
+        produto.quantidade = etQuantidade.getText().toString();
+        produto.valor = valorUnit;
+        produto.total = total;
+        //produto.desconto = valorDesc;
+        bd.addProdutoPedidoNFe(produto);
+
+        //
+        atualizarListaProdutos();
+    }
+
+    void atualizarListaProdutos() {
+
+        //
+        listaProdutosPedido = bd.getProdutosPedidoNFe("1");
+        produtosPedidoAdapter = new ProdutosPedidoNFeAdapter(this, listaProdutosPedido, bd);
+        // Registra a Activity como Observador
+        produtosPedidoAdapter.registerObserver(this);
+        rvProdutosPedido.setAdapter(produtosPedidoAdapter);
+
+        spProduto.setSelection(0);
+        etQuantidade.setText("");
+        etPreco.setText("0,00");
     }
 
     private void ShowMsgToast(String msg) {
@@ -363,10 +465,11 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
     }
 
     private void confirmar() {
-        Intent i = new Intent(getBaseContext(), ConfirmarDadosPedidoNFE.class);
+        //Intent i = new Intent(getBaseContext(), ConfirmarDadosPedidoNFE.class);
+        Intent i = new Intent(getBaseContext(), FinanceiroNFe.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         i.putExtra("cpfCnpj_cliente", idCli);
-        i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
+        //i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
         i.putExtra("produto", spProduto.getSelectedItem().toString());
         i.putExtra("qnt", etQuantidade.getText().toString());
         i.putExtra("vlt", etPreco.getText().toString());
@@ -468,6 +571,11 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
         alerta = builder.create();
         //Exibe alerta
         alerta.show();
+    }
+
+    @Override
+    public void onProdutosPedidoChanged() {
+        runOnUiThread(this::atualizarListaProdutos);
     }
 
 }

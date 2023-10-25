@@ -212,12 +212,11 @@ public class GerenciarBancoProducao extends AppCompatActivity {
 
     private void transmitirNota() {
         //ESCODER O TECLADO
-        // TODO Auto-generated method stub
         try {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             Objects.requireNonNull(imm).hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
 
         if (transmitindo != 0) {
@@ -242,20 +241,22 @@ public class GerenciarBancoProducao extends AppCompatActivity {
             try {
                 if (elementosItens.size() != 0) {
                     itensPedidos = elementosItens.get(0);
-
                     transmitindo = linhaPed;
-
 
                     //
                     final IValidarNFCe iValidarNFCe = IValidarNFCe.retrofit.create(IValidarNFCe.class);
+                    //
+                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, bandeiraFPG, nsuFPG;
 
-                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, bandeiraFPG, nsuFPG, fracionada;
+                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+                    nsuFPG = bd.getNSUFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(pedidos.getId()).replace(".", "");
 
-                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    nsuFPG = bd.getNSUFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    String idsProdutosPedido = bd.getIdsProdutosPedido(pedidos.getId()).replace(".", "");
+                    String quantidadesProdutosPedido = bd.getQuantidadesProdutosPedido(pedidos.getId()).replace(".", "");
+                    String valorProdutosPedido = bd.getValorProdutosPedido(pedidos.getId()).replace(".", "");
 
                     // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
                     if (!unidades.getCodloja().equalsIgnoreCase("")) {
@@ -264,10 +265,10 @@ public class GerenciarBancoProducao extends AppCompatActivity {
 
                     final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
                             pedidos.getId(),
-                            itensPedidos.getQuantidade(),
+                            quantidadesProdutosPedido,
                             posApp.getSerial(),
-                            itensPedidos.getProduto(),
-                            itensPedidos.getValor().replace(".", ""),
+                            idsProdutosPedido,
+                            valorProdutosPedido,
                             idFormaPGPedido,
                             pedidos.getCpf_cliente(),
                             credenciadora,

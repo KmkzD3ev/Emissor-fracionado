@@ -34,6 +34,27 @@ public interface IValidarNFCe {
             @Field("DESCONTO") String desconto
     );
 
+    // TRANSMITIR NOTAS NFC-E autorizador_app_novo_v1.php
+    @FormUrlEncoded
+    @POST("autorizador_app_novo_v1.php")
+    Call<ValidarNFCe> transmitirNFCe(
+            @Field("PEDIDO") String pedido,
+            @Field("QTD") String qtd,
+            @Field("SERIAL") String serial,
+            @Field("PRODUTO") String produto,
+            @Field("VLR") String vlr,
+            @Field("FORMAP") String formap,
+            @Field("CPFCLI") String cpfcli,
+            @Field("CREDENCIADORA") String credenciadora,
+            @Field("CAUTS") String codaut,
+            @Field("NSU") String nsu,
+            @Field("VLRFORMAP") String vlrformap,
+            @Field("NAUTOCARTAO") String nautocartao,
+            @Field("BANDEIRA") String bandeira,
+            @Field("FRACIONADA") String fracionada,
+            @Field("DESCONTO") String desconto
+    );
+
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(String.format("%s%s", new Configuracoes().GetUrlServer(), "/POSSIAC/AUTORIZADOR/"))
             .client(okHttpClient)

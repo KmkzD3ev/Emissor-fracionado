@@ -180,4 +180,8 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="zero_reais">0,00</string>
+    <string name="valor_forma_pagamento">"Valor da forma de pagamento"</string>
+    <string name="valor">Valor:</string>
+    <string name="msg_erro_fracionamento">Atenção: \nNão é possível fracionar com mais de um produto e uma quantidade maior que 100. \nPor favor, verifique sua lista de produtos.</string>
 </resources>

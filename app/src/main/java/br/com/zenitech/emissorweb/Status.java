@@ -24,28 +24,22 @@ import br.com.zenitech.emissorweb.domains.Unidades;
 
 public class Status extends AppCompatActivity {
 
-    //
+    //region VARIAVEIS -----------------------------------------------------------------------------
     DatabaseHelper bd;
     Context context;
     TextView txtCNPJ, txtSerie, txtUltimaNota, txtUltimaNotaNFe, txtQuant, txtTotal;
-
-    //
     ArrayList<Unidades> elementosUnidade;
     Unidades unidades;
     ArrayList<PosApp> elementosPos;
     PosApp posApp;
-
-    //
     ArrayList<StatusPedidos> pedidos;
     StatusPedidosAdapter adapter;
     RecyclerView recyclerView;
-
-    //
     ArrayList<StatusPedidosNFE> pedidosNFE;
     StatusPedidosNFEAdapter adapterNFE;
     RecyclerView recyclerViewNFE;
-
     ClassAuxiliar aux;
+    //endregion
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +87,7 @@ public class Status extends AppCompatActivity {
 
         //
         pedidos = bd.getStatusPedidos();
-        adapter = new StatusPedidosAdapter(this, pedidos);
+        adapter = new StatusPedidosAdapter(this, pedidos, bd);
         if (pedidos.size() > 0) {
             recyclerView.setVisibility(View.VISIBLE);
             recyclerView.setAdapter(adapter);
@@ -101,7 +95,7 @@ public class Status extends AppCompatActivity {
 
         //
         pedidosNFE = bd.getStatusPedidosNFE();
-        adapterNFE = new StatusPedidosNFEAdapter(this, pedidosNFE);
+        adapterNFE = new StatusPedidosNFEAdapter(this, pedidosNFE, bd);
         if (pedidosNFE.size() > 0) {
             recyclerViewNFE.setVisibility(View.VISIBLE);
             recyclerViewNFE.setAdapter(adapterNFE);
@@ -113,8 +107,8 @@ public class Status extends AppCompatActivity {
         at();
     }
 
-    void at(){
-        Handler  handler = new Handler();
+    void at() {
+        Handler handler = new Handler();
 
         final Runnable r = () -> {
             txtTotal.setText(bd.getValorTotal());

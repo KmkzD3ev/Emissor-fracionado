@@ -1,24 +1,12 @@
 package br.com.zenitech.emissorweb;
 
-import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.LinearLayoutCompat;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
@@ -31,12 +19,20 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Button;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
@@ -47,27 +43,22 @@ import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
 import br.com.zenitech.emissorweb.adapters.FormasPagamentoPedidosAdapter;
+import br.com.zenitech.emissorweb.adapters.ProdutosPedidoAdapter;
 import br.com.zenitech.emissorweb.domains.FormaPagamentoPedido;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosTemp;
 import br.com.zenitech.emissorweb.domains.PosApp;
+import br.com.zenitech.emissorweb.domains.ProdutosPedidoDomain;
 import br.com.zenitech.emissorweb.domains.Unidades;
-import stone.application.StoneStart;
-import stone.application.interfaces.StoneCallbackInterface;
-import stone.providers.BluetoothConnectionProvider;
-import stone.user.UserModel;
-import stone.utils.PinpadObject;
-import stone.utils.Stone;
+import br.com.zenitech.emissorweb.interfaces.IProdutosPedidoObserver;
 
-import static br.com.zenitech.emissorweb.GerenciarPagamentoCartao.getApplicationName;
-
-public class FormPedidos extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class FormPedidos extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
+        IProdutosPedidoObserver {
     static final int PAGAMENTO_REQUEST = 1;
     static final int PAGAMENTO_PIX_REQUEST = 2;
     private DatabaseHelper bd;
@@ -109,13 +100,17 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     private ArrayList<FormaPagamentoPedido> listaFinanceiroCliente;
     private FormasPagamentoPedidosAdapter adapter;
-    private RecyclerView rvFinanceiro;
+    private RecyclerView rvFinanceiro, rvProdutosPedido;
+
+    // LISTA PRODUTOS
+    private ArrayList<ProdutosPedidoDomain> listaProdutosPedido;
+    ProdutosPedidoAdapter produtosPedidoAdapter;
 
     private Spinner spProduto, spFormasPagamento, spDescricaoCredenciadora, spBandeiraCredenciadora;
     private EditText cpf_cnpj_cliente, etQuantidade, etPreco, etCodAutorizacao, etNsuCeara, etDesconto;
     private TextInputLayout TiNsuCeara;
     LinearLayout llCredenciadora, infoDadosPedido, formFinanceiroPedido;
-    LinearLayoutCompat llFormAddFormasPag, formDadosPedido;
+    LinearLayoutCompat llFormAddFormasPag, formDadosPedido, formVenda;
 
     private Toolbar toolbar;
     AlertDialog alerta;
@@ -136,7 +131,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     // BTNs **
     private Button btnAddF, btnPagamento, btnPagCartao;
-    Button btnPagamentoCartaoNFCE, btnAvancarNFCE, btnEscolheFP, btnAddFormPag;
+    Button btnPagamentoCartaoNFCE, btnAvancarNFCE, btnEscolheFP, btnAddFormPag, btnPagamentoForm, btnAddProdutoLista;
     private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     int id = 0;
     int idTemp = 0;
@@ -177,6 +172,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //
         rvFinanceiro = findViewById(R.id.rvFinanceiro);
         rvFinanceiro.setLayoutManager(new LinearLayoutManager(this));
+
+        //
+        rvProdutosPedido = findViewById(R.id.rvProdutosPedido);
+        rvProdutosPedido.setLayoutManager(new LinearLayoutManager(this));
 
         //
         bgTotal = findViewById(R.id.bgTotal);
@@ -234,6 +233,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //
         llCredenciadora = findViewById(R.id.llCredenciadora);
         formDadosPedido = findViewById(R.id.formDadosPedido);
+        formVenda = findViewById(R.id.formVenda);
         formFinanceiroPedido = findViewById(R.id.formFinanceiroPedido);
 
         //
@@ -262,7 +262,11 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         etDesconto.setText("0,00");
         try {
             if (posApp.getDesconto_app_emissor().equalsIgnoreCase("1")) {
-                etDesconto.setVisibility(View.VISIBLE);
+                /*
+                 * TRABALHAR NA PARTE DE DESCONTO COM O NOVO MODELO COM MAIS DE 1 PRODUTO,
+                 * O VALOR DO DESCONTO SÓ APARECE NO FORMULÁRIO DE PRODUTOS ISSO É UM ERRO,
+                 * TEM QUE CONTABILIZAR NO FINANCEIRO E NA TRANSMISSÃO DA NOTA*/
+                //etDesconto.setVisibility(View.VISIBLE);
             }
         } catch (Exception ignored) {
 
@@ -442,13 +446,48 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         }
 
         btnEscolheFP = findViewById(R.id.btnEscolheFP);
+        btnPagamentoForm = findViewById(R.id.btnPagamentoForm);
+        btnAddProdutoLista = findViewById(R.id.btnAddProdutoLista);
         infoDadosPedido = findViewById(R.id.infoDadosPedido);
         llFormAddFormasPag = findViewById(R.id.llFormAddFormasPag);
 
-        btnEscolheFP.setOnClickListener(v -> ValidarCampFormPedido());
+        //btnEscolheFP.setOnClickListener(v -> ValidarCampFormPedido());ValidarCampFormPedido()
+        btnPagamentoForm.setOnClickListener(v -> {
+            if (listaProdutosPedido.size() > 0) {
+                /*
+                    REGRAS PARA FRACIONAMENTO:
+                    # NÃO PODE TER MAIS DE 1 PRODUTO
+                    # O PRODUTO PRECISA SER GÁS COM NCM = 27111910
+                    # A QUANTIDADE PRECISA SER MAIOR QUE 5 E NEMOR QUE 100
+                */
+
+                // RECEBE A QUANTIDADE DE PRODUTOS COM O NCM = 27111910
+                quantidade = bd.getQuantProdutosPedidoNCM(idTemp);                      // QUANTIDADE DE GÁS
+                int quantProdutosDiverso = bd.getQuantProdutosPedidoDiverso(idTemp);    // PRODUTOS QUE NÃO SÃO GÁS GLP
+                int quantProdutoPedido = listaProdutosPedido.size();                    // QUANTIDADE DE PRODUTOS NA LISTA
+
+                // SE A QUANTIDADE DE PRODUTOS NA LISTA FOR 1 E A QUANTIDADE
+                // DE ITENS FOR MENOR OU IGUAL A 5 PODE FRACIONAR
+                if (quantidade > 0 && quantidade <= 5) {
+                    formsView();
+                } else if (quantProdutoPedido == 1 && quantProdutosDiverso < 101) {
+                    // PARA FRACIONAR NOTAS DE ÁGUA E OUTROS PRODUTOS SEM SER GÁS
+                    quantidade = quantProdutosDiverso;
+                    formsView();
+                } else {
+                    findViewById(R.id.msgErroFracionar).setVisibility(View.VISIBLE);
+                    //Toast.makeText(this, "Não é possível emitir NFCe com mais de 1 produto e quantidade superios a 5 unidades de Gás GLP", Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(this, "Adicione pelo menos um produto", Toast.LENGTH_LONG).show();
+            }
+        });
 
         txtValorFormaPagamento = findViewById(R.id.txtValorFormaPagamento);
         txtValorFormaPagamento.addTextChangedListener(new FormPedidos.MoneyTextWatcher(txtValorFormaPagamento));
+
+        // ADD PRODUTO AO PEDIDO
+        btnAddProdutoLista.setOnClickListener(v -> ValidarCampFormPedido());
         //
         btnAddF = findViewById(R.id.btnAddF);
         btnAddF.setOnClickListener(v -> {
@@ -479,6 +518,12 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 confirmar();
             }
         });
+
+
+        listaProdutosPedido = bd.getProdutosPedido(idTemp);
+        produtosPedidoAdapter = new ProdutosPedidoAdapter(this, listaProdutosPedido, bd);
+        // Registra a Activity como Observador
+        produtosPedidoAdapter.registerObserver(this);
     }
 
     @Override
@@ -486,6 +531,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         super.onPostResume();
 
         atualizarListaFormPag();
+        atualizarListaProdutos();
     }
 
     private void AddFormaPagamento(String authorizationCode, String cardBrand, String nsu) {
@@ -526,9 +572,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 !cliente_secret_transfeera.equalsIgnoreCase("") &&
                 !pix_key_transfeera.equalsIgnoreCase("") &&
                 spFormasPagamento.getSelectedItem().toString().equalsIgnoreCase("PAGAMENTO INSTANTÂNEO (PIX)")) {
-            // ASAAS -- } else if (!unidades.getApi_key_asaas().equalsIgnoreCase("") && spFormasPagamento.getSelectedItem().toString().equalsIgnoreCase("PAGAMENTO INSTANTÂNEO (PIX)")) {
-            // PIX
-            //AddFormaPagamentoPIX("","","");
+
+            //
             iniciarPagamentoPIX();
         } else {
             if (unidades.getCodloja().equalsIgnoreCase("")) {
@@ -548,29 +593,46 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 }
             }
 
-            bd.addFormasPagamentoPedidosTemp(new FormaPagamentoPedido(
-                    "",
-                    String.valueOf(idTemp), //ID PEDIDO
-                    aux.getIdFormaPagamento(spFormasPagamento.getSelectedItem().toString()),
-                    "" + aux.converterValores(aux.soNumeros(txtValorFormaPagamento.getText().toString())),
-                    authorizationCode,
-                    cardBrand,
-                    nsu,
-                    "",
-                    "0"
-            ));
+
+            if (bd.getPedidosTemp(String.valueOf(idTemp)).size() > 1) {
+                // PARA NOTAS FRACIONADAS
+                for (Pedidos pedido : bd.getPedidosTemp(String.valueOf(idTemp))) {
+                    ItensPedidos itemPedido = bd.getItensPedido(pedido.getId()).get(0);
+                    //String valFinanceiro = aux.multiplicar();
+                    bd.addFormasPagamentoPedidosTemp(new FormaPagamentoPedido(
+                            "",
+                            pedido.getId(),//String.valueOf(idTemp), //ID PEDIDO
+                            aux.getIdFormaPagamento(spFormasPagamento.getSelectedItem().toString()),
+                            "" + itemPedido.getTotal(),// + aux.converterValores(aux.soNumeros(txtValorFormaPagamento.getText().toString())),
+                            authorizationCode,
+                            cardBrand,
+                            nsu,
+                            "",
+                            "0"
+                    ));
+                }
+            } else {
+                bd.addFormasPagamentoPedidosTemp(new FormaPagamentoPedido(
+                        "",
+                        String.valueOf(idTemp), //ID PEDIDO
+                        aux.getIdFormaPagamento(spFormasPagamento.getSelectedItem().toString()),
+                        "" + aux.converterValores(aux.soNumeros(txtValorFormaPagamento.getText().toString())),
+                        authorizationCode,
+                        cardBrand,
+                        nsu,
+                        "",
+                        "0"
+                ));
+            }
 
             //
             listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
-            adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos);
+            adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos, idTemp);
             rvFinanceiro.setAdapter(adapter);
 
             //
             String tif = aux.maskMoney(new BigDecimal(bd.getValorTotalFinanceiro(String.valueOf(idTemp), api_asaas)));
             txtTotalItemFinanceiro.setText(tif);
-
-            //
-            //!txtTotalItemFinanceiro.getText().equals(txtTotalFinanceiro.getText()
 
             //
             String valorFinanceiro = String.valueOf(aux.converterValores(txtTotalFinanceiro.getText().toString()));
@@ -591,8 +653,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             }
 
             //
-            /*txtDocumentoFormaPagamento.setText("");
-            tilDocumento.setVisibility(View.VISIBLE);*/
             spFormasPagamento.setSelection(0);
             etCodAutorizacao.setText("");
         }
@@ -604,7 +664,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         //
         listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
-        adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos);
+        adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos, idTemp);
         rvFinanceiro.setAdapter(adapter);
 
         //
@@ -657,7 +717,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         //
         listaFinanceiroCliente = bd.getFinanceiroCliente(idTemp);
-        adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos);
+        adapter = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos, idTemp);
         rvFinanceiro.setAdapter(adapter);
 
         //
@@ -713,6 +773,13 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        produtosPedidoAdapter.unregisterObserver(this);
+    }
+
     //COMPARAR O VALOR DO FINANCEIRO COM O VALOR ADICIONADO
     private boolean compararValorRestante() {
 
@@ -752,110 +819,13 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     }
 
-    private void addFinanceiro() {
-
-        /*//
-        id = id + 1;
-        ed.putInt("id_financeiro_venda", id).apply();
-
-        //
-        String[] fPag = spFormasPagamentoCliente.getSelectedItem().toString().split(" _ ");
-
-        String sql = "";
-        sql += id + "\n";//CODIGO_FINANCEIRO
-        sql += prefs.getString("unidade", "UNIDADE TESTE") + "\n";//UNIDADE_FINANCEIRO
-        sql += classAuxiliar.inserirDataAtual() + "\n";//DATA_FINANCEIRO
-        sql += codigo_cliente + "\n";//CODIGO_CLIENTE_FINANCEIRO
-        sql += fPag[0] + "\n";//sql += spFormasPagamentoCliente.getSelectedItem().toString() + "\n";//FPAGAMENTO_FINANCEIRO
-        sql += txtDocumentoFormaPagamento.getText().toString() + "\n";//DOCUMENTO_FINANCEIRO
-        sql += String.valueOf(classAuxiliar.inserirData(classAuxiliar.formatarData(classAuxiliar.soNumeros(txtVencimentoFormaPagamento.getText().toString())))) + "\n";//VENCIMENTO_FINANCEIRO
-        sql += String.valueOf(classAuxiliar.converterValores(txtValorFormaPagamento.getText().toString())) + "\n";//VALOR_FINANCEIRO
-        sql += "0" + "\n";//STATUS_AUTORIZACAO
-        sql += "0" + "\n";//PAGO
-        sql += "0" + "\n";//VASILHAME_REF
-        sql += "0" + "\n";//USUARIO_ATUAL_FINANCEIRO
-        sql += classAuxiliar.inserirDataAtual() + "\n";//DATA_INCLUSAO
-        sql += "" + "\n";//NOSSO_NUMERO_FINANCEIRO
-        sql += "" + prefs.getInt("id_vendedor", 1) + "\n";//ID_VENDEDOR_FINANCEIRO
-        sql += "" + prefs.getInt("id_venda_app", 1) + "\n";
-
-        //SETAR O SQL NO LOG PARA CONSULTA
-        Log.e("SQL", sql);
-
-        //INSERIR FINANCEIRO
-        bd.addFinanceiro(new FinanceiroVendasDomain(
-                String.valueOf(id),//CODIGO_FINANCEIRO
-                prefs.getString("unidade", "UNIDADE TESTE"),//UNIDADE_FINANCEIRO
-                classAuxiliar.inserirDataAtual(),//DATA_FINANCEIRO
-                codigo_cliente,//CODIGO_CLIENTE_FINANCEIRO
-                fPag[0],//spFormasPagamentoCliente.getSelectedItem().toString(),//FPAGAMENTO_FINANCEIRO
-                txtDocumentoFormaPagamento.getText().toString(),//DOCUMENTO_FINANCEIRO
-                String.valueOf(classAuxiliar.inserirData(classAuxiliar.formatarData(classAuxiliar.soNumeros(txtVencimentoFormaPagamento.getText().toString())))),//VENCIMENTO_FINANCEIRO
-                String.valueOf(classAuxiliar.converterValores(txtValorFormaPagamento.getText().toString())),//VALOR_FINANCEIRO
-                "0",//STATUS_AUTORIZACAO
-                "0",//PAGO
-                "0",//VASILHAME_REF
-                "0",//USUARIO_ATUAL_FINANCEIRO
-                "" + classAuxiliar.inserirDataAtual(),//DATA_INCLUSAO
-                "",//NOSSO_NUMERO_FINANCEIRO
-                "" + prefs.getInt("id_vendedor", 1),//ID_VENDEDOR_FINANCEIRO
-                "" + prefs.getInt("id_venda_app", 1)
-        ));
-
-        //
-        listaFinanceiroCliente = bd.getFinanceiroCliente(prefs.getInt("id_venda_app", 1));
-        adapter = new FinanceiroVendasAdapter(this, listaFinanceiroCliente);
-        rvFinanceiro.setAdapter(adapter);
-
-        //
-        String tif = classAuxiliar.maskMoney(new BigDecimal(bd.getValorTotalFinanceiro(String.valueOf(prefs.getInt("id_venda_app", 1)))));
-        txtTotalItemFinanceiro.setText(tif);
-
-        //
-        //!txtTotalItemFinanceiro.getText().equals(txtTotalFinanceiro.getText()
-
-        //
-        String valorFinanceiro = String.valueOf(classAuxiliar.converterValores(txtTotalFinanceiro.getText().toString()));
-        String valorFinanceiroAdd = String.valueOf(classAuxiliar.converterValores(txtTotalItemFinanceiro.getText().toString()));
-
-        //SUBTRAIR O VALOR PELA QUANTIDADE
-        String[] subtracao = {valorFinanceiro, valorFinanceiroAdd};
-        String total = String.valueOf(classAuxiliar.subitrair(subtracao));
-
-        txtValorFormaPagamento.setText(total);
-
-        //
-        if (comparar()) {
-
-            bgTotal.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.erro));
-            txtValorFormaPagamento.setText("0,00");
-        } else {
-            bgTotal.setBackgroundColor(ContextCompat.getColor(getBaseContext(), R.color.transparente));
-        }
-
-        //
-        txtDocumentoFormaPagamento.setText("");
-        tilDocumento.setVisibility(View.VISIBLE);
-        spFormasPagamentoCliente.setSelection(0);
-
-        //ESCONDER O TECLADO
-        // TODO Auto-generated method stub
-        try {
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }*/
-    }
-
     private void ValidarCampFormPedido() {
         //ESCODER O TECLADO
-        // TODO Auto-generated method stub
         try {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             Objects.requireNonNull(imm).hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
 
         //Log.i("Valor", String.valueOf(aux.converterValores(etPreco.getText().toString())));
@@ -910,37 +880,96 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             int vCompMax = aux.comparar(arsMax);
 
             // Verifica a quantidade máxima permeitida
-            if (Integer.parseInt(etQuantidade.getText().toString()) > 300) {
-                ShowMsgToast("Quantidade Máxima 300 Unidades.");
-            }
+            /*if (Integer.parseInt(etQuantidade.getText().toString()) > 1) {
+                //ShowMsgToast("Quantidade Máxima 100 Unidades.");
+                etDesconto.setText("0,00");
+                etDesconto.setEnabled(false);
+            } else {
+                etDesconto.setText("0,00");
+                etDesconto.setEnabled(true);
+            }*/
+
             // Verifica se o valor informado é igual ou maior ao preço minimo
-            else if (!precoMinimo.equalsIgnoreCase("0.0")) {
+            //else
+            if (!precoMinimo.equalsIgnoreCase("0.0")) {
 
                 if (vComp > 0) {
                     ShowMsgToast("O Valor não pode ser menor que o preço mínimo!");
                 } else if (vCompMax == -1) {
                     ShowMsgToast("O Valor não pode ser maior que o preço máximo!");
                 } else {
-                    formsView();
+                    //formsView();
+                    AddProdutoPedido();
                 }
             } else {
-                formsView();
+                //formsView();
+                AddProdutoPedido();
             }
         }
     }
 
-    private void formsView() {
+    //
+    private void AddProdutoPedido() {
+        ProdutosPedidoDomain produto = new ProdutosPedidoDomain();
+
         //
-        quantidade = Integer.parseInt(etQuantidade.getText().toString());
-        fracionar();
+        String valorUnit = String.valueOf(aux.converterValores(etPreco.getText().toString()));
+
+        //MULTIPLICA O VALOR PELA QUANTIDADE
+        String[] multiplicar = {valorUnit, etQuantidade.getText().toString()};
+        String total = String.valueOf(aux.multiplicar(multiplicar));
+
+        String valorDesc = String.valueOf(aux.converterValores(etDesconto.getText().toString()));
+        String[] multiplicarDesc = {valorDesc, etQuantidade.getText().toString()};
+        String desconto = String.valueOf(aux.multiplicar(multiplicarDesc));
+
+        String[] subtrair = {total, desconto};
+        total = String.valueOf(aux.subitrair(subtrair));
+
+        produto.id_pedido = String.valueOf(idTemp);
+        produto.produto = spProduto.getSelectedItem().toString();
+        produto.quantidade = etQuantidade.getText().toString();
+        produto.valor = valorUnit;
+        produto.total = total;
+        produto.desconto = valorDesc;
+        bd.addProdutoPedido(produto);
+
+        etDesconto.setText("0,00");
+
+        //
+        atualizarListaProdutos();
+    }
+
+    void atualizarListaProdutos() {
+        findViewById(R.id.msgErroFracionar).setVisibility(View.GONE);
+
+        //
+        listaProdutosPedido = bd.getProdutosPedido(idTemp);
+        produtosPedidoAdapter = new ProdutosPedidoAdapter(this, listaProdutosPedido, bd);
+        // Registra a Activity como Observador
+        produtosPedidoAdapter.registerObserver(this);
+        rvProdutosPedido.setAdapter(produtosPedidoAdapter);
+
+        spProduto.setSelection(0);
+        etQuantidade.setText("");
+        etPreco.setText("0,00");
+    }
+
+    private void formsView() {
 
         // Verifica a quantidade máxima permeitida
-        if (Integer.parseInt(etQuantidade.getText().toString()) > 5) {
-            //ShowMsgToast("Maior que 5");
+        if (quantidade > 5) {
+            ShowMsgToast("Maior que 5");
             txtValorFormaPagamento.setEnabled(false);
             spFormasPagamento.setAdapter(null);
             spFormasPagamento.setAdapter(adapterFormasPagamentoDinheiro);
         }
+
+        fracionar();
+
+        //
+        /*quantidade = Integer.parseInt(etQuantidade.getText().toString());
+
         //
         String valorUnit = String.valueOf(aux.converterValores(etPreco.getText().toString()));
 
@@ -956,14 +985,17 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         total = String.valueOf(aux.subitrair(subtrair));
 
         //
-        txtCpfCnpjCli.setText(String.format("Cpf/Cnpj: %s", cpf_cnpj_cliente.getText().toString()));
         txtProduto.setText(String.format("Produto: %s", spProduto.getSelectedItem().toString()));
-        txtQuant.setText(String.format("Quantidade: %s", etQuantidade.getText().toString()));
+        txtQuant.setText(String.format("Quantidade: %s", etQuantidade.getText().toString()));*/
+
+        txtCpfCnpjCli.setText(String.format("Cpf/Cnpj: %s", cpf_cnpj_cliente.getText().toString()));
+        String total = bd.getValorTotalPedido(String.valueOf(idTemp), String.valueOf(aux.converterValores(etDesconto.getText().toString())));
         //
         txtTotalFinanceiro.setText(aux.maskMoney(new BigDecimal(total)));
         txtValorFormaPagamento.setText(aux.maskMoney(new BigDecimal(total)));
         //
-        formDadosPedido.setVisibility(View.GONE);
+        //formDadosPedido.setVisibility(View.GONE);
+        formVenda.setVisibility(View.GONE);
         formFinanceiroPedido.setVisibility(View.VISIBLE);
     }
 
@@ -989,7 +1021,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         }
 
         //
-        if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
+        /*if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
             ShowMsgToast("Selecione a forma de pagamento.");
         } else if (spProduto.getSelectedItem().toString().equals("PRODUTO")) {
             ShowMsgToast("Selecione um produto.");
@@ -997,7 +1029,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             ShowMsgToast("Informe a quantidade.");
         } else if (Integer.parseInt(etQuantidade.getText().toString()) > quant) {
             ShowMsgToast("Restam apenas " + quant + " itens. Diminua a quantidade!");
-        } else if (etPreco.getText().toString().equals("")
+        } else */
+        if (etPreco.getText().toString().equals("")
                 || valEtPreco.equals("R$ 0,00")
                 || valEtPreco.equals("0.0")
                 || valEtPreco.equals("0.00")) {
@@ -1056,13 +1089,27 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
             i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
             i.putExtra("produto", spProduto.getSelectedItem().toString());
+            i.putExtra("qnt", quantidade);
+            i.putExtra("vlt", aux.converterValores(txtTotalItemFinanceiro.getText().toString()));
+            i.putExtra("credenciadora", idCredenciadoras.get(spDescricaoCredenciadora.getSelectedItemPosition()));//spDescricaoCredenciadora.getSelectedItem().toString()
+            i.putExtra("bandeira", aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()));
+            i.putExtra("cod_aut", etCodAutorizacao.getText().toString());
+            i.putExtra("nsu", etNsuCeara.getText().toString());
+            i.putExtra("desconto", etDesconto.getText().toString());
+
+            /*//
+            Intent i = new Intent(getBaseContext(), ConfirmarDadosPedido.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
+            i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
+            i.putExtra("produto", spProduto.getSelectedItem().toString());
             i.putExtra("qnt", etQuantidade.getText().toString());
             i.putExtra("vlt", etPreco.getText().toString());
             i.putExtra("credenciadora", idCredenciadoras.get(spDescricaoCredenciadora.getSelectedItemPosition()));//spDescricaoCredenciadora.getSelectedItem().toString()
             i.putExtra("bandeira", aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()));
             i.putExtra("cod_aut", etCodAutorizacao.getText().toString());
             i.putExtra("nsu", etNsuCeara.getText().toString());
-            i.putExtra("desconto", etDesconto.getText().toString());
+            i.putExtra("desconto", etDesconto.getText().toString());*/
 
             startActivity(i);
             finish();
@@ -1265,6 +1312,12 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     }
 
+    @Override
+    public void onProdutosPedidoChanged() {
+        runOnUiThread(this::atualizarListaProdutos);
+        runOnUiThread(this::atualizarListaFormPag);
+    }
+
     public class MoneyTextWatcher implements TextWatcher {
         private final WeakReference<EditText> editTextWeakReference;
 
@@ -1337,15 +1390,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         builder.setPositiveButton("OK", (arg0, arg1) -> {
             //Toast.makeText(InformacoesVagas.this, "positivo=" + arg1, Toast.LENGTH_SHORT).show();
         });
-        /*//define um botão como negativo.
-        builder.setNegativeButton("Negativo", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface arg0, int arg1) {
-                Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-            }
-        });*/
-        //cria o AlertDialog
         alerta = builder.create();
-        //Exibe alerta
         alerta.show();
     }
 
@@ -1356,18 +1401,13 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         if (requestCode == PAGAMENTO_REQUEST) {
 
             if (resultCode == Activity.RESULT_OK) {
-                String result = data.getStringExtra("result");
-                //ShowMsgToast(data.getStringExtra("result"));
 
                 etCodAutorizacao.setText(data.getStringExtra("authorizationCode"));
                 etCodAutorizacao.setEnabled(false);
                 etNsuCeara.setText(data.getStringExtra("nsu"));
                 etNsuCeara.setEnabled(false);
 
-                //confirmar();
-                //ShowMsgToast(data.getStringExtra("result"));
                 AddFormaPagamento(data.getStringExtra("authorizationCode"), aux.getIdBandeira(data.getStringExtra("cardBrand")), data.getStringExtra("nsu"));
-                //Timber.tag("Stone").i(Objects.requireNonNull(data.getStringExtra("authorizationCode")));
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -1385,79 +1425,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 ShowMsgToast("Operação Cancelada!");
             }
         }
-    }
-
-    // Iniciar o Stone
-    void iniciarStone() {
-        // O primeiro passo é inicializar o SDK.
-        StoneStart.init(getApplicationContext());
-        /*Em seguida, é necessário chamar o método setAppName da classe Stone,
-        que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
-        Stone.setAppName(getApplicationName(getApplicationContext()));
-        //Ambiente de Sandbox "Teste"
-        //Stone.setEnvironment(new Configuracoes().Ambiente());
-        //Ambiente de Produção
-        //Stone.setEnvironment((Environment.PRODUCTION));
-
-        // Esse método deve ser executado para inicializar o SDK
-        List<UserModel> userList = StoneStart.init(getApplicationContext());
-
-        // Quando é retornado null, o SDK ainda não foi ativado
-        /*if (userList != null) {
-            // O SDK já foi ativado.
-            _pinpadAtivado();
-
-        } else {
-            // Inicia a ativação do SDK
-            ativarStoneCode();
-        }*/
-    }
-
-    public void turnBluetoothOn() {
-        try {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mBluetoothAdapter.enable();
-            do {
-            } while (!mBluetoothAdapter.isEnabled());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void pinpadConnection() {
-
-        // Pega o pinpad selecionado do ListView.
-        //String[] pinpadInfo = listView.getAdapter().getItem(position).toString().split("_");
-        //PinpadObject pinpadSelected = new PinpadObject(pinpadInfo[0], pinpadInfo[1], false);
-        PinpadObject pinpadSelected = new PinpadObject("PAX-6A801896", "34:81:F4:04:BF:37", false);
-
-        // Passa o pinpad selecionado para o provider de conexão bluetooth.
-        final BluetoothConnectionProvider bluetoothConnectionProvider = new BluetoothConnectionProvider(FormPedidos.this, pinpadSelected);
-        bluetoothConnectionProvider.setDialogMessage("Criando conexao com o pinpad selecionado"); // Mensagem exibida do dialog.
-        bluetoothConnectionProvider.useDefaultUI(false); // Informa que haverá um feedback para o usuário.
-        bluetoothConnectionProvider.setConnectionCallback(new StoneCallbackInterface() {
-
-            public void onSuccess() {
-                Toast.makeText(getApplicationContext(), "Pinpad conectado", Toast.LENGTH_SHORT).show();
-                //btConnected = true;
-                //finish();
-            }
-
-            public void onError() {
-                Toast.makeText(getApplicationContext(), "Erro durante a conexao. Verifique a lista de erros do provider para mais informacoes", Toast.LENGTH_SHORT).show();
-                //Timber.e("onError: %s", bluetoothConnectionProvider.getListOfErrors());
-            }
-        });
-        bluetoothConnectionProvider.execute(); // Executa o provider de conexão bluetooth.
     }
 
     // Fracionar o pedido caso a quantidade seja maior que 5
@@ -1478,29 +1445,14 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //
         String data = aux.exibirDataAtual();
         String hora = aux.horaAtual();
-        //statusNota.setText("");
-        //protocoloNota.setText("");
-        //dataHoraNota.setText(String.format("%s %s", cAux.exibirDataAtual(), cAux.horaAtual()));
-        //dataHoraNota.setText(String.format("%s %s", data, hora));
 
-        //-------CRIA UM ID PARA O PEDIDO------//
-        /*if(prefs.getInt("id_pedido", 0) == 0){
-            ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedido()) + 1)).apply();
-        }else{
-            ed.putInt("id_pedido", (prefs.getInt("id_pedido", 0) + 1)).apply();
-        }
-        dhfghgdg*/
         if (!dd) {
-            id = idTemp;//prefs.getInt("id_pedido", 1);
+            id = idTemp;
             dd = true;
         } else {
             ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedidos()) + 1)).apply();
             id = prefs.getInt("id_pedido", 1);
         }
-
-
-        //id = Integer.parseInt(bd.getUltimoIdPedido());
-
 
         //INSERI O PEDIDO NO BANCO DE DADOS
         addPedido(
@@ -1518,16 +1470,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         if (quantidade > 0) {
             fracionar();
-        } /*else {
-            //elementosPedidos = bd.getPedidosTransmitir();
-            elementosPedidos = bd.getPedidosTransmitirFecharDia();
-            transmitir = elementosPedidos.size();
-            transmitindo = elementosPedidos.size();
-
-            Log.i(TAG, String.valueOf(elementosPedidos.size()));
-        }*/
-
-        //id += 1;
+        }
     }
 
     private void addPedido(
@@ -1558,7 +1501,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 protocolo,//PROTOCOLO
                 dataEmissao,//DATA EMISSÃO
                 horaEmissao,//HORA EMISSÃO
-                "" + aux.converterValores(aux.soNumeros(total)),//VALOR TOTAL
+                "" + bd.getValorTotalPedido(String.valueOf(id), etDesconto.getText().toString()),/// aux.converterValores(aux.soNumeros(total)),//VALOR TOTAL
                 dataProtocolo,//DATA PROTOCOLO - "28042017"
                 horaProtocolo,//HORA PROTOCOLO - "151540"
                 cpf,//CPF/CNPJ CLIENTE
@@ -1569,14 +1512,37 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 spDescricaoCredenciadora.getSelectedItem().toString()
         ));
 
-        //
-        bd.addItensPedidos(new ItensPedidos(
-                "" + id,//ID PEDIDO
-                "" + bd.getIdProduto(spProduto.getSelectedItem().toString()),
-                "" + quantidade,
-                "" + aux.converterValores(etPreco.getText().toString()),//aux.soNumeros(String.valueOf(aux.converterValores(etPreco.getText().toString()))),
-                "" + aux.converterValores(aux.soNumeros(etDesconto.getText().toString())),
-                "" // + aux.converterValores(aux.soNumeros(etDesconto.getText().toString()))
-        ));
+        for (ProdutosPedidoDomain produto : bd.getProdutosPedido(idTemp)) {
+            //
+            String _quant = "0";
+            if (NotaFracionada.equals("1")) {
+                _quant = quantidade;
+            } else {
+                _quant = produto.quantidade;
+            }
+            bd.addItensPedidos(new ItensPedidos(
+                    "" + id,//ID PEDIDO
+                    "" + produto.id_produto,
+                    "" + _quant,// produto.quantidade,
+                    "" + produto.valor,
+                    "" + aux.converterValores(aux.soNumeros(etDesconto.getText().toString())),
+                    "" // + aux.converterValores(aux.soNumeros(etDesconto.getText().toString()))
+            ));
+            String[] mValor = {produto.valor, _quant};
+            String vTotal = String.valueOf(aux.multiplicar(mValor));
+            bd.updateValorPedido(String.valueOf(id), vTotal);
+
+            /*
+            //
+            bd.addItensPedidos(new ItensPedidos(
+                    "" + id,//ID PEDIDO
+                    "" + bd.getIdProduto(spProduto.getSelectedItem().toString()),
+                    "" + quantidade,
+                    "" + aux.converterValores(etPreco.getText().toString()),//aux.soNumeros(String.valueOf(aux.converterValores(etPreco.getText().toString()))),
+                    "" + aux.converterValores(aux.soNumeros(etDesconto.getText().toString())),
+                    "" // + aux.converterValores(aux.soNumeros(etDesconto.getText().toString()))
+            ));
+            */
+        }
     }
 }

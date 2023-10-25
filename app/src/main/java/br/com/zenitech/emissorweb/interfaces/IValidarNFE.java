@@ -23,7 +23,12 @@ public interface IValidarNFE {
             @Field("PRODS") String produto,
             @Field("VLRS") String vlr,
             @Field("FORMAPAG") String formap,
-            @Field("CODCLI") String cpfcli
+            @Field("CODCLI") String cpfcli,
+            @Field("VLRSPAG") String vlrspag,
+            @Field("CREDENCIADORA") String credenciadora,
+            @Field("CAUTS") String codaut,
+            @Field("BANDEIRA") String bandeira,
+            @Field("VERSAO") int VERSAO
     );
 
     // REIMPRIMIR NOTA
@@ -33,7 +38,8 @@ public interface IValidarNFE {
             @Field("TELA") String tela,
             @Field("CODPED") String CODPED,
             @Field("SERIE") String SERIE,
-            @Field("SERIAL") String SERIAL
+            @Field("SERIAL") String SERIAL,
+            @Field("VERSAO") int VERSAO
     );
 
     Retrofit retrofit = new Retrofit.Builder()

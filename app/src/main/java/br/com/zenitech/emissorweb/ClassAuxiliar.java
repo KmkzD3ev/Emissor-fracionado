@@ -1,12 +1,16 @@
 package br.com.zenitech.emissorweb;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.MessageDigest;
@@ -634,5 +638,54 @@ public class ClassAuxiliar {
 
     public void ShowMsgLog(String tag, String msg) {
         Log.e(tag, msg);
+    }
+
+    // Retorna a lista de formas de pagamento aceita pela SEFAZ
+    public String[] FormasDePagamentoEmissor() {
+        return new String[]{"DINHEIRO", "CARTÃO DE CRÉDITO", "CARTÃO DE DÉBITO",
+                "PAGAMENTO INSTANTÂNEO (PIX)", "BOLETO"};
+    }
+
+    // Retorna a lista de credenciadoras
+    public String[] BandeirasCredenciadoras() {
+        return new String[]{"BANDEIRA", "Visa", "Mastercard", "American Express", "Sorocred",
+                "Diners Club", "Elo", "Hipercard", "Aura", "Cabal", "Outros"};
+    }
+
+    // Retorna a lista de parcelas do cartao de credito
+    public String[] ParcelasCartaoCredito() {
+        return new String[]{"1X (À VISTA)", "2X SEM JUROS", "3X SEM JUROS", "4X SEM JUROS",
+                "5X SEM JUROS", "6X SEM JUROS", "7X SEM JUROS", "8X SEM JUROS", "9X SEM JUROS",
+                "10X SEM JUROS", "11X SEM JUROS", "12X SEM JUROS"};
+    }
+
+    public static class MoneyTextWatcher implements TextWatcher {
+        private final WeakReference<EditText> editTextWeakReference;
+
+        MoneyTextWatcher(EditText editText) {
+            editTextWeakReference = new WeakReference<>(editText);
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            EditText editText = editTextWeakReference.get();
+            if (editText == null) return;
+            String s = editable.toString();
+            editText.removeTextChangedListener(this);
+            String cleanString = s.replaceAll("[^0-9]", "");
+            BigDecimal parsed = new BigDecimal(cleanString).setScale(2, RoundingMode.FLOOR).divide(new BigDecimal(100), RoundingMode.FLOOR);
+            String formatted = NumberFormat.getCurrencyInstance().format(parsed);
+            editText.setText(formatted);
+            editText.setSelection(formatted.length());
+            editText.addTextChangedListener(this);
+        }
     }
 }

@@ -5,12 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -20,11 +14,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import java.math.BigDecimal;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Random;
 
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
@@ -39,53 +36,40 @@ import retrofit2.Response;
 public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnClickListener {
     // ATIVA O MODO TESTE
     private boolean modo_teste = false;
-    private String TAG = "ConfirmarDadosPedidos";
+    private final String TAG = "ConfirmarDadosPedidos";
     private ProgressDialog pd;
     private Context contexto;
-    private VerificarOnline verificarOnline;
+    VerificarOnline verificarOnline;
     AlertDialog alerta;
-
     Button btnPrintNotaCont, btnPrint, btn_sair, btn_fechar;
     ConfirmarDadosPedido mActivity;
-
     TextView cpfCnpj_cliente, formaPagamento, produto, qnt, vlt, vltTotal,
             statusNota, protocoloNota, dataHoraNota, desconto;
-
-    //
     private SharedPreferences prefs;
-    private SharedPreferences.Editor ed;
+    SharedPreferences.Editor ed;
     private DatabaseHelper bd;
     int id = 0;
     private ClassAuxiliar cAux;
     private String total, valorUnit;
-
-
     private LinearLayout NSdadosPedidos, NSdadosNFCe;
     private RelativeLayout NSdadosNFCeCont;
     ArrayList<Unidades> elementos;
     Unidades unidades;
-
     ArrayList<PosApp> elementosPos;
     PosApp posApp;
-
     ArrayList<Pedidos> elementosPedidos;
     Pedidos pedidos;
-
+    Pedidos infoPedido;
     ArrayList<ItensPedidos> elementosItens;
     ItensPedidos itensPedidos;
-
     String idFormaPagamento, credenciadora, cod_aut, nsu, bandeira;
-
-    //QUANTIDADE FRAGMENTADA
     int quantidade = 0;
-    int random;
     int transmitir;
     int transmitindo;
-
-    // INFORMAR ERRO
+    int count = 1;
+    int erro = 0;
     private boolean erroTransmitir = false;
-    // SE 1 INFORMA QUE A NOTA FOI FRACIONADA
-    String NotaFracionada = "0";
+    String idUltPedido;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,12 +130,6 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
             Bundle params = intent.getExtras();
             if (params != null) {
 
-                //-------CRIA UM ID PARA O PEDIDO------//
-                //ed.putInt("id_pedido", (prefs.getInt("id_pedido", 0) + 1)).apply();
-                //id = prefs.getInt("id_pedido", 1);
-
-                //id = Integer.parseInt(bd.getUltimoIdPedido());
-
                 boolean siac = false;
 
                 try {
@@ -174,39 +152,46 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     btn_fechar.setVisibility(View.VISIBLE);
 
                 } else {
+                    idUltPedido = bd.getUltimoIdPedido();
+                    infoPedido = bd.getPedido(idUltPedido);
+                    //cpfCnpj_cliente.setText(params.getString("cpfCnpj_cliente"));
+                    cpfCnpj_cliente.setText(infoPedido.getCpf_cliente());
+                    formaPagamento.setText(bd.getFormasPagamentoPedidoPrint(idUltPedido));
+                    //produto.setText(params.getString("produto"));
+                    produto.setText(bd.getProdutosPedidoConfirmacao(Integer.parseInt(infoPedido.getId()), cAux));
+                    //qnt.setText(params.getString("qnt"));
+                    //vlt.setText(params.getString("vlt"));
+                    //Log.e("Desconto", bd.getItensPedido(idUltPedido).get(0).getDesconto());
+                    //desconto.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(bd.getItensPedido(idUltPedido).get(0).getDesconto()))));//des
+                    idFormaPagamento = bd.getFormasPagamentoPedido(idUltPedido);
 
-                    cpfCnpj_cliente.setText(params.getString("cpfCnpj_cliente"));
-                    //formaPagamento.setText(params.getString("formaPagamento"));
-                    formaPagamento.setText(bd.getFormasPagamentoPedidoPrint(bd.getUltimoIdPedido()));
-                    produto.setText(params.getString("produto"));
-                    qnt.setText(params.getString("qnt"));
-                    vlt.setText(params.getString("vlt"));
-                    Log.e("Desconto", bd.getItensPedido(bd.getUltimoIdPedido()).get(0).getDesconto());
-                    //String vD = String.valueOf(cAux.converterValores(params.getString("desconto")));
-                    //String[] multiplicarDesc = {vD, params.getString("qnt")};
-                    //String des = String.valueOf(cAux.multiplicar(multiplicarDesc));
-                    desconto.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(bd.getItensPedido(bd.getUltimoIdPedido()).get(0).getDesconto()))));//des
-                    //idFormaPagamento = cAux.getIdFormaPagamento(params.getString("formaPagamento"));
-                    idFormaPagamento = bd.getFormasPagamentoPedido(bd.getUltimoIdPedido());
+                    String v = bd.getValorTotalFinanceiro(idUltPedido, false);
+                    vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(v))));
+                    total = v;
 
                     credenciadora = params.getString("credenciadora");
                     cod_aut = params.getString("cod_aut");
                     nsu = params.getString("nsu");
-                    //sdfsd
                 }
 
-                //
+                /*//
                 valorUnit = String.valueOf(cAux.converterValores(vlt.getText().toString()));
 
+                Toast.makeText(contexto, "valor: "+ valorUnit, Toast.LENGTH_SHORT).show();
+                Toast.makeText(contexto, "Quant: "+ qnt.getText().toString(), Toast.LENGTH_SHORT).show();
+
                 //MULTIPLICA O VALOR PELA QUANTIDADE
-                String[] multiplicar = {valorUnit, qnt.getText().toString()};
+                //String[] multiplicar = {valorUnit, qnt.getText().toString()};
+                String[] multiplicar = {"100.00", "1"};
                 total = String.valueOf(cAux.multiplicar(multiplicar));
 
                 String[] subtrairTotDesc = {total, String.valueOf(cAux.converterValores(desconto.getText().toString()))};
                 String totalComDesconto = String.valueOf(cAux.subitrair(subtrairTotDesc));
-                vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(totalComDesconto))));
+                vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(totalComDesconto))));*/
 
-                quantidade = Integer.parseInt(qnt.getText().toString());
+                // RECEBE A QUANTIDADE DE PRODUTOS COM O NCM = 27111910
+                //quantidade = bd.getQuantProdutosPedidoNCM(id);      // QUANTIDADE DE GÁS
+                quantidade = 1;// Integer.parseInt(qnt.getText().toString());
 
                 btnPrint = findViewById(R.id.btnPrint);
                 btnPrint.setOnClickListener(this);
@@ -218,10 +203,10 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     btnPrintNotaCont.setText("Salvar e transmitir depois!");
                 }
 
-                if (quantidade > 5) {
+                /*if (quantidade > 5) {
                     btnPrint.setVisibility(View.GONE);
                     btnPrintNotaCont.setVisibility(View.GONE);
-                }
+                }*/
 
                 //SE A QUANTIDADE FOR MAIOR QUE 5 FRACIONA EM NOTAS DE ATÉ 5 UNIDADES
                 //fracionar();
@@ -230,8 +215,12 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 transmitir = elementosPedidos.size();
                 transmitindo = elementosPedidos.size();
 
-                Log.i(TAG, String.valueOf(elementosPedidos.size()));
+                if (elementosPedidos.size() > 1) {
+                    btnPrint.setVisibility(View.GONE);
+                    btnPrintNotaCont.setVisibility(View.GONE);
+                }
 
+                Log.i(TAG, String.valueOf(elementosPedidos.size()));
             }
         }
 
@@ -263,78 +252,13 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         });
     }
 
-    public void fracionar() {
-        if (quantidade > 5) {
-            Random r = new Random();
-            random = r.nextInt(6 - 1) + 1;
-            NotaFracionada = "1";
-        } else {
-            random = quantidade;
-        }
-
-        //
-        //Log.i("DIV", String.valueOf(random));
-
-        String[] sub = {String.valueOf(quantidade), String.valueOf(random)};
-        quantidade = cAux.subitrair(sub).intValue();
-
-        //
-        String data = cAux.exibirDataAtual();
-        String hora = cAux.horaAtual();
-        statusNota.setText("");
-        protocoloNota.setText("");
-        //dataHoraNota.setText(String.format("%s %s", cAux.exibirDataAtual(), cAux.horaAtual()));
-        dataHoraNota.setText(String.format("%s %s", data, hora));
-
-        //-------CRIA UM ID PARA O PEDIDO------//
-        ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedido()) + prefs.getInt("id_pedido", 0) + 1)).apply();
-        id = prefs.getInt("id_pedido", 1);
-
-        //id = Integer.parseInt(bd.getUltimoIdPedido());
-
-
-        //INSERI O PEDIDO NO BANCO DE DADOS
-        addPedido(
-                "OFF",
-                protocoloNota.getText().toString(),
-                cAux.inserirData(data),
-                hora,
-                total,
-                "",
-                "",
-                cpfCnpj_cliente.getText().toString(),
-                idFormaPagamento,
-                String.valueOf(random),
-                credenciadora
-        );
-
-        if (quantidade > 0) {
-            fracionar();
-        } else {
-            //elementosPedidos = bd.getPedidosTransmitir();
-            elementosPedidos = bd.getPedidosTransmitirFecharDia();
-            transmitir = elementosPedidos.size();
-            transmitindo = elementosPedidos.size();
-
-            Log.i(TAG, String.valueOf(elementosPedidos.size()));
-        }
-
-        id += 1;
-    }
-
-    int count = 1;
-    //int retransmitir = 0;
-
-    int erro = 0;
-
     private void transmitirNota() {
         //ESCODER O TECLADO
-        // TODO Auto-generated method stub
         try {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             Objects.requireNonNull(imm).hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
 
         if (transmitindo != 0) {
@@ -367,25 +291,29 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     valorUnit = String.valueOf(cAux.converterValores(vlt.getText().toString()));
                     String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, bandeiraFPG, nsuFPG;
 
-                    Log.e("IDTEMP", "" + pedidos.getId_pedido_temp());
+                    Log.e("IDTEMP", "" + pedidos.getId());
 
-                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    nsuFPG = bd.getNSUFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
+                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+                    nsuFPG = bd.getNSUFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(pedidos.getId()).replace(".", "");
+
+                    String idsProdutosPedido = bd.getIdsProdutosPedido(pedidos.getId()).replace(".", "");
+                    String quantidadesProdutosPedido = bd.getQuantidadesProdutosPedido(pedidos.getId()).replace(".", "");
+                    String valorProdutosPedido = bd.getValorProdutosPedido(pedidos.getId()).replace(".", "");
 
                     // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
                     if (!unidades.getCodloja().equalsIgnoreCase("")) {
                         credenciadora = "STONE";
                     }
 
-                    final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
+                    final Call<ValidarNFCe> call = iValidarNFCe.transmitirNFCe(
                             pedidos.getId(),
-                            itensPedidos.getQuantidade(),
+                            quantidadesProdutosPedido,
                             posApp.getSerial(),
-                            itensPedidos.getProduto(),
-                            itensPedidos.getValor().replace(".", ""),
+                            idsProdutosPedido,
+                            valorProdutosPedido,
                             idFormaPGPedido,
                             pedidos.getCpf_cliente(),
                             credenciadora,
@@ -431,18 +359,6 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
                                             Toast.makeText(contexto, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
                                         } else {
-
-                                            Log.e("NOTA", sincronizacao.getErro());
-
-                                            //
-                                            /*bd.upadtePedidosTransmissao(
-                                                    "OFF",
-                                                    " ",
-                                                    "",
-                                                    "",
-                                                    pedidos.getId()
-                                            );*/
-
                                             erroTransmitir = true;
                                         }
                                     } else {
@@ -467,17 +383,6 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                             NSdadosNFCeCont.setVisibility(View.VISIBLE);
                             NSdadosNFCe.setVisibility(View.GONE);
                             NSdadosPedidos.setVisibility(View.GONE);
-
-                            Log.i(TAG, "" + t);
-
-                            //
-                            /*bd.upadtePedidosTransmissao(
-                                    "OFF",
-                                    " ",
-                                    "",
-                                    "",
-                                    pedidos.getId()
-                            );*/
 
                             erroTransmitir = true;
 
@@ -512,268 +417,6 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         }
     }
 
-    private void transmitirNota_COPIA_DE_SEGURANCA() {
-        //ESCODER O TECLADO
-        // TODO Auto-generated method stub
-        try {
-            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            Objects.requireNonNull(imm).hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-
-        if (transmitindo != 0) {
-            NSdadosPedidos.setVisibility(View.GONE);
-
-            //MOSTRA A MENSAGEM DE SINCRONIZAÇÃO
-            pd = ProgressDialog.show(contexto, count + "/" + transmitir, "Transmitindo...",
-                    true, false);
-
-            count++;
-
-
-            String[] subNotaPed = {String.valueOf(transmitindo), "1"};
-            //cAux.subitrair(subNotaPed);
-            int linhaPed = cAux.subitrair(subNotaPed).intValue();
-
-            //
-            pedidos = elementosPedidos.get(linhaPed);
-            //
-            elementosItens = bd.getItensPedido(pedidos.getId());
-
-            try {
-                if (elementosItens.size() != 0) {
-                    itensPedidos = elementosItens.get(0);
-
-                    transmitindo = linhaPed;
-
-                    //
-                    final IValidarNFCe iValidarNFCe = IValidarNFCe.retrofit.create(IValidarNFCe.class);
-                    //
-                    valorUnit = String.valueOf(cAux.converterValores(vlt.getText().toString()));
-                    //MULTIPLICA O VALOR PELA QUANTIDADE
-                    String[] multiplicar = {valorUnit, qnt.getText().toString()};
-
-                    /*if (pedidos.getFracionado().equalsIgnoreCase("1")) {
-                        valorFormaPGPedido = String.valueOf(cAux.multiplicar(multiplicar));
-                    } else {
-                        valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                        idFormaPGPedido = bd.getIdFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                    }*/
-                    String valorFormaPGPedido, idFormaPGPedido, nAutoCartao, bandeiraFPG, nsuFPG, fracionada;
-
-                    /*valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                    nsuFPG = bd.getNSUFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");*/
-                    //fracionada = bd.getAutorizacaoFormasPagamentoPedido(bd.getUltimoIdPedido()).replace(".", "");
-
-                    Log.e("IDTEMP", "" + pedidos.getId_pedido_temp());
-
-                    valorFormaPGPedido = bd.getValoresFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    nsuFPG = bd.getNSUFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    idFormaPGPedido = bd.getIdFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    bandeiraFPG = bd.getBandeiraFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-                    nAutoCartao = bd.getAutorizacaoFormasPagamentoPedido(pedidos.getId_pedido_temp()).replace(".", "");
-
-                    //Toast.makeText(contexto, valorUnit, Toast.LENGTH_LONG).show();
-
-                    // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
-                    if (!unidades.getCodloja().equalsIgnoreCase("")) {
-                        credenciadora = "STONE";
-                    }
-
-                    final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
-                            pedidos.getId(),
-                            itensPedidos.getQuantidade(),
-                            posApp.getSerial(),
-                            itensPedidos.getProduto(),
-                            itensPedidos.getValor().replace(".", ""),
-                            idFormaPGPedido,
-                            pedidos.getCpf_cliente(),
-                            credenciadora,
-                            cod_aut,
-                            nsuFPG,
-                            valorFormaPGPedido,
-                            nAutoCartao,
-                            bandeiraFPG,
-                            pedidos.getFracionado(),
-                            desconto.getText().toString()
-                    );
-
-                    call.enqueue(new Callback<ValidarNFCe>() {
-                        @Override
-                        public void onResponse(@NonNull Call<ValidarNFCe> call, @NonNull Response<ValidarNFCe> response) {
-
-                            //
-                            final ValidarNFCe sincronizacao = response.body();
-                            if (sincronizacao != null) {
-
-                                //if(!sincronizacao.getErro().equalsIgnoreCase("")) return;
-                                //
-                                runOnUiThread(() -> {
-
-                                    //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
-                                    if (pd != null && pd.isShowing()) {
-                                        pd.dismiss();
-                                    }
-
-                                    // MODO TESTE SERIAL 123456780
-                                    // CASO O MODO TESTE ESTEJA ATIVO, FAZ O UPDATE PARA "ON" MESMO SEM PROTOCOLO
-                                    if (!modo_teste) {
-                                        if (!sincronizacao.getProtocolo().isEmpty() && sincronizacao.getProtocolo().length() >= 10) {
-
-                                            //
-                                            statusNota.setText(getString(R.string.autorizada));
-                                            protocoloNota.setText(sincronizacao.getProtocolo());
-                                            dataHoraNota.setText(String.format("%s %s", cAux.exibirDataAtual(), cAux.horaAtual()));
-
-                                            //
-                                            bd.upadtePedidosTransmissao(
-                                                    "ON",
-                                                    sincronizacao.getProtocolo(),
-                                                    cAux.soNumeros(cAux.inserirDataAtual()),
-                                                    cAux.soNumeros(cAux.horaAtual()),
-                                                    pedidos.getId()
-                                            );
-                                        } else {
-
-                                            //
-                                            bd.upadtePedidosTransmissao(
-                                                    "OFF",
-                                                    " ",
-                                                    "",
-                                                    "",
-                                                    pedidos.getId()
-                                            );
-
-                                            erroTransmitir = true;
-                                        }
-                                    } else {
-                                        //
-                                        bd.upadtePedidosTransmissao(
-                                                "ON",
-                                                " ",
-                                                "",
-                                                "",
-                                                pedidos.getId()
-                                        );
-                                    }
-
-                                    transmitirNota();
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(@NonNull Call<ValidarNFCe> call, @NonNull Throwable t) {
-
-
-                            NSdadosNFCeCont.setVisibility(View.VISIBLE);
-                            NSdadosNFCe.setVisibility(View.GONE);
-                            NSdadosPedidos.setVisibility(View.GONE);
-
-                            Log.i(TAG, "" + t);
-
-                            //
-                            bd.upadtePedidosTransmissao(
-                                    "OFF",
-                                    " ",
-                                    "",
-                                    "",
-                                    pedidos.getId()
-                            );
-
-                            erroTransmitir = true;
-
-                            //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
-                            if (pd != null && pd.isShowing()) {
-                                pd.dismiss();
-                            }
-
-                            // VERIFICA A QUANTIDADE DE ERROS
-                            if (erro > 3) {
-                                erro++;
-                                transmitirNota();
-                            } else {
-                                Log.i(TAG, "Mais de 3 erros");
-                            }
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                //CANCELA A MENSAGEM DE SINCRONIZAÇÃO
-                if (pd != null && pd.isShowing()) {
-                    pd.dismiss();
-                }
-
-                Log.i(TAG, Objects.requireNonNull(e.getMessage()));
-
-                erroTransmitir = true;
-
-            }
-        } else {
-            if (erroTransmitir) {
-                Toast.makeText(contexto, "Encontramos erro ao transmitir uma mais notas!", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(contexto, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
-            }
-            //finish();
-        }
-    }
-
-    private void addPedido(
-            String status,
-            String protocolo,
-            String dataEmissao,
-            String horaEmissao,
-            String vlTotal,
-            String dataProtocolo,
-            String horaProtocolo,
-            String cpf,
-            String FPagamento,
-            String quantidade,
-            String credenciadora
-    ) {
-
-
-        //
-        valorUnit = String.valueOf(cAux.converterValores(vlt.getText().toString()));
-
-        //MULTIPLICA O VALOR PELA QUANTIDADE
-        String[] multiplicar = {valorUnit, String.valueOf(random)};
-        total = String.valueOf(cAux.multiplicar(multiplicar));
-        //vltTotal.setText("R$" + cAux.maskMoney(new BigDecimal(String.valueOf(total))));
-
-        //
-        bd.addPedidos(new Pedidos(
-                String.valueOf(id),//ID PEDIDO
-                status,//SITUAÇÃO
-                protocolo,//PROTOCOLO
-                dataEmissao,//DATA EMISSÃO
-                horaEmissao,//HORA EMISSÃO
-                "" + cAux.converterValores(cAux.soNumeros(total)),//VALOR TOTAL
-                dataProtocolo,//DATA PROTOCOLO - "28042017"
-                horaProtocolo,//HORA PROTOCOLO - "151540"
-                cpf,//CPF/CNPJ CLIENTE
-                FPagamento,//FORMA PAGAMENTO
-                "",
-                bd.getUltimoIdPedido(),
-                NotaFracionada,
-                credenciadora
-        ));
-
-        //
-        bd.addItensPedidos(new ItensPedidos(
-                String.valueOf(id),//ID PEDIDO
-                bd.getIdProduto(produto.getText().toString()),
-                quantidade,
-                "" + cAux.converterValores(vlt.getText().toString()),
-                null,
-                ""
-        ));
-    }
 
     @Override
     protected void onDestroy() {
@@ -789,16 +432,13 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
             case R.id.btnPrint: {
                 if (new Configuracoes().GetDevice()) {
                     prefs.edit().putString("tamPapelImpressora", "58mm").apply();
-                    //double v0 = Double.parseDouble(total);
-                    //double v1 = bd.getTributosProduto(produto.getText().toString());
-                    //double tributo = v0 - (v0 - (v1 * v0));
+
                     double tributo = bd.getTributosProduto(produto.getText().toString(), total);
                     double tributoN = bd.getTributosNProduto(produto.getText().toString(), total);
                     double tributoE = bd.getTributosEProduto(produto.getText().toString(), total);
                     double tributoM = bd.getTributosMProduto(produto.getText().toString(), total);
                     Intent i = new Intent(contexto, ImpressoraPOS.class);
 
-                    String serie = bd.getSeriePOS();
                     ArrayList<Unidades> elementosUnidade = bd.getUnidades();
                     unidades = elementosUnidade.get(0);
 
@@ -811,7 +451,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
                     //NOTA
                     i.putExtra("imprimir", "nota");
-                    i.putExtra("pedido", "" + bd.getUltimoIdPedido());// id
+                    i.putExtra("pedido", "" + idUltPedido);// id
                     i.putExtra("cliente", (!cpfCnpj_cliente.getText().toString().equals("") ? cpfCnpj_cliente.getText().toString() : "CONSUMIDOR NAO IDENTIFICADO"));
                     i.putExtra("id_produto", "" + bd.getIdProduto(produto.getText().toString()));
                     i.putExtra("produto", produto.getText().toString());
@@ -830,7 +470,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     i.putExtra("tributosE", cAux.maskMoney(new BigDecimal(String.valueOf(tributoE))));
                     i.putExtra("tributosM", cAux.maskMoney(new BigDecimal(String.valueOf(tributoM))));
                     //i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
-                    i.putExtra("form_pagamento", bd.getFormasPagamentoPedidoPrint(bd.getUltimoIdPedido()));
+                    i.putExtra("form_pagamento", bd.getFormasPagamentoPedidoPrint(idUltPedido));
                     i.putExtra("desconto", cAux.maskMoney(new BigDecimal(String.valueOf(cAux.converterValores(desconto.getText().toString())))));
                     //bd.getFormasPagamentoPedidoPrint(String.valueOf(id));
 
@@ -851,19 +491,12 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("")) {
                         selectTamPapImpressora();
                     } else {
-                        //double v0 = Double.parseDouble(total);
-                        //double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
-                        //double tributo = v0 - (v0 - (v1 * v0));
-                        double tributo = bd.getTributosProduto(produto.getText().toString(), total);
-                        double tributoN = bd.getTributosNProduto(produto.getText().toString(), total);
-                        double tributoE = bd.getTributosEProduto(produto.getText().toString(), total);
-                        double tributoM = bd.getTributosMProduto(produto.getText().toString(), total);
-
-                        /*
-                        PackageManager packageManager = getPackageManager();
-                        String packageName = "br.com.zenitech.impressora";
-                        Intent i = packageManager.getLaunchIntentForPackage(packageName);
-                        */
+                        //double tributo = bd.getTributosProduto(produto.getText().toString(), total);
+                        double[] tributos = bd.getTributosProdutosPedido(idUltPedido, total);
+                        double tributo = tributos[0];// bd.getTributosProdutosPedido(idUltPedido, total);
+                        double tributoN = tributos[1];// bd.getTributosNProduto(produto.getText().toString(), total);
+                        double tributoE = tributos[2];//bd.getTributosEProduto(produto.getText().toString(), total);
+                        double tributoM = tributos[3];//bd.getTributosMProduto(produto.getText().toString(), total);
 
                         Intent i = new Intent(contexto, Impressora.class);
 
@@ -880,7 +513,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
 
                         //NOTA
                         i.putExtra("imprimir", "nota");
-                        i.putExtra("pedido", "" + bd.getUltimoIdPedido());// id
+                        i.putExtra("pedido", "" + idUltPedido);// id
                         i.putExtra("cliente", (!cpfCnpj_cliente.getText().toString().equals("") ? cpfCnpj_cliente.getText().toString() : "CONSUMIDOR NAO IDENTIFICADO"));
                         i.putExtra("id_produto", "" + bd.getIdProduto(produto.getText().toString()));
                         i.putExtra("produto", produto.getText().toString());
@@ -899,7 +532,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                         i.putExtra("tributosM", cAux.maskMoney(new BigDecimal(String.valueOf(tributoM))));
                         //i.putExtra("form_pagamento", "" + formaPagamento.getText().toString());
 
-                        i.putExtra("form_pagamento", bd.getFormasPagamentoPedidoPrint(bd.getUltimoIdPedido()));
+                        i.putExtra("form_pagamento", bd.getFormasPagamentoPedidoPrint(idUltPedido));
 
                         Log.e(TAG,
                                 "pedido: " + id + "\n" +
@@ -931,7 +564,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                         " ",
                         "",
                         "",
-                        bd.getUltimoIdPedido()// idString.valueOf(id)
+                        idUltPedido// idString.valueOf(id)
                 );
 
                 if (unidades.getUf().equalsIgnoreCase(new Configuracoes().GetUFCeara())) {
@@ -957,8 +590,6 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
     }
 
     private void selectTamPapImpressora() {
-
-        //
         //Cria o gerador do AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setIcon(R.drawable.logo_emissor_web);
@@ -971,13 +602,6 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         builder.setNeutralButton("Papel de 58mm", (arg0, arg1) -> prefs.edit().putString("tamPapelImpressora", "58mm").apply());
 
         builder.setPositiveButton("Papel de 80mm", (arg0, arg1) -> prefs.edit().putString("tamPapelImpressora", "80mm").apply());
-
-        /*//define um botão como negativo.
-        builder.setNegativeButton("Negativo", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface arg0, int arg1) {
-                Toast.makeText(InformacoesVagas.this, "negativo=" + arg1, Toast.LENGTH_SHORT).show();
-            }
-        });*/
 
         //cria o AlertDialog
         alerta = builder.create();

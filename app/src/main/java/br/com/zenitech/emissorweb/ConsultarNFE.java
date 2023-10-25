@@ -66,7 +66,7 @@ public class ConsultarNFE extends AppCompatActivity {
         findViewById(R.id.btnConsultarNFE).setOnClickListener(v -> VerificarCampos());
 
         // SE O APARELHO FOR UM POS
-        if(configuracoes.GetDevice()) {
+        if (configuracoes.GetDevice()) {
             //
             iniciarStone();
         }
@@ -110,10 +110,11 @@ public class ConsultarNFE extends AppCompatActivity {
                 "778",
                 nNota.getText().toString(),
                 serie,
-                posApp.getSerial()
+                posApp.getSerial(),
+                76
         );
 
-        call.enqueue(new Callback<ValidarNFE>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<ValidarNFE> call, @NonNull Response<ValidarNFE> response) {
 
@@ -124,7 +125,7 @@ public class ConsultarNFE extends AppCompatActivity {
                     //
                     runOnUiThread(() -> {
                         if (!sincronizacao.getProtocolo().isEmpty() && sincronizacao.getProtocolo().length() >= 10) {
-
+                            Toast.makeText(ConsultarNFE.this, ""+sincronizacao.getProds_nota().size(), Toast.LENGTH_SHORT).show();
                             if (new Configuracoes().GetDevice()) {
                                 prefs.edit().putString("barcode", sincronizacao.getBarcode()).apply();
                                 prefs.edit().putString("nome", sincronizacao.getNome()).apply();
@@ -134,7 +135,12 @@ public class ConsultarNFE extends AppCompatActivity {
                                 prefs.edit().putString("nnf", sincronizacao.getNnf()).apply();
                                 prefs.edit().putString("serie", sincronizacao.getSerie()).apply();
                                 prefs.edit().putString("chave", sincronizacao.getChave()).apply();
-                                prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
+                                StringBuilder textBuffer = new StringBuilder();
+                                for (int ind = 0; ind < sincronizacao.getProds_nota().size(); ind++) {
+                                    textBuffer.append(sincronizacao.getProds_nota().get(ind).getNome()).append("{br}");
+                                }
+                                prefs.edit().putString("prods_nota", textBuffer.toString()).apply();
+                                //prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
                                 prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
                                 prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
 
@@ -165,7 +171,7 @@ public class ConsultarNFE extends AppCompatActivity {
                                 i.putExtra("form_pagamento", "");
 
                                 startActivity(i);
-                            }else {
+                            } else {
 
                                 prefs.edit().putString("barcode", sincronizacao.getBarcode()).apply();
                                 prefs.edit().putString("nome", sincronizacao.getNome()).apply();
@@ -175,7 +181,12 @@ public class ConsultarNFE extends AppCompatActivity {
                                 prefs.edit().putString("nnf", sincronizacao.getNnf()).apply();
                                 prefs.edit().putString("serie", sincronizacao.getSerie()).apply();
                                 prefs.edit().putString("chave", sincronizacao.getChave()).apply();
-                                prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
+                                StringBuilder textBuffer = new StringBuilder();
+                                for (int ind = 0; ind < sincronizacao.getProds_nota().size(); ind++) {
+                                    textBuffer.append(sincronizacao.getProds_nota().get(ind).getNome()).append("{br}");
+                                }
+                                prefs.edit().putString("prods_nota", textBuffer.toString()).apply();
+                                //prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
                                 prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
                                 prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
 
@@ -211,8 +222,7 @@ public class ConsultarNFE extends AppCompatActivity {
 
                         Log.i("CNFE", sincronizacao.getProtocolo());
                     });
-                }
-                else{
+                } else {
                     Toast.makeText(context, "NF-e Não encontrada!", Toast.LENGTH_LONG).show();
                 }
             }

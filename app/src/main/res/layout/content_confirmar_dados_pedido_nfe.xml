@@ -78,7 +78,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="4dp"
-                            android:text="P-13"
+                            android:text=""
                             android:textSize="18sp" />
 
                         <TextView
@@ -86,7 +86,8 @@
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
                             android:text="Quatidade:"
-                            android:textColor="@color/colorAccent" />
+                            android:textColor="@color/colorAccent"
+                            android:visibility="gone" />
 
                         <TextView
                             android:id="@+id/qnt"
@@ -94,14 +95,16 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="4dp"
                             android:text="0"
-                            android:textSize="18sp" />
+                            android:textSize="18sp"
+                            android:visibility="gone" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
                             android:text="Valor Unit.:"
-                            android:textColor="@color/colorAccent" />
+                            android:textColor="@color/colorAccent"
+                            android:visibility="gone" />
 
                         <TextView
                             android:id="@+id/vlt"
@@ -109,7 +112,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="4dp"
                             android:text="R$ 0,00"
-                            android:textSize="18sp" />
+                            android:textSize="18sp"
+                            android:visibility="gone" />
 
                         <TextView
                             android:layout_width="match_parent"

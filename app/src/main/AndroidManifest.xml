@@ -53,6 +53,12 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:replace="allowBackup"
         tools:targetApi="n">
+
+        <activity
+            android:name=".FinanceiroNFe"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Pix"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -229,6 +235,16 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label=""
             android:theme="@android:style/Theme.Holo.Dialog.NoActionBar" />
+        <activity
+            android:name=".pagamentos.PagamentoPix"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".pagamentos.PagamentoStone"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label=""
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
