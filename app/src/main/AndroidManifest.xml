@@ -57,30 +57,25 @@
         <activity
             android:name=".FinanceiroNFe"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Pix"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="PIX"
-            android:screenOrientation="fullSensor" />
+            android:label="PIX" />
         <activity
             android:name=".Seguranca"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Segurança"
-            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".EditarPedido"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Editar Pedido"
-            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ResetApp"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_reset_app"
-            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CancelarPagamentoCartao"
@@ -153,7 +148,6 @@
             android:name=".SplashScreen"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:screenOrientation="fullSensor"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

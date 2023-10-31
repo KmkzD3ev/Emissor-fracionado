@@ -357,7 +357,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                                                     pedidos.getId()
                                             );
 
-                                            Toast.makeText(contexto, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
+                                            //Toast.makeText(contexto, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
                                         } else {
                                             erroTransmitir = true;
                                         }
@@ -413,6 +413,8 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         } else {
             if (erroTransmitir) {
                 Toast.makeText(contexto, "Encontramos erro ao transmitir uma ou mais notas!", Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(contexto, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
             }
         }
     }

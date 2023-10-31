@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.Autorizacoes;
@@ -1220,6 +1221,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return produtos;
     }
+
     public ArrayList<ProdutosPedidoDomain> getProdutosPedidoNFe(String id_pedido) {
         ArrayList<ProdutosPedidoDomain> produtos = new ArrayList<>();
 
@@ -1259,7 +1261,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //LISTAR TODOS OS ITENS DO FINANCEIRO
-    public int getQuantProdutosPedidoNCM(int id_pedido) {
+    public int getQuantProdutosPedidoNCMGas(int id_pedido) {
         int quant = 0;
 
         String query = "SELECT  SUM(prp.quantidade) " +
@@ -1281,10 +1283,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return quant;
     }
+
+    public String getProdutosPedidoNCMGas(int id_pedido) {
+        StringBuilder str = new StringBuilder();
+
+        String query = "SELECT  pro.nome " +
+                "FROM produtos_pedido prp " +
+                "INNER JOIN produtos pro ON pro.codigo = prp.id_produto " +
+                "WHERE prp.id_pedido = '" + id_pedido + "' AND pro.ncm = '27111910'";
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                str.append(cursor.getString(0)).append(", ");
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return str.toString();
+    }
+
+    //LISTAR TODOS OS ITENS DO FINANCEIRO DIFERENTE DE GÁS
+    public List<String> getQuantProdutosPedidoNCM(int id_pedido) {
+        List<String> list = new ArrayList();
+
+        String query = "SELECT pro.codigo, SUM(prp.quantidade) quantidade " +
+                "FROM produtos_pedido prp " +
+                "INNER JOIN produtos pro ON pro.codigo = prp.id_produto " +
+                "WHERE prp.id_pedido = '" + id_pedido + "' AND pro.ncm != '27111910' " +
+                "GROUP BY pro.codigo";
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(0) != null) {
+                    list.add(cursor.getString(0) + "," + cursor.getString(1));
+                    //quant = Integer.parseInt(cursor.getString(0));
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return list;
+    }
+
     public int getQuantProdutosPedidoDiverso(int id_pedido) {
         int quant = 0;
 
-        String query = "SELECT  SUM(prp.quantidade) " +
+        String query = "SELECT SUM(prp.quantidade) " +
                 "FROM produtos_pedido prp " +
                 "INNER JOIN produtos pro ON pro.codigo = prp.id_produto " +
                 "WHERE prp.id_pedido = '" + id_pedido + "'";
@@ -2674,6 +2724,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return idsProdutos.toString();
     }
+
     public String getQuantidadesProdutosPedidoNFe(String id_pedido) {
         StringBuilder quantidadeProdutos = new StringBuilder();
 
@@ -3462,6 +3513,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return formasPag.toString();
+    }
+
+
+    public List<String> getMinMaxFracionamentoProduto(String codigo) {
+        List<String> minMax = new ArrayList<>();
+
+        String query = "SELECT minfrac_produto, maxfrac_produto " +
+                "FROM produtos pro " +
+                "WHERE pro.codigo = '" + codigo + "'";
+
+        Log.e("SQL", query);
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                if (cursor.getString(0) != null) {
+                    minMax.add(cursor.getString(0));
+                    minMax.add(cursor.getString(1));
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        if (minMax.isEmpty()) {
+            minMax.add("0");
+            minMax.add("0");
+        }
+        return minMax;
     }
 
     public void FecharConexao() {

@@ -41,8 +41,10 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -148,6 +150,8 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     ArrayList<PosApp> elementosPos;
     PosApp posApp;
+    String codigoProduto;
+    //boolean _fracionar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,6 +161,9 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         toolbar.inflateMenu(R.menu.menu_form_pedido);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        //_fracionar = false;
+        codigoProduto = "";
 
         //
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
@@ -180,27 +187,9 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         //
         bgTotal = findViewById(R.id.bgTotal);
 
-        //-------CRIA UM ID PARA O PEDIDO------//
-        //ed.putInt("id_pedido_temp", (prefs.getInt("id_pedido_temp", 0) + 1)).apply();
-
-        //ShowMsgToast(String.valueOf(prefs.getInt("id_pedido", 0)));
-
-        /*if (prefs.getInt("id_pedido", 0) == 0) {
-            ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimaNotaPOS()) + 1)).apply();
-        } else {
-            //ed.putInt("id_pedido", (Integer.parseInt(bd.getUltimoIdPedido()) + 1)).apply();
-        }*/
-
-        //idTemp = prefs.getInt("id_pedido_temp", 1);
-        /*ed.putInt("id_pedido", (prefs.getInt("id_pedido", 0) + 1)).apply();
-        idTemp = prefs.getInt("id_pedido", 1);*/
-
         //MULTIPLICA O VALOR PELA QUANTIDADE
         idTemp = bd.getProximoIdPedido();
-        Log.e("IdTemp", String.valueOf(idTemp));
-        /*if (prefs.getBoolean("primeiro_pedido", true)) {
-            ed.putBoolean("primeiro_pedido", false).apply();
-        }*/
+        //Log.e("IdTemp", String.valueOf(idTemp));
 
         //
         bd.addPedidosTemp(new PedidosTemp(
@@ -284,15 +273,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         txtValTotalPagar = findViewById(R.id.txtValTotalPagar);
         txtTotalPago = findViewById(R.id.txtTotalPago);
 
-        /*etPreco.setOnEditorActionListener((v, actionId, event) -> {
-            boolean handled = false;
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                VerificarCamposIniciarPedido();
-                handled = true;
-            }
-            return handled;
-        });*/
-
         //LISTA DE PRODUTOS
         ArrayList<String> listaProdutos = bd.getProdutos();
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, listaProdutos);
@@ -318,9 +298,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                     }
 
                     quant = bd.getQuantProdutoRemessa(parent.getItemAtPosition(position).toString());
-                    //Toast.makeText(getBaseContext(), "" + quant, Toast.LENGTH_LONG).show();
-                    //Toast.makeText(getBaseContext(), "" + bd.getQuantProdutoRemessa(parent.getItemAtPosition(position).toString()), Toast.LENGTH_LONG).show();
-                    //Toast.makeText(getBaseContext(), precoMinimo + "|" + precoMaximo, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -453,7 +430,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
         //btnEscolheFP.setOnClickListener(v -> ValidarCampFormPedido());ValidarCampFormPedido()
         btnPagamentoForm.setOnClickListener(v -> {
-            if (listaProdutosPedido.size() > 0) {
+
+            TextView txt = findViewById(R.id.msgErroFracionar);
+
+            if (!listaProdutosPedido.isEmpty()) {
                 /*
                     REGRAS PARA FRACIONAMENTO:
                     # NÃO PODE TER MAIS DE 1 PRODUTO
@@ -462,21 +442,165 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
                 */
 
                 // RECEBE A QUANTIDADE DE PRODUTOS COM O NCM = 27111910
-                quantidade = bd.getQuantProdutosPedidoNCM(idTemp);                      // QUANTIDADE DE GÁS
-                int quantProdutosDiverso = bd.getQuantProdutosPedidoDiverso(idTemp);    // PRODUTOS QUE NÃO SÃO GÁS GLP
+                quantidade = bd.getQuantProdutosPedidoNCMGas(idTemp);                      // QUANTIDADE DE GÁS
                 int quantProdutoPedido = listaProdutosPedido.size();                    // QUANTIDADE DE PRODUTOS NA LISTA
+                int quantProdutosDiverso = bd.getQuantProdutosPedidoDiverso(idTemp);    // PRODUTOS QUE NÃO SÃO GÁS GLP
 
-                // SE A QUANTIDADE DE PRODUTOS NA LISTA FOR 1 E A QUANTIDADE
-                // DE ITENS FOR MENOR OU IGUAL A 5 PODE FRACIONAR
+                // SE A QUANTIDADE DE GÁS FOR MAIOR QUE 0 E MENOR IGUAL A 5 NÃO PRECISA FRACIONAR
                 if (quantidade > 0 && quantidade <= 5) {
-                    formsView();
-                } else if (quantProdutoPedido == 1 && quantProdutosDiverso < 101) {
+                    StringBuilder str = new StringBuilder();
+                    boolean erro = false;
+                    boolean avancar = true;
+                    List<String> listPro = bd.getQuantProdutosPedidoNCM(idTemp);
+                    if (!listPro.isEmpty()) {
+                        for (int i = 0; listPro.size() > i; i++) {
+                            String[] iList = listPro.get(i).split(",");
+                            List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
+                            if (!minMaxFrac.get(0).equals("0") && !minMaxFrac.get(1).equals("0")) {
+                                int min = Integer.parseInt(minMaxFrac.get(0));
+                                int max = Integer.parseInt(minMaxFrac.get(1));
+
+                                if (Integer.parseInt(iList[1]) > max) {
+                                    avancar = false;
+                                    erro = true;
+
+                                    String sProduto = bd.getProduto(iList[0]);
+                                    str.append("Atenção:\nPara o produto ").append(sProduto).append(" a quantidade máxima por pedido é de ").append(max).append(" unidades.\n");
+                                }
+                            }
+                        }
+
+                        if (erro) {
+                            txt.setVisibility(View.VISIBLE);
+                            txt.setText(str.toString());
+                        }
+                    }
+
+                    if (avancar)
+                        formsView();
+                }
+                // SE A QUATIDADE DE PRODUTOS NA LISTA FOR IGUAL 1 E A QUANTIDADE DO PRODUTO FOR MENOR QUE 101 PODE FRACIONAR
+                else if (quantProdutoPedido == 1 && quantProdutosDiverso < 101) {
+                    //_fracionar = true;
                     // PARA FRACIONAR NOTAS DE ÁGUA E OUTROS PRODUTOS SEM SER GÁS
                     quantidade = quantProdutosDiverso;
                     formsView();
+                }
+                // SE A QUATIDADE DE PRODUTOS NA LISTA FOR IGUAL 1 E A QUANTIDADE DO PRODUTO FOR MENOR QUE 101 PODE FRACIONAR
+                else if (quantProdutoPedido == 1) {
+                    // VERIFICA SE A QUANTIDADE DE GÁS É MAIOR QUE 5
+                    if (quantidade > 5) {
+                        txt.setVisibility(View.VISIBLE);
+                        String proPedido = bd.getProdutosPedidoNCMGas(idTemp);
+                        txt.setText(MessageFormat.format("Atenção:\nPara quantidades acima de 5 unidades do(s) produto(s) {0}não é permitido adicionar outros itens na nota. Favor emitir em notas separadas.", proPedido));
+                        return;
+                    }
+
+                    // PARA FRACIONAR NOTAS DE ÁGUA E OUTROS PRODUTOS SEM SER GÁS
+                    //quantidade = quantProdutosDiverso;
+                    StringBuilder str = new StringBuilder();
+                    boolean erro = false;
+                    boolean avancar = true;
+                    List<String> listPro = bd.getQuantProdutosPedidoNCM(idTemp);
+                    if (!listPro.isEmpty()) {
+                        for (int i = 0; listPro.size() > i; i++) {
+                            String[] iList = listPro.get(i).split(",");
+                            List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
+                            if (!minMaxFrac.get(0).equals("0") && !minMaxFrac.get(1).equals("0")) {
+                                int min = Integer.parseInt(minMaxFrac.get(0));
+                                int max = Integer.parseInt(minMaxFrac.get(1));
+
+                                    avancar = false;
+                                    erro = true;
+
+                                    String sProduto = bd.getProduto(iList[0]);
+                                    str.append("Atenção:\nPara o produto ").append(sProduto).append(" a quantidade máxima por pedido é de ").append(max).append(" unidades.\n");
+                              
+                            }
+                        }
+
+                        if (erro) {
+                            txt.setVisibility(View.VISIBLE);
+                            txt.setText(str.toString());
+                        }
+                    }
+
+                    if (avancar)
+                        formsView();
+                }else if (quantProdutoPedido > 1) {
+                    // VERIFICA SE A QUANTIDADE DE GÁS É MAIOR QUE 5
+                    if (quantidade > 5) {
+                        txt.setVisibility(View.VISIBLE);
+                        String proPedido = bd.getProdutosPedidoNCMGas(idTemp);
+                        txt.setText(MessageFormat.format("Atenção:\nPara quantidades acima de 5 unidades do(s) produto(s) {0}não é permitido adicionar outros itens na nota. Favor emitir em notas separadas.", proPedido));
+                        return;
+                    }
+
+                    // PARA FRACIONAR NOTAS DE ÁGUA E OUTROS PRODUTOS SEM SER GÁS
+                    //quantidade = quantProdutosDiverso;
+                    StringBuilder str = new StringBuilder();
+                    boolean erro = false;
+                    boolean avancar = true;
+                    List<String> listPro = bd.getQuantProdutosPedidoNCM(idTemp);
+                    if (!listPro.isEmpty()) {
+                        for (int i = 0; listPro.size() > i; i++) {
+                            String[] iList = listPro.get(i).split(",");
+                            List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
+                            if (!minMaxFrac.get(0).equals("0") && !minMaxFrac.get(1).equals("0")) {
+                                int min = Integer.parseInt(minMaxFrac.get(0));
+                                int max = Integer.parseInt(minMaxFrac.get(1));
+
+                                //Toast.makeText(this, iList[1] + " | " + max, Toast.LENGTH_SHORT).show();
+
+                                if (Integer.parseInt(iList[1]) > max) {
+                                    avancar = false;
+                                    erro = true;
+
+                                    String sProduto = bd.getProduto(iList[0]);
+                                    str.append("Atenção:\nPara o produto ").append(sProduto).append(" a quantidade máxima por pedido é de ").append(max).append(" unidades.\n");
+                                }
+                            }
+                        }
+
+                        if (erro) {
+                            txt.setVisibility(View.VISIBLE);
+                            txt.setText(str.toString());
+                        }
+                    }
+
+                    if (avancar)
+                        formsView();
                 } else {
-                    findViewById(R.id.msgErroFracionar).setVisibility(View.VISIBLE);
-                    //Toast.makeText(this, "Não é possível emitir NFCe com mais de 1 produto e quantidade superios a 5 unidades de Gás GLP", Toast.LENGTH_LONG).show();
+
+                    StringBuilder str = new StringBuilder();
+                    boolean erro = false;
+                    List<String> listPro = bd.getQuantProdutosPedidoNCM(idTemp);
+                    if (!listPro.isEmpty()) {
+                        for (int i = 0; listPro.size() > i; i++) {
+                            String[] iList = listPro.get(i).split(",");
+                            List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
+                            if (!minMaxFrac.get(0).equals("0") && !minMaxFrac.get(1).equals("0")) {
+                                int min = Integer.parseInt(minMaxFrac.get(0));
+                                int max = Integer.parseInt(minMaxFrac.get(1));
+
+                                if (Integer.parseInt(iList[1]) > max) {
+                                    erro = true;
+
+                                    String sProduto = bd.getProduto(iList[0]);
+                                    str.append("Atenção:\nLimite de quantidade para o produto ").append(sProduto).append(": \nQuantidade máxima por pedido: ").append(max).append(" unidades.\n").append("Quantidade máxima por lote: 100 unidades.");
+
+                                }
+                            }
+                        }
+
+                        if (erro) {
+                            txt.setVisibility(View.VISIBLE);
+                            txt.setText(str.toString());
+                        }
+                    } else {
+                        txt.setVisibility(View.VISIBLE);
+                        txt.setText(R.string.msg_erro_fracionamento);
+                    }
                 }
             } else {
                 Toast.makeText(this, "Adicione pelo menos um produto", Toast.LENGTH_LONG).show();
@@ -957,36 +1081,23 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     private void formsView() {
 
-        // Verifica a quantidade máxima permeitida
+        /*// Verifica a quantidade máxima permeitida
         if (quantidade > 5) {
             ShowMsgToast("Maior que 5");
             txtValorFormaPagamento.setEnabled(false);
             spFormasPagamento.setAdapter(null);
             spFormasPagamento.setAdapter(adapterFormasPagamentoDinheiro);
-        }
+        }*/
 
+        //
         fracionar();
 
-        //
-        /*quantidade = Integer.parseInt(etQuantidade.getText().toString());
-
-        //
-        String valorUnit = String.valueOf(aux.converterValores(etPreco.getText().toString()));
-
-        //MULTIPLICA O VALOR PELA QUANTIDADE
-        String[] multiplicar = {valorUnit, etQuantidade.getText().toString()};
-        String total = String.valueOf(aux.multiplicar(multiplicar));
-
-        String valorDesc = String.valueOf(aux.converterValores(etDesconto.getText().toString()));
-        String[] multiplicarDesc = {valorDesc, etQuantidade.getText().toString()};
-        String desconto = String.valueOf(aux.multiplicar(multiplicarDesc));
-
-        String[] subtrair = {total, desconto};
-        total = String.valueOf(aux.subitrair(subtrair));
-
-        //
-        txtProduto.setText(String.format("Produto: %s", spProduto.getSelectedItem().toString()));
-        txtQuant.setText(String.format("Quantidade: %s", etQuantidade.getText().toString()));*/
+        // Verifica a quantidade máxima permeitida
+        if (NotaFracionada.equals("1")) {
+            txtValorFormaPagamento.setEnabled(false);
+            spFormasPagamento.setAdapter(null);
+            spFormasPagamento.setAdapter(adapterFormasPagamentoDinheiro);
+        }
 
         txtCpfCnpjCli.setText(String.format("Cpf/Cnpj: %s", cpf_cnpj_cliente.getText().toString()));
         String total = bd.getValorTotalPedido(String.valueOf(idTemp), String.valueOf(aux.converterValores(etDesconto.getText().toString())));
@@ -994,7 +1105,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         txtTotalFinanceiro.setText(aux.maskMoney(new BigDecimal(total)));
         txtValorFormaPagamento.setText(aux.maskMoney(new BigDecimal(total)));
         //
-        //formDadosPedido.setVisibility(View.GONE);
         formVenda.setVisibility(View.GONE);
         formFinanceiroPedido.setVisibility(View.VISIBLE);
     }
@@ -1002,18 +1112,14 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     private void VerificarCamposIniciarPedido(boolean pagamento) {
 
         //ESCODER O TECLADO
-        // TODO Auto-generated method stub
         try {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
             Objects.requireNonNull(imm).hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
-        } catch (Exception e) {
-            // TODO: handle exception
+        } catch (Exception ignored) {
         }
 
         //
         if (!compararValorRestante()) return;
-
-        //Log.i("Valor", String.valueOf(aux.converterValores(etPreco.getText().toString())));
 
         String valEtPreco = "";
         if (!etPreco.getText().toString().equals("")) {
@@ -1021,23 +1127,12 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
         }
 
         //
-        /*if (spFormasPagamento.getSelectedItem().toString().equals("FORMA PAGAMENTO")) {
-            ShowMsgToast("Selecione a forma de pagamento.");
-        } else if (spProduto.getSelectedItem().toString().equals("PRODUTO")) {
-            ShowMsgToast("Selecione um produto.");
-        } else if (etQuantidade.getText().toString().equals("") || etQuantidade.getText().toString().equals("0")) {
-            ShowMsgToast("Informe a quantidade.");
-        } else if (Integer.parseInt(etQuantidade.getText().toString()) > quant) {
-            ShowMsgToast("Restam apenas " + quant + " itens. Diminua a quantidade!");
-        } else */
         if (etPreco.getText().toString().equals("")
                 || valEtPreco.equals("R$ 0,00")
                 || valEtPreco.equals("0.0")
                 || valEtPreco.equals("0.00")) {
             ShowMsgToast("Informe o valor unitário.");
         } else {
-
-
             String[] ars = {precoMinimo, String.valueOf(aux.converterValores(etPreco.getText().toString()))};
             int vComp = aux.comparar(ars);
             //
@@ -1079,7 +1174,7 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
 
     private void confirmar() {
 
-        if (bd.getPedidosTransmitirFecharDia().size() > 0) {
+        if (!bd.getPedidosTransmitirFecharDia().isEmpty()) {
             // APAGA TODOS OS PAGAMENTOS PIX COM STATUS 1
             bd.deleteFormPagPIX();
 
@@ -1097,28 +1192,10 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             i.putExtra("nsu", etNsuCeara.getText().toString());
             i.putExtra("desconto", etDesconto.getText().toString());
 
-            /*//
-            Intent i = new Intent(getBaseContext(), ConfirmarDadosPedido.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
-            i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
-            i.putExtra("produto", spProduto.getSelectedItem().toString());
-            i.putExtra("qnt", etQuantidade.getText().toString());
-            i.putExtra("vlt", etPreco.getText().toString());
-            i.putExtra("credenciadora", idCredenciadoras.get(spDescricaoCredenciadora.getSelectedItemPosition()));//spDescricaoCredenciadora.getSelectedItem().toString()
-            i.putExtra("bandeira", aux.getIdBandeira(spBandeiraCredenciadora.getSelectedItem().toString()));
-            i.putExtra("cod_aut", etCodAutorizacao.getText().toString());
-            i.putExtra("nsu", etNsuCeara.getText().toString());
-            i.putExtra("desconto", etDesconto.getText().toString());*/
-
             startActivity(i);
             finish();
         } else {
             Toast.makeText(getBaseContext(), "Encontramos um problema com esse pedido. Precisa refazer!", Toast.LENGTH_SHORT).show();
-
-            //Intent i = new Intent(getBaseContext(), Principal.class);
-            //startActivity(i);
-            //finish();
         }
     }
 
@@ -1147,9 +1224,6 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
             i = new Intent(getBaseContext(), GerenciarPagamentoCartao.class);
         }
 
-        /*i.putExtra("qnt", etQuantidade.getText().toString());
-        i.putExtra("vlt", etPreco.getText().toString());
-        i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());*/
         i.putExtra("cpfCnpj_cliente", cpf_cnpj_cliente.getText().toString());
         i.putExtra("formaPagamento", spFormasPagamento.getSelectedItem().toString());
         i.putExtra("produto", spProduto.getSelectedItem().toString());
@@ -1431,13 +1505,38 @@ public class FormPedidos extends AppCompatActivity implements AdapterView.OnItem
     boolean dd = false;
 
     public void fracionar() {
-        if (quantidade > 5) {
-            Random r = new Random();
-            random = r.nextInt(6 - 1) + 1;
-            NotaFracionada = "1";
+        //if (_fracionar) {
+        if (bd.getQuantProdutosPedidoNCMGas(idTemp) > 0) {
+            if (quantidade > 5) {
+                Random r = new Random();
+                random = r.nextInt(6 - 1) + 1;
+                NotaFracionada = "1";
+            } else {
+                random = quantidade;
+            }
         } else {
-            random = quantidade;
+            List<String> listPro = bd.getQuantProdutosPedidoNCM(idTemp);
+            String[] iList = listPro.get(0).split(",");
+            List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
+            if (!minMaxFrac.get(0).equals("0") && !minMaxFrac.get(1).equals("0")) {
+                int min = Integer.parseInt(minMaxFrac.get(0));
+                int max = Integer.parseInt(minMaxFrac.get(1));
+                if (quantidade > max) {
+                    Random r = new Random();
+                    random = r.nextInt(max - min) + 1;
+                    NotaFracionada = "1";
+                } else {
+                    random = quantidade;
+                }
+                //Toast.makeText(this, "Fracionar produto diferente de gás", Toast.LENGTH_SHORT).show();
+            } else {
+                random = quantidade;
+            }
         }
+
+        /*} else {
+            random = quantidade;
+        }*/
 
         String[] sub = {String.valueOf(quantidade), String.valueOf(random)};
         quantidade = aux.subitrair(sub).intValue();
