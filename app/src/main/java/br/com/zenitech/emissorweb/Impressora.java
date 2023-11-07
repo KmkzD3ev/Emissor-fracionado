@@ -1892,7 +1892,7 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append("{reset}{center}").append(tamFont).append(linhas).append("------------------------------------------------{br}");
             //
             textBuffer.append("{reset}{center}").append(tamFont).append("NATUREZA DA OPRACAO{br}");
-            textBuffer.append("{reset}{center}").append(tamFont).append("VENDA DE GLP DENTRO DO ESTADO - REVENDA{br}");
+            textBuffer.append("{reset}{center}").append(tamFont).append(prefs.getString("nat_op", "")).append("{br}");
             //
             textBuffer.append("{reset}{center}").append(tamFont).append(linhas).append("------------------------------------------------{br}");
             //
@@ -2029,7 +2029,7 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
             //
             textBuffer.append(tamFont).append("NATUREZA DA OPRACAO{br}");
-            textBuffer.append(tamFont).append("VENDA DE GLP DENTRO DO ESTADO - REVENDA{br}");
+            textBuffer.append(tamFont).append(prefs.getString("nat_op", "")).append("{br}");
             //
             textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
             //

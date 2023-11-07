@@ -313,28 +313,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //
     double getTributosProduto(String Produto, String ValTotal) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        myDataBase = this.getWritableDatabase();
         ClassAuxiliar aux = new ClassAuxiliar();
-        String tributo = "";
+        double tributo = 0.0;
         String tot = String.valueOf(aux.converterValores(ValTotal));
         //
         Cursor produtos;
-        String query_pos = "" +
-                "SELECT (((pro.tributose + pro.tributosn + pro.tributosm) / 100) * " + tot + ") as tributos FROM produtos pro " +
+        String query_pos = "SELECT (((pro.tributose + pro.tributosn + pro.tributosm) / 100) * " + tot + ") as tributos FROM produtos pro " +
                 "WHERE pro.nome = '" + Produto + "' LIMIT 1";
         Log.e(TAG, query_pos);
-        produtos = db.rawQuery(query_pos, null);
+        produtos = myDataBase.rawQuery(query_pos, null);
         if (produtos.moveToFirst()) {
-            do {
-
-                tributo = produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO));
-
-            } while (produtos.moveToNext());
+            tributo = Double.parseDouble(produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)));
         }
 
         produtos.close();
 
-        return Double.parseDouble(tributo);
+        return tributo;
     }
 
     //

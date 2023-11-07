@@ -1,13 +1,17 @@
 package br.com.zenitech.emissorweb;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import android.util.Log;
 import android.view.MenuItem;
@@ -70,6 +74,32 @@ public class ConsultarNFE extends AppCompatActivity {
             //
             iniciarStone();
         }
+
+        CheckPermission();
+        ativarBluetooth();
+    }
+
+    private void CheckPermission() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN)
+                != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT)
+                        != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.BLUETOOTH_SCAN, android.Manifest.permission.BLUETOOTH_CONNECT},
+                        128);
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BLUETOOTH_ADMIN},
+                    128);
+        }
+    }
+
+    private void ativarBluetooth() {
+        new AtivarDesativarBluetooth().enableBT(context, this);
     }
 
     // Iniciar o Stone
@@ -143,6 +173,7 @@ public class ConsultarNFE extends AppCompatActivity {
                                 //prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
                                 prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
                                 prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
+                                prefs.edit().putString("nat_op", sincronizacao.getNat_op()).apply();
 
                                 Intent i = new Intent(context, ImpressoraPOS.class);
 
