@@ -393,7 +393,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //
-    double getTributosEProduto(String Produto, String ValTotal) {
+    double  getTributosEProduto(String Produto, String ValTotal) {
         SQLiteDatabase db = this.getWritableDatabase();
         ClassAuxiliar aux = new ClassAuxiliar();
         String tributo = "";

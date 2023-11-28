@@ -624,12 +624,12 @@ public class Principal extends AppCompatActivity
                     Intent i = new Intent(context, ImpressoraPOS.class);
                     i.putExtra("imprimir", "comprovante_pix_reimp");
                     startActivity(i);
-                }/* else {
-                //
-                Intent i = new Intent(context, Impressora.class);
-                i.putExtra("imprimir", "reimpressao_comprovante");
-                startActivity(i);
-            }*/
+                } else {
+                    //
+                    Intent i = new Intent(context, Impressora.class);
+                    i.putExtra("imprimir", "comprovante_pix_reimp");
+                    startActivity(i);
+                }
             } else
                 makeText(context, "Nada para imprimir", LENGTH_SHORT).show();
         }
@@ -777,7 +777,7 @@ public class Principal extends AppCompatActivity
                             context.deleteDatabase("emissorwebDB");
                             //Intent i = new Intent(context, Sincronizar.class);
                             Intent i = new Intent(context, AppFinalizado.class);
-                            if(initAuto){
+                            if (initAuto) {
                                 i.putExtra("initAuto", true);
                             }
                             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);

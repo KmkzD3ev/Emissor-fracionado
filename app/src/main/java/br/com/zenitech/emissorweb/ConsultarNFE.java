@@ -220,6 +220,7 @@ public class ConsultarNFE extends AppCompatActivity {
                                 //prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
                                 prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
                                 prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
+                                prefs.edit().putString("nat_op", sincronizacao.getNat_op()).apply();
 
                                 Intent i = new Intent(context, Impressora.class);
 

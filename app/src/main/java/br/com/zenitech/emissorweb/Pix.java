@@ -3,6 +3,7 @@ package br.com.zenitech.emissorweb;
 import static br.com.zenitech.emissorweb.Configuracoes.token_authorization;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -58,11 +59,13 @@ public class Pix extends AppCompatActivity {
     Unidades unidades;
 
     MyCountDownTimer time;
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pix);
+        context = this;
         bd = new DatabaseHelper(this);
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
 
@@ -130,6 +133,8 @@ public class Pix extends AppCompatActivity {
         super.onResume();
         VerificarActivityAtiva.activityResumed();
         espera();
+
+        new AtivarDesativarBluetooth().enableBT(context, this);
     }
 
     @Override
@@ -395,7 +400,17 @@ public class Pix extends AppCompatActivity {
         if (VerificarActivityAtiva.isActivityVisible()) {
             if (totPrint == 0) {
                 totPrint = 1;
-                ImprimirComprovante();
+
+                Configuracoes configuracoes = new Configuracoes();
+                if (configuracoes.GetDevice()) {
+                    ImprimirComprovante();
+                } else {
+                    //
+                    Intent i = new Intent(context, Impressora.class);
+                    i.putExtra("imprimir", "comprovante_pix_reimp");
+                    i.putExtra("impressao_pix", true);
+                    startActivity(i);
+                }
             }
 
             new Handler().postDelayed(() -> {

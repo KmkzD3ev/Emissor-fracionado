@@ -8,8 +8,8 @@ import android.content.pm.PackageManager;
 
 import androidx.core.app.ActivityCompat;
 
-class AtivarDesativarBluetooth {
-    void enableBT(Context context, Activity activity) {
+public class AtivarDesativarBluetooth {
+    public void enableBT(Context context, Activity activity) {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!mBluetoothAdapter.isEnabled()) {
             if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {

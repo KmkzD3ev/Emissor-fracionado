@@ -1,9 +1,11 @@
 package br.com.zenitech.emissorweb.pagamentos;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -22,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.core.app.ActivityCompat;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,6 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.stone.posandroid.providers.PosPrintProvider;
+import br.com.zenitech.emissorweb.AtivarDesativarBluetooth;
+import br.com.zenitech.emissorweb.Impressora;
+import br.com.zenitech.emissorweb.ImpressoraPOS;
 import br.com.zenitech.emissorweb.R;
 import br.com.zenitech.emissorweb.ClassAuxiliar;
 import br.com.zenitech.emissorweb.Configuracoes;
@@ -128,6 +134,8 @@ public class PagamentoPix extends AppCompatActivity {
         super.onResume();
         VerificarActivityAtiva.activityResumed();
         espera();
+
+        new AtivarDesativarBluetooth().enableBT(context, this);
     }
 
     @Override
@@ -382,7 +390,17 @@ public class PagamentoPix extends AppCompatActivity {
         if (VerificarActivityAtiva.isActivityVisible()) {
             if (totPrint == 0) {
                 totPrint = 1;
+
+                Configuracoes configuracoes = new Configuracoes();
+                if (configuracoes.GetDevice()) {
                     ImprimirComprovante();
+                } else {
+                    //
+                    Intent i = new Intent(context, Impressora.class);
+                    i.putExtra("imprimir", "comprovante_pix_reimp");
+                    i.putExtra("impressao_pix", true);
+                    startActivity(i);
+                }
             }
 
             new Handler().postDelayed(() -> {

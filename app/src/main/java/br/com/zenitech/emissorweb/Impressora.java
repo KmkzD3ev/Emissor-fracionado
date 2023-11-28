@@ -66,6 +66,7 @@ import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosNFE;
+import br.com.zenitech.emissorweb.domains.PrintPixDomain;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import br.com.zenitech.emissorweb.network.PrinterServer;
 import br.com.zenitech.emissorweb.util.HexUtil;
@@ -80,6 +81,7 @@ public class Impressora extends AppCompatActivity {
 
     // Pedido para obter o dispositivo bluetooth
     private static final int DEFAULT_NETWORK_PORT = 9100;
+    private boolean impressao_pix = false;
 
     // Interface, usado para invocar a operação da impressora assíncrona.
     private interface PrinterRunnable {
@@ -193,6 +195,7 @@ public class Impressora extends AppCompatActivity {
                 tributosM = params.getString("tributosM");
                 tipoImpressao = params.getString("imprimir");
                 form_pagamento = params.getString("form_pagamento");
+                impressao_pix = params.getBoolean("impressao_pix");
 
                 linhaProduto = new String[]{
                         "1 " + id_produto + "      " + produto,
@@ -310,6 +313,9 @@ public class Impressora extends AppCompatActivity {
                     //Imprimir comprovante do pagamento cartão
                     imprimirComprovanteCancelCartaoCliente();
                     tempoImprCompCancelEsta(5000);
+                } else if (tipoImpressao.equals("comprovante_pix_reimp")) {
+
+                    ComprovantePixReimpressao();
                 } else {
 
                     //Imprimir nota fiscal eletronica
@@ -1619,6 +1625,37 @@ public class Impressora extends AppCompatActivity {
             printer.flush();
 
         }, R.string.msg_printing_comp_pag_cartao_nfce);
+    }
+
+    void ComprovantePixReimpressao() {
+        // --------------------     COMPROVANTE PIX         --------------------------------------------
+
+        runTask((dialog, printer) -> {
+            final BitmapFactory.Options optionsStone = new BitmapFactory.Options();
+            optionsStone.inScaled = false;
+
+            PrintPixDomain printPixDomain = bd.ultimoPIX();
+
+            ClassAuxiliar aux = new ClassAuxiliar();
+            String strPix = "";
+            if(!impressao_pix) {strPix = tamFont + "          REIMPRESSAO" + "{br}";}
+            //
+            String txtCompPag2 = tamFont + "{br}" +
+                    tamFont + "        Comprovante Pix" + "{br}" +
+                    tamFont + "        Via do Lojista" + "{br}" +
+                    strPix +
+                    tamFont + "Pedido: " + printPixDomain.id_pedido + "{br}" +
+                    tamFont + "Identificador: {br}" + printPixDomain.id_cobranca_pix + "{br}" +
+                    tamFont + "Valor: " + aux.maskMoney(new BigDecimal(printPixDomain.valor)) + "{br}" +
+                    tamFont + "Data/Hora: " + aux.exibirData(printPixDomain.data) + " - " + printPixDomain.hora + "{br}";
+            //printer.reset();
+            printer.printTaggedText(txtCompPag2);
+            printer.feedPaper(120);
+            printer.flush();
+
+            finish();
+
+        }, R.string.msg_printing_comp_pag_pix);
     }
 
     void tempoImprCompViaCli() {
