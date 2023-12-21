@@ -83,7 +83,7 @@ public class PrintViewHelper {
         view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
 
         Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(),
-                view.getMeasuredHeight(), Bitmap.Config.RGB_565);
+                view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);//Bitmap.Config.RGB_565
         Canvas canvas = new Canvas(bitmap);
         Drawable background = view.getBackground();
 

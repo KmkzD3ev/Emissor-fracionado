@@ -2129,9 +2129,9 @@
             android:orientation="vertical">
 
             <RelativeLayout
-                android:background="@drawable/bg_reimpressao"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_reimpressao">
 
                 <!--<ImageView
                     android:layout_width="190dp"
@@ -2304,4 +2304,223 @@
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
+
+    <!-- MODELO DE IMPRESSÃO PIX -->
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/modelComprovantePix"
+        android:layout_width="140dp"
+        android:layout_height="150dp"
+        android:background="@android:color/white"
+        android:gravity="top|center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtEmpresaPix"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/verdana"
+            android:gravity="center"
+            android:text="DEPOSITO DE GAS SAO TOME LTDA"
+            android:textColor="@android:color/black"
+            android:textSize="7sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtCNPJPix"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/verdana"
+            android:gravity="center"
+            android:text="CNPJ: 00.000.000/0001-00"
+            android:textColor="@android:color/black"
+            android:textSize="7sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text="BANCO: "
+                android:textColor="@android:color/black"
+                android:textSize="7sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtBancoPix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text=""
+                android:textColor="@android:color/black"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@android:color/black" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="@font/verdana"
+            android:gravity="center"
+            android:text="COMPROVANTE PIX"
+            android:textColor="@android:color/black"
+            android:textSize="7sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@android:color/black" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/verdana"
+            android:gravity="end"
+            android:text="Via Lojista"
+            android:textColor="@android:color/black"
+            android:textSize="7sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtReimpressaoPix"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/verdana"
+            android:gravity="end"
+            android:text="REIMPRESSAO"
+            android:textColor="@android:color/black"
+            android:textSize="7sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text="Valor: "
+                android:textColor="@android:color/black"
+                android:textSize="7sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtValorPix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text="0,00"
+                android:textColor="@android:color/black"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text="Pedido: "
+                android:textColor="@android:color/black"
+                android:textSize="7sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtNPedido"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text="0"
+                android:textColor="@android:color/black"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text="Identificado: "
+                android:textColor="@android:color/black"
+                android:textSize="7sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtIdentificadoPix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text=""
+                android:textColor="@android:color/black"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text="Data/Hora:"
+                android:textColor="@android:color/black"
+                android:textSize="7sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtDataHoraPix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/verdana"
+                android:gravity="end"
+                android:text="00/00/0000 - 00:00:00"
+                android:textColor="@android:color/black"
+                android:textSize="8sp"
+                android:textStyle="bold" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </RelativeLayout>

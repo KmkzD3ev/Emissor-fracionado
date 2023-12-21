@@ -85,4 +85,26 @@ public class MaskUtil {
             }
         };
     }
+
+    public static String maskCnpj(String cnpj) {
+        String cleanedCnpj = unmask(cnpj);
+        StringBuilder maskAux = new StringBuilder();
+
+        int cnpjIndex = 0;
+        for (char m : CNPJMask.toCharArray()) {
+            if (m != '#') {
+                maskAux.append(m);
+            } else {
+                if (cnpjIndex < cleanedCnpj.length()) {
+                    maskAux.append(cleanedCnpj.charAt(cnpjIndex));
+                    cnpjIndex++;
+                } else {
+                    // Break se não houver mais dígitos no CNPJ
+                    break;
+                }
+            }
+        }
+
+        return maskAux.toString();
+    }
 }

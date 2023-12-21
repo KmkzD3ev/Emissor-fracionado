@@ -2403,7 +2403,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private Unidades cursorToUnidade(Cursor cursor) {
-        Unidades unidades = new Unidades(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        Unidades unidades = new Unidades(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         //
         unidades.setCodigo(cursor.getString(0));
         unidades.setRazao_social(cursor.getString(1));
@@ -2429,6 +2429,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             unidades.setCliente_secret_transfeera(cursor.getString(20));
             unidades.setPix_key_transfeera(cursor.getString(21));
         } catch (Exception ignored) {
+
+        }
+        try {
+            unidades.setBanco_pix(cursor.getString(22));
+        }catch (Exception ignored) {
 
         }
         return unidades;

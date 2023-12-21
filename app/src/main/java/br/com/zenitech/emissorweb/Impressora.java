@@ -1,6 +1,7 @@
 package br.com.zenitech.emissorweb;
 
 import static br.com.zenitech.emissorweb.ClassAuxiliar.getSha1Hex;
+import static br.com.zenitech.emissorweb.MaskUtil.maskCnpj;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -23,10 +24,12 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
@@ -58,10 +61,12 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
+import br.com.zenitech.emissorweb.controller.PrintViewHelper;
 import br.com.zenitech.emissorweb.domains.AutorizacoesPinpad;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
@@ -1630,18 +1635,70 @@ public class Impressora extends AppCompatActivity {
     void ComprovantePixReimpressao() {
         // --------------------     COMPROVANTE PIX         --------------------------------------------
 
+        //
+        LinearLayoutCompat MdelComprovantePix = findViewById(R.id.modelComprovantePix);
+        TextView txtEmpresaPix, txtCNPJPix, txtBancoPix, txtValorPix, txtNPedido,
+                txtIdentificadoPix, txtDataHoraPix, txtReimpressaoPix;
+
+        txtEmpresaPix = findViewById(R.id.txtEmpresaPix);
+        txtCNPJPix = findViewById(R.id.txtCNPJPix);
+        txtBancoPix = findViewById(R.id.txtBancoPix);
+        txtValorPix = findViewById(R.id.txtValorPix);
+        txtNPedido = findViewById(R.id.txtNPedido);
+        txtIdentificadoPix = findViewById(R.id.txtIdentificadoPix);
+        txtDataHoraPix = findViewById(R.id.txtDataHoraPix);
+        txtReimpressaoPix = findViewById(R.id.txtReimpressaoPix);
+
+        if (!impressao_pix) {
+            txtReimpressaoPix.setVisibility(View.VISIBLE);
+        }
+
+        elementosUnidade = bd.getUnidades();
+        unidades = elementosUnidade.get(0);
+        ClassAuxiliar aux = new ClassAuxiliar();
+        PrintPixDomain printPixDomain = bd.ultimoPIX();
+
+        txtEmpresaPix.setText(unidades.getRazao_social());
+        txtCNPJPix.setText("CNPJ: " + maskCnpj(unidades.getCnpj()));
+        txtBancoPix.setText(unidades.getBanco_pix());
+        txtValorPix.setText(aux.maskMoney(new BigDecimal(printPixDomain.valor)));
+        txtNPedido.setText(printPixDomain.id_pedido);
+        txtIdentificadoPix.setText(printPixDomain.id_cobranca_pix);
+        txtDataHoraPix.setText(aux.exibirData(printPixDomain.data) + " - " + printPixDomain.hora);
+        // GERAR IMAGEM DE IMPRESSÃO
+
+        PrintViewHelper printViewHelper = new PrintViewHelper();
+        Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(MdelComprovantePix, 140, 150);
+
+        //
+        final int widthStone = Objects.requireNonNull(bitmapCabecalhoNFCe).getWidth();
+        final int heightStone = bitmapCabecalhoNFCe.getHeight();
+        final int[] argbStone = new int[widthStone * heightStone];
+        bitmapCabecalhoNFCe.getPixels(argbStone, 0, widthStone, 0, 0, widthStone, heightStone);
+        bitmapCabecalhoNFCe.recycle();
+
         runTask((dialog, printer) -> {
             final BitmapFactory.Options optionsStone = new BitmapFactory.Options();
             optionsStone.inScaled = false;
-
-            PrintPixDomain printPixDomain = bd.ultimoPIX();
-
-            ClassAuxiliar aux = new ClassAuxiliar();
             String strPix = "";
-            if(!impressao_pix) {strPix = tamFont + "          REIMPRESSAO" + "{br}";}
+            if (!impressao_pix) {
+                strPix = tamFont + "          REIMPRESSAO" + "{br}";
+            }
+
+            //printer.reset();
+            printer.printImage(argbStone, widthStone, heightStone, Printer.ALIGN_CENTER, true);
+            printer.feedPaper(0);
+
+
             //
             String txtCompPag2 = tamFont + "{br}" +
+                    tamFont + unidades.getRazao_social() + "{br}" +
+                    tamFont + unidades.getCnpj() + "{br}" +
+                    tamFont + "{br}" +
+                    tamFont + "Banco: " + "{br}" +
+                    tamFont + "-----------------------------------------{br}" +
                     tamFont + "        Comprovante Pix" + "{br}" +
+                    tamFont + "-----------------------------------------{br}" +
                     tamFont + "        Via do Lojista" + "{br}" +
                     strPix +
                     tamFont + "Pedido: " + printPixDomain.id_pedido + "{br}" +
@@ -1649,7 +1706,7 @@ public class Impressora extends AppCompatActivity {
                     tamFont + "Valor: " + aux.maskMoney(new BigDecimal(printPixDomain.valor)) + "{br}" +
                     tamFont + "Data/Hora: " + aux.exibirData(printPixDomain.data) + " - " + printPixDomain.hora + "{br}";
             //printer.reset();
-            printer.printTaggedText(txtCompPag2);
+            //printer.printTaggedText(txtCompPag2);
             printer.feedPaper(120);
             printer.flush();
 

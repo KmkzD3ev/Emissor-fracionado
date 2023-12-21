@@ -24,8 +24,9 @@ public class Unidades {
     private String idCSC;
     private String CSC;
     private String url_qrcode;
+    private String banco_pix;
 
-    public Unidades(String codigo, String razao_social, String cnpj, String endereco, String numero, String bairro, String cep, String telefone, String ie, String cidade, String uf, String codigo_ibge, String url_consulta, String codloja, String api_key_asaas, String cliente_cob_asaas, String cliente_id_transfeera, String cliente_secret_transfeera, String pix_key_transfeera, String idCSC, String CSC, String url_qrcode) {
+    public Unidades(String codigo, String razao_social, String cnpj, String endereco, String numero, String bairro, String cep, String telefone, String ie, String cidade, String uf, String codigo_ibge, String url_consulta, String codloja, String api_key_asaas, String cliente_cob_asaas, String cliente_id_transfeera, String cliente_secret_transfeera, String pix_key_transfeera, String idCSC, String CSC, String url_qrcode, String banco_pix) {
         this.codigo = codigo;
         this.razao_social = razao_social;
         this.cnpj = cnpj;
@@ -48,6 +49,7 @@ public class Unidades {
         this.idCSC = idCSC;
         this.CSC = CSC;
         this.url_qrcode = url_qrcode;
+        this.banco_pix = banco_pix;
     }
 
     public String getCodigo() {
@@ -224,5 +226,13 @@ public class Unidades {
 
     public void setUrl_qrcode(String url_qrcode) {
         this.url_qrcode = url_qrcode;
+    }
+
+    public String getBanco_pix() {
+        return banco_pix;
+    }
+
+    public void setBanco_pix(String banco_pix) {
+        this.banco_pix = banco_pix;
     }
 }
