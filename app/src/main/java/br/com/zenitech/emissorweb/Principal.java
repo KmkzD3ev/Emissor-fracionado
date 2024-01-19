@@ -291,6 +291,7 @@ public class Principal extends AppCompatActivity
             return;
         }
         startActivity(new Intent(context, FormPedidos.class));
+        //startActivity(new Intent(context, FinanceiroNFCe.class));
     }
 
     private void alertaAtualizarBancoDeDados() {
@@ -365,7 +366,8 @@ public class Principal extends AppCompatActivity
 
         //define um botão como positivo
         builder.setPositiveButton("Finalizar Pedido", (arg0, arg1) -> {
-            Intent i = new Intent(Principal.this, EditarPedido.class);
+            //Intent i = new Intent(Principal.this, EditarPedido.class);
+            Intent i = new Intent(context, FinanceiroNFCe.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
         });
@@ -376,7 +378,8 @@ public class Principal extends AppCompatActivity
     private void _pedidoFinaceiroDiferente() {
         //ABRI A TELA DE SINCRONIZAR
         try {
-            if (bd.getVerificarFinanceiroUltimoPedido()) {
+            //getVerificarFinanceiroUltimoPedido
+            if (bd.getFinanceiroUltimoPedido(bd.getIdPedidoTemp())) {
                 pedidoNaoFinalizadoDialog();
             }
         } catch (Exception ignored) {

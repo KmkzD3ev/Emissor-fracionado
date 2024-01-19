@@ -2312,7 +2312,8 @@
         android:layout_height="150dp"
         android:background="@android:color/white"
         android:gravity="top|center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/txtEmpresaPix"
@@ -2339,8 +2340,8 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
 
             <TextView
                 android:layout_width="wrap_content"

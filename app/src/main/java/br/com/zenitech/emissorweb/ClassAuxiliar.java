@@ -4,7 +4,9 @@ import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -536,11 +538,10 @@ public class ClassAuxiliar {
         } else if (s.equalsIgnoreCase("PAGAMENTO INSTANTANEO (PIX)")) {
             idFormaPagamento = "17";
 
-        }
-        else if (s.equalsIgnoreCase("OUTROS")) {
+        } else if (s.equalsIgnoreCase("OUTROS")) {
             idFormaPagamento = "99";
         } else if (s.equalsIgnoreCase("DUPLICATA MERCANTIL")) {
-            idFormaPagamento = "00";
+            idFormaPagamento = "0";
         }
 
         return idFormaPagamento;
@@ -582,9 +583,9 @@ public class ClassAuxiliar {
         } else if (s.equalsIgnoreCase("17")) {
             nomeGPG = "PAGAMENTO INSTANTANEO (PIX)";
 
-        }  else if (s.equalsIgnoreCase("99")) {
+        } else if (s.equalsIgnoreCase("99")) {
             nomeGPG = "OUTROS";
-        } else if (s.equalsIgnoreCase("00")) {
+        } else if (s.equalsIgnoreCase("0")) {
             nomeGPG = "DUPLICATA MERCANTIL";
         }
 
@@ -633,7 +634,9 @@ public class ClassAuxiliar {
     }
 
     public void ShowMsgToast(Context context, String msg) {
-        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     public void ShowMsgLog(String tag, String msg) {
@@ -645,6 +648,20 @@ public class ClassAuxiliar {
         return new String[]{"DINHEIRO", "CARTÃO DE CRÉDITO", "CARTÃO DE DÉBITO",
                 "PAGAMENTO INSTANTÂNEO (PIX)", "BOLETO"};
     }
+
+    // FPRMAS DE PAGAMENTO EMISSOR NFE
+    public String[] FormasDePagamentoEmissorNFe(boolean duplicata) {
+        if (duplicata) {
+            return new String[]{
+                    "DINHEIRO", "CARTÃO DE CRÉDITO", "CARTÃO DE DÉBITO",
+                    "PAGAMENTO INSTANTÂNEO (PIX)", "BOLETO", "DUPLICATA MERCANTIL"};
+        } else {
+            return new String[]{
+                    "DINHEIRO", "CARTÃO DE CRÉDITO", "CARTÃO DE DÉBITO",
+                    "PAGAMENTO INSTANTÂNEO (PIX)", "BOLETO"};
+        }
+    }
+
 
     // Retorna a lista de credenciadoras
     public String[] BandeirasCredenciadoras() {
@@ -658,11 +675,37 @@ public class ClassAuxiliar {
                 "5X SEM JUROS", "6X SEM JUROS", "7X SEM JUROS", "8X SEM JUROS", "9X SEM JUROS",
                 "10X SEM JUROS", "11X SEM JUROS", "12X SEM JUROS"};
     }
+    public String[] ParcelasDuplicatas() {
+        return new String[]{
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+        };
+    }
+
+    public String dataFutura(int dias) {
+
+        cal.setTime(data);
+        cal.add(Calendar.DAY_OF_MONTH, dias);
+        Date dataFutura = cal.getTime();
+        String dataReturn = exibirDataFormat.format(dataFutura);
+        Log.i("DataFutura", exibirDataFormat.format(cal.getTime()));
+        return dataReturn;// exibirDataFormat.format(cal.getTime());
+    }
 
     public static class MoneyTextWatcher implements TextWatcher {
         private final WeakReference<EditText> editTextWeakReference;
 
-        MoneyTextWatcher(EditText editText) {
+        public MoneyTextWatcher(EditText editText) {
             editTextWeakReference = new WeakReference<>(editText);
         }
 
@@ -685,6 +728,34 @@ public class ClassAuxiliar {
             String formatted = NumberFormat.getCurrencyInstance().format(parsed);
             editText.setText(formatted);
             editText.setSelection(formatted.length());
+            editText.addTextChangedListener(this);
+        }
+    }
+
+    public static class VerifyQuaint implements TextWatcher {
+        private final WeakReference<EditText> editTextWeakReference;
+
+        public VerifyQuaint(EditText editText) {
+            editTextWeakReference = new WeakReference<>(editText);
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            EditText editText = editTextWeakReference.get();
+            if (editText == null) return;
+            String s = editable.toString();
+            editText.removeTextChangedListener(this);
+            String cleanString = s.replaceAll("[^0-9]", "");
+            editText.setText(cleanString);
+            editText.setSelection(cleanString.length());
             editText.addTextChangedListener(this);
         }
     }

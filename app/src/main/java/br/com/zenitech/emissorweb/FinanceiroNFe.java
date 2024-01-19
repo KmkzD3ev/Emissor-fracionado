@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.lvrenyang.io.Pos;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.Objects;
 
 import br.com.zenitech.emissorweb.adapters.FinanceiroNFeAdapter;
 import br.com.zenitech.emissorweb.domains.FinanceiroNFeDomain;
+import br.com.zenitech.emissorweb.domains.PosApp;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import br.com.zenitech.emissorweb.interfaces.IFinanceiroNFeObserver;
 import br.com.zenitech.emissorweb.pagamentos.PagamentoPix;
@@ -51,10 +53,12 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
 
     // ADAPTERS
     FinanceiroNFeAdapter financeiroNFeAdapter;
-
+    LinearLayout llParcelasDuplicata;
     //
     ArrayList<Unidades> listUnidades;
     Unidades unidades;
+    ArrayList<PosApp> listPos;
+    PosApp pos;
     private TextInputLayout TiNsuCeara;
     EditText etCodAutorizacao, etNsuCeara;
 
@@ -70,6 +74,7 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
     //
     TextView txtValTotalPagar, txtTotalPago;
     EditText txtVencimentoFormaPagamento, txtValorFormaPagamento;
+    TextInputLayout tilVencimento;
     TextView txtTotalFinanceiro;
     TextView txtTotalItemFinanceiro;
     boolean api_asaas = false;
@@ -94,6 +99,8 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
             "Cabal",
             "Outros"
     };
+    private boolean mostrarFpgDuplicata;
+    private Spinner spParcelasDuplicata;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +113,7 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
         aux = new ClassAuxiliar();
         config = new Configuracoes();
         idTemp = 1;
+        mostrarFpgDuplicata = false;
 
         // APAGA O FINANCEIRO ANTERIOR PARA INICIAR UM NOVO
         bd.resetFinanceiroNFe();
@@ -116,13 +124,24 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
         if (!unidades.getApi_key_asaas().equalsIgnoreCase("")) {
             api_asaas = true;
         }
+        listPos = bd.getPos();
+        pos = listPos.get(0);
 
+        try {
+            if (pos.getDuplicatas_notas_fiscais().equals("1")) {
+                mostrarFpgDuplicata = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         //
         rvFinanceiro = findViewById(R.id.rvFinanceiro);
         rvFinanceiro.setLayoutManager(new LinearLayoutManager(this));
 
         //
         bgTotal = findViewById(R.id.bgTotal);
+
+        tilVencimento = findViewById(R.id.tilVencimento);
 
         //
         listaFinanceiroNFe = bd.getFinanceiroNFe(1);
@@ -131,9 +150,9 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
         // Registra a Activity como Observador
         financeiroNFeAdapter.registerObserver(this);
         //rvFinanceiro.setAdapter(financeiroNFeAdapter);
-
+        llParcelasDuplicata = findViewById(R.id.llParcelasDuplicata);
         // FORMAS DE PAGAMENTO
-        ArrayAdapter<String> adapterFormasPagamento = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, aux.FormasDePagamentoEmissor());
+        ArrayAdapter<String> adapterFormasPagamento = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, aux.FormasDePagamentoEmissorNFe(mostrarFpgDuplicata));
         adapterFormasPagamento.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spFormasPagamento = findViewById(R.id.spFormasPagamentoCliente);
         spFormasPagamento.setAdapter(adapterFormasPagamento);
@@ -152,6 +171,7 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
         txtValorFormaPagamento = findViewById(R.id.txtValorFormaPagamento);
         txtValorFormaPagamento.addTextChangedListener(new ClassAuxiliar.MoneyTextWatcher(txtValorFormaPagamento));
 
+        txtVencimentoFormaPagamento = findViewById(R.id.txtVencimentoFormaPagamento);
         //
         btnAddF = findViewById(R.id.btnAddF);
         btnAddF.setOnClickListener(v -> {
@@ -191,6 +211,12 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
         adapterParcelas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spParcelas = findViewById(R.id.spParcelas);
         spParcelas.setAdapter(adapterParcelas);
+
+        // PARCELAS DUPLICATAS
+        ArrayAdapter adapterParcelasDuplicata = new ArrayAdapter(this, android.R.layout.simple_spinner_item, aux.ParcelasDuplicatas());
+        adapterParcelasDuplicata.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spParcelasDuplicata = findViewById(R.id.spParcelasDuplicata);
+        spParcelasDuplicata.setAdapter(adapterParcelasDuplicata);
 
         // RECEBE AS INFORMAÇÕES DO FORMULÁRIO
         Intent intent = getIntent();
@@ -266,6 +292,16 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
     void SelectPagamentoCartao(String FormPG) {
         boolean cartaoCredito = FormPG.equalsIgnoreCase("CARTÃO DE CRÉDITO");
         boolean cartaoDebito = FormPG.equalsIgnoreCase("CARTÃO DE DÉBITO");
+        boolean duplicata = FormPG.equalsIgnoreCase("DUPLICATA MERCANTIL");
+
+        tilVencimento.setVisibility(View.GONE);
+        llParcelasDuplicata.setVisibility(View.GONE);
+
+        if (duplicata) {
+            tilVencimento.setVisibility(View.VISIBLE);
+            llParcelasDuplicata.setVisibility(View.VISIBLE);
+            txtVencimentoFormaPagamento.setText(aux.dataFutura(1));
+        }
 
         // SE EXISTIR STONE CODE OU OUTRO MEIO DE PAGAMENTO COM A MAQUININHA
         boolean stoneCode = !unidades.getCodloja().equalsIgnoreCase("");
@@ -380,7 +416,9 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
                     cardBrand,
                     nsu,
                     "",
-                    "0"
+                    "0",
+                    spParcelasDuplicata.getSelectedItem().toString(),
+                    txtVencimentoFormaPagamento.getText().toString()
             ));
 
             //
@@ -462,7 +500,9 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
                 "",
                 "",
                 "",
-                "0"
+                "0",
+                "",
+                ""
         ));
 
         /*//

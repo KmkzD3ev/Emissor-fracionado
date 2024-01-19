@@ -646,14 +646,17 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         // ********************** DADOS ADICIONAIS
         TextView txtNFeDadosAdd = findViewById(R.id.txtNFeDadosAdd);
         //
-        txtNFeDadosAdd.setText("( DECLARAMOS QUE OS PRODUTOS ESTAO ADEQUADAMENTE " +
+        txtNFeDadosAdd.setText(prefs.getString("inf_cpl", ""));
+
+        // ANTES DE PEGAR PELO CFOP
+        /*txtNFeDadosAdd.setText("( DECLARAMOS QUE OS PRODUTOS ESTAO ADEQUADAMENTE " +
                 "ACONDICIONADOS E ESTIVADOS PARA SUPORTAR OS RISCOS NORMAIS DAS ETAPAS NECESSARIAS A OPERACAO " +
                 "DE TRANSPORTE (CARREGAMENTO, DESCARREGAMENTO, TRANSBORDO E TRANSPORTE) E QUE ATENDEM A REGULAMENTACAO " +
                 "EM VIGOR. DATA: " + cAux.exibirDataAtual() + " .. . .. DECLARAMOS QUE A EXPEDICAO NAO CONTEM EMBALAGENS VAZIAS E " +
                 "NAO LIMPAS DE PRODUTOS PERIGOSOS QUE APRESENTAM VALOR DE QUANTIDADE LIMITADA POR VEICULO (" +
                 "COLUNA 8 DA RELACAO DE PRODUTOS PERIGOSOS) IGUAL A ZERO. DATA: " + cAux.exibirDataAtual() + " .. . .. /nASSINATURA: " +
                 "____________________________________________________________________ " +
-                prefs.getString("inf_cpl", "") + ")");
+                prefs.getString("inf_cpl", "") + ")");*/
 
         //
         LinearLayout impressora = findViewById(R.id.printNfe);

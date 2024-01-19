@@ -242,6 +242,11 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                 String bandeiraFPG = bd.getBandeirasFinanceiroNFe("1").replace(".", "");
                 String nAutoCartao = bd.getNAutFinanceiroNfe("1").replace(".", "");
 
+                //
+                String parcela = bd.getPercelaFormasPagamentoNFe("1").replace(".", "");
+                String vencimento = bd.getVencimentoFormasPagamentoNFe("1").replace(".", "");
+
+
                 String idPedidNFe = "1";// bd.getUltimoIdPedidoNFe();
                 String idsProdutosPedido = bd.getIdsProdutosPedidoNFe(idPedidNFe).replace(".", "");
                 String quantidadesProdutosPedido = bd.getQuantidadesProdutosPedidoNFe(idPedidNFe).replace(".", "");
@@ -260,6 +265,8 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                 Log.e("Dados NFe", "idFormaPGPedido: " + idFormaPGPedido);
                 Log.e("Dados NFe", "bandeiraFPG: " + bandeiraFPG);
                 Log.e("Dados NFe", "nAutoCartao: " + nAutoCartao);
+                Log.e("Dados NFe", "parcelas: " + parcela);
+                Log.e("Dados NFe", "vencimento: " + vencimento);
                 //
                 final IValidarNFE iValidarNFE = IValidarNFE.retrofit.create(IValidarNFE.class);
                 final Call<ValidarNFE> call = iValidarNFE.validarNotaNFE(
@@ -274,7 +281,9 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                         credenciadora,
                         nAutoCartao,
                         bandeiraFPG,
-                        76
+                        76,
+                        parcela,
+                        vencimento
                 );
 
                 call.enqueue(new Callback<>() {

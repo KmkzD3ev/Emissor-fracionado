@@ -259,9 +259,11 @@ public class GerenciarBancoProducao extends AppCompatActivity {
                     String valorProdutosPedido = bd.getValorProdutosPedido(pedidos.getId()).replace(".", "");
 
                     // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
-                    if (!unidades.getCodloja().equalsIgnoreCase("")) {
+                    /*if (!unidades.getCodloja().equalsIgnoreCase("")) {
                         credenciadora = "STONE";
-                    }
+                    }*/
+
+                    credenciadora = unidades.getCredenciadora();
 
                     final Call<ValidarNFCe> call = iValidarNFCe.validarNota(
                             pedidos.getId(),

@@ -1,5 +1,8 @@
 package br.com.zenitech.emissorweb.adapters;
 
+import static android.widget.Toast.LENGTH_SHORT;
+import static android.widget.Toast.makeText;
+
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -11,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.math.BigDecimal;
@@ -23,24 +25,19 @@ import br.com.zenitech.emissorweb.Pix;
 import br.com.zenitech.emissorweb.R;
 import br.com.zenitech.emissorweb.domains.FormaPagamentoPedido;
 import br.com.zenitech.emissorweb.domains.Unidades;
+import br.com.zenitech.emissorweb.interfaces.IFinanceiroNFCeObserver;
 import stone.application.interfaces.StoneCallbackInterface;
 import stone.database.transaction.TransactionDAO;
 import stone.database.transaction.TransactionObject;
 import stone.providers.CancellationProvider;
 
-import static android.widget.Toast.LENGTH_SHORT;
-import static android.widget.Toast.makeText;
-import static br.com.zenitech.emissorweb.FormPedidos.bgTotal;
-import static br.com.zenitech.emissorweb.FormPedidos.txtTotalFinanceiro;
-import static br.com.zenitech.emissorweb.FormPedidos.txtTotalItemFinanceiro;
-import static br.com.zenitech.emissorweb.FormPedidos.txtValorFormaPagamento;
-
 public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPagamentoPedidosAdapter.ViewHolder> {
 
-    ////////////////////////////////
+    DatabaseHelper bd;
     private ClassAuxiliar classAuxiliar;
-    private Context context;
-    private ArrayList<FormaPagamentoPedido> elementos;
+    private final Context context;
+    private final ArrayList<FormaPagamentoPedido> elementos;
+    ArrayList<IFinanceiroNFCeObserver> observers = new ArrayList<>();
     boolean api_asaas = false;
 
     ArrayList<Unidades> elementosUnidades;
@@ -54,11 +51,12 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
     String codigoAutorizacao;
     int positionItem;*/
 
-    public FormasPagamentoPedidosAdapter(Context context, ArrayList<FormaPagamentoPedido> elementos, ArrayList<Unidades> elementosUnidades, int idtemp) {
+    public FormasPagamentoPedidosAdapter(Context context, ArrayList<FormaPagamentoPedido> elementos, ArrayList<Unidades> elementosUnidades, int idtemp, DatabaseHelper bd) {
         this.context = context;
         this.elementos = elementos;
         this.elementosUnidades = elementosUnidades;
         this.iDTemp = idtemp;
+        this.bd = bd;
     }
 
     // Easy access to the context object in the recyclerview
@@ -95,6 +93,12 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
         LinearLayout llFormPg = holder.llFormPg;
         llFormPg.setBackgroundResource(R.color.transparente);
         holder.btnExcluirFinanceiro.setVisibility(View.VISIBLE);
+
+        //DatabaseHelper bd;
+        //bd = new DatabaseHelper(context);
+        if (bd.getQuantProdutosPedidoNCMGas(iDTemp) > 5) {
+            holder.btnExcluirFinanceiro.setVisibility(View.GONE);
+        }
 
         if (!fPP.getId_cobranca_pix().equals("")) {
             holder.btnExcluirFinanceiro.setVisibility(View.GONE);
@@ -159,21 +163,36 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
         }
     }
 
+    public void registerObserver(IFinanceiroNFCeObserver observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    public void unregisterObserver(IFinanceiroNFCeObserver observer) {
+        observers.remove(observer);
+    }
+
     public void excluirItem(String codigo, String codigo_financeiro_app, String totalVenda, int position, boolean api_asaas) {
-        FormaPagamentoPedido formaPagamentoPedido = new FormaPagamentoPedido(codigo, "" + iDTemp, null, null, null, null, null, null, null);
-        DatabaseHelper bd;
-        bd = new DatabaseHelper(context);
-        bd.deleteItemFormPagPedido(formaPagamentoPedido);
+
+        //bd = new DatabaseHelper(context);
+        bd.deleteItemFinanceiro(codigo);
 
 
         elementos.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, elementos.size());
+        // Notifica os observadores sobre a mudança nos dados
+        for (IFinanceiroNFCeObserver observer : observers) {
+            observer.onFinanceiroNFCeChanged();
+            classAuxiliar.ShowMsgToast(context, "Observou");
+        }
 
         //
         //txtTotalFinanceiro
 
-        if (elementos.size() != 0) {
+        // AJUSTAR ESSE TRECHO PARA ATUALIZAR AS INFORMAÇÕES POR UM OBSERVADOR
+        /*if (elementos.size() != 0) {
             String valor = bd.getValorTotalFinanceiro(codigo_financeiro_app, api_asaas);
             txtTotalItemFinanceiro.setText(classAuxiliar.maskMoney(new BigDecimal(valor)));
             //textTotalItens.setText(String.valueOf(elementos.size()));
@@ -198,14 +217,14 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
             txtValorFormaPagamento.setText("0,00");
         } else {
             bgTotal.setBackgroundColor(ContextCompat.getColor(context, R.color.transparente));
-        }
+        }*/
     }
 
     //COMPARAR O VALOR DO FINANCEIRO COM O VALOR ADICIONADO
     private boolean comparar() {
 
-        //
-        BigDecimal valorFinanceiro = new BigDecimal(String.valueOf(classAuxiliar.converterValores(txtTotalFinanceiro.getText().toString())));
+        // AJUSTAR ESSE TRECHO PARA ATUALIZAR AS INFORMAÇÕES POR UM OBSERVADOR
+        /*BigDecimal valorFinanceiro = new BigDecimal(String.valueOf(classAuxiliar.converterValores(txtTotalFinanceiro.getText().toString())));
         BigDecimal valorFinanceiroAdd = new BigDecimal(String.valueOf(classAuxiliar.converterValores(txtTotalItemFinanceiro.getText().toString())));
 
         if (valorFinanceiroAdd.compareTo(valorFinanceiro) == 1) {
@@ -218,7 +237,8 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
             }
         } else {
             return false;
-        }
+        }*/
+        return false;
     }
 
     //
@@ -301,7 +321,7 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
             i.putExtra("valor", "R$ " + classAuxiliar.maskMoney(new BigDecimal(valor)));
             i.putExtra("apiKey", apiKey);
             i.putExtra("cliCob", cliCob);
-            i.putExtra("pedido", "" + pedido);
+            i.putExtra("pedido", pedido);
             i.putExtra("idForPagPix", idForPagPix);
             i.putExtra("idPagamento", idPagamento);
             context.startActivity(i);

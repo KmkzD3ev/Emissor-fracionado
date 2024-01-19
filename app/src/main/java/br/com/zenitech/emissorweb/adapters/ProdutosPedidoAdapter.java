@@ -22,7 +22,7 @@ import br.com.zenitech.emissorweb.interfaces.IProdutosPedidoObserver;
 
 public class ProdutosPedidoAdapter extends RecyclerView.Adapter<ProdutosPedidoAdapter.ViewHolder> {
 
-    private DatabaseHelper bd;
+    private final DatabaseHelper bd;
     private ClassAuxiliar classAuxiliar;
     private final Context context;
     private final ArrayList<ProdutosPedidoDomain> elementos;
@@ -90,7 +90,6 @@ public class ProdutosPedidoAdapter extends RecyclerView.Adapter<ProdutosPedidoAd
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        //LinearLayout LlList;
         TextView txtProduto, txtQuantidade, txtValor, txtTotal, txtDesconto;
         ImageButton btnExcluirVenda;
 
@@ -113,9 +112,7 @@ public class ProdutosPedidoAdapter extends RecyclerView.Adapter<ProdutosPedidoAd
     }
 
     public void unregisterObserver(IProdutosPedidoObserver observer) {
-        if (observers.contains(observer)) {
-            observers.remove(observer);
-        }
+        observers.remove(observer);
     }
 
     public void excluirItem(String codigo, int position) {

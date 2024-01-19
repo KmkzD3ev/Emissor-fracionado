@@ -53,7 +53,10 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning"
         tools:replace="allowBackup"
         tools:targetApi="n">
-
+        <activity
+            android:name=".FinanceiroNFCe"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".FinanceiroNFe"
             android:configChanges="keyboardHidden|orientation|screenSize"

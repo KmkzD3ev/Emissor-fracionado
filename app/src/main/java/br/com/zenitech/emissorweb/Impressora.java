@@ -1648,15 +1648,18 @@ public class Impressora extends AppCompatActivity {
         txtIdentificadoPix = findViewById(R.id.txtIdentificadoPix);
         txtDataHoraPix = findViewById(R.id.txtDataHoraPix);
         txtReimpressaoPix = findViewById(R.id.txtReimpressaoPix);
-
+        PrintPixDomain printPixDomain;
         if (!impressao_pix) {
             txtReimpressaoPix.setVisibility(View.VISIBLE);
+            printPixDomain = bd.ultimoPIXFinanceiroNfce();
+        } else {
+            printPixDomain = bd.ultimoPIX();
         }
 
         elementosUnidade = bd.getUnidades();
         unidades = elementosUnidade.get(0);
         ClassAuxiliar aux = new ClassAuxiliar();
-        PrintPixDomain printPixDomain = bd.ultimoPIX();
+
 
         txtEmpresaPix.setText(unidades.getRazao_social());
         txtCNPJPix.setText("CNPJ: " + maskCnpj(unidades.getCnpj()));
@@ -1664,7 +1667,8 @@ public class Impressora extends AppCompatActivity {
         txtValorPix.setText(aux.maskMoney(new BigDecimal(printPixDomain.valor)));
         txtNPedido.setText(printPixDomain.id_pedido);
         txtIdentificadoPix.setText(printPixDomain.id_cobranca_pix);
-        txtDataHoraPix.setText(aux.exibirData(printPixDomain.data) + " - " + printPixDomain.hora);
+        //aux.exibirData(printPixDomain.data) + " - " + printPixDomain.hora
+        txtDataHoraPix.setText(prefs.getString("DataHoraPix", ""));
         // GERAR IMAGEM DE IMPRESSÃO
 
         PrintViewHelper printViewHelper = new PrintViewHelper();
@@ -1691,7 +1695,7 @@ public class Impressora extends AppCompatActivity {
 
 
             //
-            String txtCompPag2 = tamFont + "{br}" +
+            /*String txtCompPag2 = tamFont + "{br}" +
                     tamFont + unidades.getRazao_social() + "{br}" +
                     tamFont + unidades.getCnpj() + "{br}" +
                     tamFont + "{br}" +
@@ -1704,9 +1708,9 @@ public class Impressora extends AppCompatActivity {
                     tamFont + "Pedido: " + printPixDomain.id_pedido + "{br}" +
                     tamFont + "Identificador: {br}" + printPixDomain.id_cobranca_pix + "{br}" +
                     tamFont + "Valor: " + aux.maskMoney(new BigDecimal(printPixDomain.valor)) + "{br}" +
-                    tamFont + "Data/Hora: " + aux.exibirData(printPixDomain.data) + " - " + printPixDomain.hora + "{br}";
+                    tamFont + "Data/Hora: " + aux.exibirData(printPixDomain.data) + " - " + printPixDomain.hora + "{br}";*/
             //printer.reset();
-            //printer.printTaggedText(txtCompPag2);
+            //printer.printText(txtCompPag2);
             printer.feedPaper(120);
             printer.flush();
 
@@ -1999,14 +2003,16 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append("{reset}{center}").append(tamFont).append(linhas).append("------------------------------------------------{br}");
             //
             textBuffer.append("{reset}{center}").append("DADOS ADICIONAIS{br}");
-            textBuffer.append("{reset}{center}").append(tamFont).append("( DECLARAMOS QUE OD PRODUTOS ESTAO ADEQUADAMENTE " +
+            /*
+            "( DECLARAMOS QUE OD PRODUTOS ESTAO ADEQUADAMENTE " +
                     "ACONDICIONADOS E ESTIVADOS PARA SUPORTAR OS RISCOS NORMAIS DAS ETAPAS NECESSARIAS A OPERACAO " +
                     "DE TRANSPORTE (CARREGAMENTO, DESCARREGAMENTO, TRANSBORDO E TRANSPORTE) E QUE ATENDEM A REGULAMENTACAO " +
                     "EM VIGOR. DATA: " + cAux.exibirDataAtual() + " .. . .. DECLARAMOS QUE A EXPEDICAO NAO CONTEM EMBALAGENS VAZIAS E " +
                     "NAO LIMPAS DE PRODUTOS PERIGOSOS QUE APRESENTAM VALOR DE QUANTIDADE LIMITADA POR VEICULO (" +
                     "COLUNA 8 DA RELACAO DE PRODUTOS PERIGOSOS) IGUAL A ZERO. DATA: " + cAux.exibirDataAtual() + " .. . .. {br}ASSINATURA: " +
                     "__________________________________________________ {br}" +
-                    prefs.getString("inf_cpl", "") + "){br}");
+            * */
+            textBuffer.append("{reset}{center}").append(tamFont).append(prefs.getString("inf_cpl", "")).append("{br}");
             //
             textBuffer.append("{reset}{center}").append(tamFont).append(linhas).append("------------------------------------------------{br}");
             //
@@ -2135,14 +2141,16 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
             //
             textBuffer.append("DADOS ADICIONAIS{br}");
-            textBuffer.append(tamFont).append("( DECLARAMOS QUE OS PRODUTOS ESTAO ADEQUADAMENTE " +
+            /*
+            "( DECLARAMOS QUE OS PRODUTOS ESTAO ADEQUADAMENTE " +
                     "ACONDICIONADOS E ESTIVADOS PARA SUPORTAR OS RISCOS NORMAIS DAS ETAPAS NECESSARIAS A OPERACAO " +
                     "DE TRANSPORTE (CARREGAMENTO, DESCARREGAMENTO, TRANSBORDO E TRANSPORTE) E QUE ATENDEM A REGULAMENTACAO " +
                     "EM VIGOR. DATA: " + cAux.exibirDataAtual() + " .. . .. DECLARAMOS QUE A EXPEDICAO NAO CONTEM EMBALAGENS VAZIAS E " +
                     "NAO LIMPAS DE PRODUTOS PERIGOSOS QUE APRESENTAM VALOR DE QUANTIDADE LIMITADA POR VEICULO (" +
                     "COLUNA 8 DA RELACAO DE PRODUTOS PERIGOSOS) IGUAL A ZERO. DATA: " + cAux.exibirDataAtual() + " .. . .. {br}ASSINATURA: " +
                     "____________________________________________________________________ {br}" +
-                    prefs.getString("inf_cpl", "") + "){br}");
+            * */
+            textBuffer.append(tamFont).append(prefs.getString("inf_cpl", "")).append("{br}");
             //
             textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
             //

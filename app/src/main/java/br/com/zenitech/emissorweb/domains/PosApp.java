@@ -13,8 +13,9 @@ public class PosApp {
     private String nota_remessa;
     private String serie_remessa;
     private String desconto_app_emissor;
+    private String duplicatas_notas_fiscais;
 
-    public PosApp(String codigo, String serial, String cliente, String unidade, String serie, String ultnfce, String ultboleto, String nota_remessa, String serie_remessa, String desconto_app_emissor) {
+    public PosApp(String codigo, String serial, String cliente, String unidade, String serie, String ultnfce, String ultboleto, String nota_remessa, String serie_remessa, String desconto_app_emissor, String duplicatas_notas_fiscais) {
         this.codigo = codigo;
         this.serial = serial;
         this.cliente = cliente;
@@ -25,6 +26,7 @@ public class PosApp {
         this.nota_remessa = nota_remessa;
         this.serie_remessa = serie_remessa;
         this.desconto_app_emissor = desconto_app_emissor;
+        this.duplicatas_notas_fiscais = duplicatas_notas_fiscais;
     }
 
     public String getCodigo() {
@@ -105,5 +107,13 @@ public class PosApp {
 
     public void setDesconto_app_emissor(String desconto_app_emissor) {
         this.desconto_app_emissor = desconto_app_emissor;
+    }
+
+    public String getDuplicatas_notas_fiscais() {
+        return duplicatas_notas_fiscais;
+    }
+
+    public void setDuplicatas_notas_fiscais(String duplicatas_notas_fiscais) {
+        this.duplicatas_notas_fiscais = duplicatas_notas_fiscais;
     }
 }

@@ -10,8 +10,10 @@ public class FinanceiroNFeDomain {
     public String nsu;
     public String id_cobranca_pix;
     public String status_pix;
+    public String parcelas;
+    public String vencimento;
 
-    public FinanceiroNFeDomain(String id, String id_pedido, String id_forma_pagamento, String valor, String codigo_autorizacao, String cardBrand, String nsu, String id_cobranca_pix, String status_pix) {
+    public FinanceiroNFeDomain(String id, String id_pedido, String id_forma_pagamento, String valor, String codigo_autorizacao, String cardBrand, String nsu, String id_cobranca_pix, String status_pix, String parcelas, String vencimento) {
         this.id = id;
         this.id_pedido = id_pedido;
         this.id_forma_pagamento = id_forma_pagamento;
@@ -21,5 +23,7 @@ public class FinanceiroNFeDomain {
         this.nsu = nsu;
         this.id_cobranca_pix = id_cobranca_pix;
         this.status_pix = status_pix;
+        this.parcelas = parcelas;
+        this.vencimento = vencimento;
     }
 }

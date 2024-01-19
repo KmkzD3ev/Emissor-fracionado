@@ -28,7 +28,9 @@ public interface IValidarNFE {
             @Field("CREDENCIADORA") String credenciadora,
             @Field("CAUTS") String codaut,
             @Field("BANDEIRA") String bandeira,
-            @Field("VERSAO") int VERSAO
+            @Field("VERSAO") int VERSAO,
+            @Field("PARCELA") String parcela,
+            @Field("VENCIMENTO") String vencimento
     );
 
     // REIMPRIMIR NOTA

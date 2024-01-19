@@ -38,8 +38,8 @@ android {
         minSdkVersion 22
         maxSdkVersion 34
         targetSdk 34
-        versionCode 80
-        versionName '3.8.0'
+        versionCode 82
+        versionName '3.8.2'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         signingConfig signingConfigs.debug
@@ -85,8 +85,10 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.6'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.6'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.6'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.6'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.6'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.6'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.6'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.5.1', {
@@ -113,11 +115,11 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0@aar'
 
     /*/ Stone POS - PIN PAD ***/
-    implementation 'br.com.stone:stone-sdk:4.8.0'
-    implementation 'br.com.stone:stone-sdk-posandroid:4.8.0'
-    implementation 'br.com.stone:stone-sdk-posandroid-ingenico:4.8.0'
-    implementation 'br.com.stone:stone-sdk-posandroid-sunmi:4.8.0'
-    implementation 'br.com.stone:stone-sdk-posandroid-gertec:4.8.0'
+    implementation 'br.com.stone:stone-sdk:4.8.3'
+    implementation 'br.com.stone:stone-sdk-posandroid:4.8.3'
+    implementation 'br.com.stone:stone-sdk-posandroid-ingenico:4.8.3'
+    implementation 'br.com.stone:stone-sdk-posandroid-sunmi:4.8.3'
+    implementation 'br.com.stone:stone-sdk-posandroid-gertec:4.8.3'
 
     // Multidex **
     implementation 'androidx.multidex:multidex:2.0.1'

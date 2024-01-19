@@ -7,14 +7,16 @@ public class PixDomain {
     private String expirationDate;
     private String status;
     private String tokenAuthorization;
+    private String dataHora;
 
-    public PixDomain(String id, String encodedImage, String payload, String expirationDate, String status, String tokenAuthorization) {
+    public PixDomain(String id, String encodedImage, String payload, String expirationDate, String status, String tokenAuthorization, String dataHora) {
         this.id = id;
         this.encodedImage = encodedImage;
         this.payload = payload;
         this.expirationDate = expirationDate;
         this.status = status;
         this.tokenAuthorization = tokenAuthorization;
+        this.dataHora = dataHora;
     }
 
     public String getId() {
@@ -63,5 +65,13 @@ public class PixDomain {
 
     public void setTokenAuthorization(String tokenAuthorization) {
         this.tokenAuthorization = tokenAuthorization;
+    }
+
+    public String getDataHora() {
+        return dataHora;
+    }
+
+    public void setDataHora(String dataHora) {
+        this.dataHora = dataHora;
     }
 }

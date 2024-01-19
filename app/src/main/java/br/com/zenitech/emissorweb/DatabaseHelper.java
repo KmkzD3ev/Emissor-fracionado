@@ -1,6 +1,5 @@
 package br.com.zenitech.emissorweb;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,7 +7,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -29,8 +27,6 @@ import br.com.zenitech.emissorweb.domains.FormaPagamentoPedido;
 import br.com.zenitech.emissorweb.domains.ItensPedidos;
 import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosNFE;
-import br.com.zenitech.emissorweb.domains.PedidosTemp;
-import br.com.zenitech.emissorweb.domains.PixDomain;
 import br.com.zenitech.emissorweb.domains.PosApp;
 import br.com.zenitech.emissorweb.domains.PrintPixDomain;
 import br.com.zenitech.emissorweb.domains.Produtos;
@@ -368,7 +364,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //
     double getTributosNProduto(String Produto, String ValTotal) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        /*SQLiteDatabase db = this.getWritableDatabase();
         ClassAuxiliar aux = new ClassAuxiliar();
         String tributo = "";
         String tot = String.valueOf(aux.converterValores(ValTotal));
@@ -389,12 +385,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         produtos.close();
 
-        return Double.parseDouble(tributo);
+        return Double.parseDouble(tributo);*/
+
+        myDataBase = this.getWritableDatabase();
+        ClassAuxiliar aux = new ClassAuxiliar();
+        double tributo = 0.0;
+        String tot = String.valueOf(aux.converterValores(ValTotal));
+        //
+        Cursor produtos;
+        String query_pos = "SELECT (((pro.tributosn) / 100) * " + tot + ") as tributos FROM produtos pro " + "WHERE pro.nome = '" + Produto + "' LIMIT 1";
+        Log.e(TAG, query_pos);
+        produtos = myDataBase.rawQuery(query_pos, null);
+        if (produtos.moveToFirst()) {
+            if (!produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)).isEmpty()) {
+                tributo = Double.parseDouble(produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)));
+            }
+            //tributo = Double.parseDouble(produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)));
+        }
+
+        produtos.close();
+
+        return tributo;
     }
 
     //
-    double  getTributosEProduto(String Produto, String ValTotal) {
-        SQLiteDatabase db = this.getWritableDatabase();
+    double getTributosEProduto(String Produto, String ValTotal) {
+        /*SQLiteDatabase db = this.getWritableDatabase();
         ClassAuxiliar aux = new ClassAuxiliar();
         String tributo = "";
         String tot = String.valueOf(aux.converterValores(ValTotal));
@@ -415,12 +431,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         produtos.close();
 
-        return Double.parseDouble(tributo);
+        return Double.parseDouble(tributo);*/
+        myDataBase = this.getWritableDatabase();
+        ClassAuxiliar aux = new ClassAuxiliar();
+        double tributo = 0.0;
+        String tot = String.valueOf(aux.converterValores(ValTotal));
+        //
+        Cursor produtos;
+        String query_pos = "" + "SELECT (((pro.tributose) / 100) * " + tot + ") as tributos FROM produtos pro " + "WHERE pro.nome = '" + Produto + "' LIMIT 1";
+        Log.e(TAG, query_pos);
+        produtos = myDataBase.rawQuery(query_pos, null);
+        if (produtos.moveToFirst()) {
+            if (!produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)).isEmpty()) {
+                tributo = Double.parseDouble(produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)));
+            }
+        }
+
+        produtos.close();
+
+        return tributo;
     }
 
     //
     double getTributosMProduto(String Produto, String ValTotal) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        /*SQLiteDatabase db = this.getWritableDatabase();
         ClassAuxiliar aux = new ClassAuxiliar();
         String tributo = "";
         String tot = String.valueOf(aux.converterValores(ValTotal));
@@ -441,7 +475,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         produtos.close();
 
-        return Double.parseDouble(tributo);
+        return Double.parseDouble(tributo);*/
+        myDataBase = this.getWritableDatabase();
+        ClassAuxiliar aux = new ClassAuxiliar();
+        double tributo = 0.0;
+        String tot = String.valueOf(aux.converterValores(ValTotal));
+        //
+        Cursor produtos;
+        String query_pos = "" + "SELECT (((pro.tributosm) / 100) * " + tot + ") as tributos FROM produtos pro " + "WHERE pro.nome = '" + Produto + "' LIMIT 1";
+        Log.e(TAG, query_pos);
+        produtos = myDataBase.rawQuery(query_pos, null);
+        if (produtos.moveToFirst()) {
+            if (!produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)).isEmpty()) {
+                tributo = Double.parseDouble(produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)));
+            }
+            //tributo = Double.parseDouble(produtos.getString(produtos.getColumnIndexOrThrow(TRIBUTOS_PRODUTO)));
+        }
+
+        produtos.close();
+
+        return tributo;
     }
 
     //
@@ -1077,24 +1130,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // ADD PEDIDO TEMPORARIO
-    void addPedidosTemp(PedidosTemp pedidos) {
+    void addPedidosTemp(String idPedido) {
         try {
             myDataBase = this.getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(ID_PEDIDOS, pedidos.getId());
-            values.put(SITUACAO_PEDIDOS, pedidos.getSituacao());
-            values.put(PROTOCOLO_PEDIDOS, pedidos.getProtocolo());
-            values.put(DATA_PEDIDOS, pedidos.getData());
-            values.put(HORA_PEDIDOS, pedidos.getHora());
-            values.put(VALOR_TOTAL_PEDIDOS, pedidos.getValor_total());
-            values.put(DATA_PROTOCOLO_PEDIDOS, pedidos.getData_protocolo());
-            values.put(HORA_PROTOCOLO_PEDIDOS, pedidos.getHora_protocolo());
-            values.put(CPF_CLIENTE_PEDIDOS, pedidos.getCpf_cliente());
-            values.put(FORMA_PAGAMENTO_PEDIDOS, pedidos.getForma_pagamento());
+            values.put(ID_PEDIDOS, idPedido);
+            values.put(SITUACAO_PEDIDOS, "OFF");
+            values.put(PROTOCOLO_PEDIDOS, "");
+            values.put(DATA_PEDIDOS, "");
+            values.put(HORA_PEDIDOS, "");
+            values.put(VALOR_TOTAL_PEDIDOS, "");
+            values.put(DATA_PROTOCOLO_PEDIDOS, "");
+            values.put(HORA_PROTOCOLO_PEDIDOS, "");
+            values.put(CPF_CLIENTE_PEDIDOS, "");
+            values.put(FORMA_PAGAMENTO_PEDIDOS, "");
             myDataBase.insert("pedidos_temp", null, values);
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, Objects.requireNonNull(e.getMessage()));
         }
     }
 
@@ -1153,6 +1206,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             myDataBase.insert("produtos_pedido", null, values);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    // ADICIONAR FINANCEIRO PEDIDO NFCe
+    public void addFinanceiroNFCe(FormaPagamentoPedido formaPagamentoPedido) {
+        try {
+            myDataBase = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("id_pedido", formaPagamentoPedido.id_pedido);
+            values.put("id_forma_pagamento", formaPagamentoPedido.id_forma_pagamento);
+            values.put("valor", formaPagamentoPedido.valor);
+            values.put("codigo_autorizacao", formaPagamentoPedido.codigo_autorizacao);
+            values.put("bandeira", formaPagamentoPedido.cardBrand);
+            values.put("nsu", formaPagamentoPedido.codigo_autorizacao);
+            values.put("id_cobranca_pix", formaPagamentoPedido.id_cobranca_pix);
+            values.put("status_pix", formaPagamentoPedido.status_pix);
+            myDataBase.insert("financeiro_nfce", null, values);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 
@@ -2216,6 +2289,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
+    public Boolean getFinanceiroUltimoPedido(String idPedido) {
+        boolean result = false;
+        String query = "SELECT pet.id " +
+                "FROM pedidos_temp pet " +
+                "INNER JOIN produtos_pedido prp ON prp.id_pedido = pet.id " +
+                "WHERE pet.id = '" + idPedido + "' AND (pet.situacao = 'OFF' OR pet.situacao = '') " +
+                "ORDER BY pet.id DESC " +
+                "LIMIT 1";
+
+        Log.e("FinanceiroUltimoPedido", query);
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            result = true;
+        }
+        cursor.close();
+
+        return result;
+    }
+
     //
     String ultimoIdPedido() {
         //BANCO DE DADOS
@@ -2403,7 +2498,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR PEDIDOS
     private Unidades cursorToUnidade(Cursor cursor) {
-        Unidades unidades = new Unidades(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        Unidades unidades = new Unidades(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         //
         unidades.setCodigo(cursor.getString(0));
         unidades.setRazao_social(cursor.getString(1));
@@ -2432,8 +2527,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         }
         try {
-            unidades.setBanco_pix(cursor.getString(22));
-        }catch (Exception ignored) {
+            unidades.setCredenciadora(cursor.getString(22));
+        } catch (Exception ignored) {
+
+        }
+        try {
+            unidades.setBanco_pix(cursor.getString(23));
+        } catch (Exception ignored) {
 
         }
         return unidades;
@@ -2462,7 +2562,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //CURSOR POS
     private PosApp cursorToPos(Cursor cursor) {
-        PosApp posApp = new PosApp(null, null, null, null, null, null, null, null, null, null);
+        PosApp posApp = new PosApp(null,null, null, null, null, null, null, null, null, null, null);
 
         //
         posApp.setCodigo(cursor.getString(0));
@@ -2476,6 +2576,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         posApp.setSerie_remessa(cursor.getString(8));
         try {
             posApp.setDesconto_app_emissor(cursor.getString(9));
+        } catch (Exception ignored) {
+
+        }
+        try {
+            posApp.setDuplicatas_notas_fiscais(cursor.getString(10));
         } catch (Exception ignored) {
 
         }
@@ -2503,12 +2608,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return listaPos;
     }
 
+    public PosApp getDadosPos() {
+        PosApp dadosPos = null;
+        String query = "SELECT * FROM pos LIMIT 1";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            dadosPos = cursorToPos(cursor);
+        }
+        cursor.close();
+        return dadosPos;
+    }
+
     // GET LIST CREDENCIADORAS
 
     ArrayList<String> getCredenciadora() {
         ArrayList<String> list = new ArrayList<>();
         myDataBase = this.getReadableDatabase();
-        //db.beginTransaction();
         String selectQuery = "SELECT * From credenciadoras GROUP BY cnpj_credenciadora";
         Cursor cursor = myDataBase.rawQuery(selectQuery, null);
         list.add("CREDENCIADORA");
@@ -2519,9 +2635,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     list.add(nome);
                 }
             }
-
             cursor.close();
-            //db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2532,7 +2646,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     ArrayList<String> getIdCredenciadora() {
         ArrayList<String> list = new ArrayList<>();
         myDataBase = this.getReadableDatabase();
-        //db.beginTransaction();
         String selectQuery = "SELECT codigo_credenciadora From credenciadoras GROUP BY cnpj_credenciadora";
         Cursor cursor = myDataBase.rawQuery(selectQuery, null);
         list.add("CREDENCIADORA");
@@ -2545,7 +2658,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             cursor.close();
-            //db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2570,7 +2682,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return formaPagamentoPedido;
     }
 
-    //LISTAR TODOS OS ITENS DO FINANCEIRO
+    // LISTA O FINANCEIRO DO PEDIDO TEMPORÁRIO
     public ArrayList<FormaPagamentoPedido> getFinanceiroCliente(int id_pedido) {
         ArrayList<FormaPagamentoPedido> listaFinanceiroVendas = new ArrayList<>();
 
@@ -2578,6 +2690,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FROM pedidos ped " +
                 "INNER JOIN formas_pagamento_pedidos fpp ON fpp.id_pedido = ped.id " +
                 "WHERE ped.id_pedido_temp = '" + id_pedido + "' " +
+                "GROUP BY fpp.id_forma_pagamento";
+        //String query = "SELECT * FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
+        Log.e("SQL", "getFinanceiroCliente - " + query);
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                //FormaPagamentoPedido formaPagamentoPedido = cursorFormaPagamentoPedido(cursor);
+                listaFinanceiroVendas.add(cursorFormaPagamentoPedido(cursor));
+                //Log.e("SQL", "getFinanceiroCliente - " + formaPagamentoPedido.getId_pedido());
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        //db.close();
+        return listaFinanceiroVendas;
+    }
+
+
+    //LISTAR TODOS OS ITENS DO FINANCEIRO
+    public ArrayList<FormaPagamentoPedido> getFinanceiroPedidoTemp(int id_pedido) {
+        ArrayList<FormaPagamentoPedido> listaFinanceiroVendas = new ArrayList<>();
+
+        String query = "SELECT fpp.id, fpp.id_pedido, fpp.id_forma_pagamento, SUM(fpp.valor) AS valor, fpp.codigo_autorizacao, fpp.bandeira, fpp.nsu, fpp.id_cobranca_pix, fpp.status_pix " +
+                "FROM formas_pagamento_pedidos fpp " +
+                "WHERE fpp.id_pedido = '" + id_pedido + "' " +
                 "GROUP BY fpp.id_forma_pagamento";
         //String query = "SELECT * FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
         Log.e("SQL", "getFinanceiroCliente - " + query);
@@ -2635,6 +2775,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return formasPag.toString();
     }
+    /*public String getFormasPagamentoPedidoPrint(String id_pedido) {
+        ClassAuxiliar aux = new ClassAuxiliar();
+        StringBuilder formasPag = new StringBuilder();
+
+        String query = "SELECT id_forma_pagamento FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                if (!formasPag.toString().contains(aux.getNomeFormaPagamento(cursor.getString(0))))
+                    formasPag.append(aux.getNomeFormaPagamento(cursor.getString(0))).append(", ");
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return formasPag.toString();
+    }*/
 
     /*public String getNomeFormaPagamento(String id_pedido) {
         String formasPag = "";
@@ -2655,7 +2813,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String getValoresFormasPagamentoPedido(String id_pedido) {
         StringBuilder formasPag = new StringBuilder();
 
-        String query = "SELECT valor * 100 FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
+        String query = "SELECT valor * 100 FROM financeiro_nfce WHERE id_pedido = '" + id_pedido + "'";
         myDataBase = this.getReadableDatabase();
         Cursor cursor = myDataBase.rawQuery(query, null);
 
@@ -2668,9 +2826,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return formasPag.toString();
     }
+    /*public String getValoresFormasPagamentoPedido(String id_pedido) {
+        StringBuilder formasPag = new StringBuilder();
+
+        String query = "SELECT valor * 100 FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                formasPag.append(cursor.getString(0)).append(",");
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return formasPag.toString();
+    }*/
 
     //LISTAR TODOS OS ITENS DO FINANCEIRO
     public String getIdFormasPagamentoPedido(String id_pedido) {
+        StringBuilder formasPag = new StringBuilder();
+
+        String query = "SELECT id_forma_pagamento FROM financeiro_nfce WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                formasPag.append(cursor.getString(0)).append(",");
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return formasPag.toString();
+    }
+    /*public String getIdFormasPagamentoPedido(String id_pedido) {
         StringBuilder formasPag = new StringBuilder();
 
         String query = "SELECT id_forma_pagamento FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
@@ -2685,7 +2875,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return formasPag.toString();
-    }
+    }*/
 
     //LISTAR TODOS OS IDS DOS PRODUTOS DO PEDIDO
     public String getIdsProdutosPedido(String id_pedido) {
@@ -2855,7 +3045,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String getAutorizacaoFormasPagamentoPedido(String id_pedido) {
         StringBuilder formasPag = new StringBuilder();
 
-        String query = "SELECT codigo_autorizacao FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
+        String query = "SELECT codigo_autorizacao FROM financeiro_nfce WHERE id_pedido = '" + id_pedido + "'";
         myDataBase = this.getReadableDatabase();
         Cursor cursor = myDataBase.rawQuery(query, null);
 
@@ -2868,9 +3058,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return formasPag.toString();
     }
+    /*public String getAutorizacaoFormasPagamentoPedido(String id_pedido) {
+        StringBuilder formasPag = new StringBuilder();
+
+        String query = "SELECT codigo_autorizacao FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                formasPag.append(cursor.getString(0)).append(",");
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return formasPag.toString();
+    }*/
 
     //LISTAR TODOS OS ITENS DO FINANCEIRO
     public String getBandeiraFormasPagamentoPedido(String id_pedido) {
+        StringBuilder formasPag = new StringBuilder();
+
+        String query = "SELECT bandeira FROM financeiro_nfce WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                formasPag.append(cursor.getString(0)).append(",");
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return formasPag.toString();
+    }
+    /*public String getBandeiraFormasPagamentoPedido(String id_pedido) {
         StringBuilder formasPag = new StringBuilder();
 
         String query = "SELECT bandeira FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
@@ -2885,10 +3107,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return formasPag.toString();
-    }
+    }*/
 
     //LISTAR TODOS OS ITENS DO FINANCEIRO
     public String getNSUFormasPagamentoPedido(String id_pedido) {
+        StringBuilder formasPag = new StringBuilder();
+
+        String query = "SELECT nsu FROM financeiro_nfce WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                formasPag.append(cursor.getString(0)).append(",");
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return formasPag.toString();
+    }
+   /* public String getNSUFormasPagamentoPedido(String id_pedido) {
         StringBuilder formasPag = new StringBuilder();
 
         String query = "SELECT nsu FROM formas_pagamento_pedidos WHERE id_pedido = '" + id_pedido + "'";
@@ -2903,6 +3141,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return formasPag.toString();
+    }*/
+
+    // APAGA ITENS DO FINANCEIRO DO PEDIDO
+
+    public void deleteItemFinanceiro(String idItemFin) {
+        myDataBase = this.getWritableDatabase();
+
+        myDataBase.delete("formas_pagamento_pedidos", "id = ?", new String[]{idItemFin});
+        //myDataBase.close();
     }
 
     //
@@ -2950,6 +3197,148 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //SOMAR O VALOR DO FINANCEIRO
+    public String getTotalFinanceiro(String idPedido, boolean api_asaas) {
+        myDataBase = this.getReadableDatabase();
+
+        String selectQuery;
+
+        if (api_asaas) {
+            selectQuery = "SELECT SUM(fpp.valor) AS valor " +
+                    "FROM formas_pagamento_pedidos fpp " +
+                    "WHERE fpp.id_pedido = '" + idPedido + "' AND fpp.status_pix = '0'";
+        } else {
+            selectQuery = "SELECT SUM(fpp.valor) AS valor " +
+                    "FROM formas_pagamento_pedidos fpp " +
+                    "WHERE fpp.id_pedido = '" + idPedido + "'";
+        }
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        String total = "0.0";
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            total = cursor.getString(0);
+        }
+
+        cursor.close();
+        if (total == null) {
+            total = "0.0";
+        }
+        return total;
+    }
+
+    //SOMAR O VALOR DO FINANCEIRO
+    public String getTotalFinanceiroDinheiro(String idPedido, boolean api_asaas) {
+        myDataBase = this.getReadableDatabase();
+
+        String selectQuery;
+
+        if (api_asaas) {
+            selectQuery = "SELECT SUM(fpp.valor) AS valor " +
+                    "FROM formas_pagamento_pedidos fpp " +
+                    "WHERE fpp.id_pedido = '" + idPedido + "' AND fpp.status_pix = '0' AND id_forma_pagamento = 1";
+        } else {
+            selectQuery = "SELECT SUM(fpp.valor) AS valor " +
+                    "FROM formas_pagamento_pedidos fpp " +
+                    "WHERE fpp.id_pedido = '" + idPedido + "' AND id_forma_pagamento = 1";
+        }
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        String total = "0.00";
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            total = cursor.getString(0);
+        }
+
+        cursor.close();
+        if (total == null) {
+            total = "0.00";
+        }
+        return total;
+    }
+
+    //SOMAR O VALOR DO FINANCEIRO
+    public String getTotalFinanceiroPix(String idPedido, boolean api_asaas) {
+        myDataBase = this.getReadableDatabase();
+
+        String selectQuery;
+
+        if (api_asaas) {
+            selectQuery = "SELECT SUM(fpp.valor) AS valor " +
+                    "FROM formas_pagamento_pedidos fpp " +
+                    "WHERE fpp.id_pedido = '" + idPedido + "' AND fpp.status_pix = '0' AND id_forma_pagamento = 17";
+        } else {
+            selectQuery = "SELECT SUM(fpp.valor) AS valor " +
+                    "FROM formas_pagamento_pedidos fpp " +
+                    "WHERE fpp.id_pedido = '" + idPedido + "' AND id_forma_pagamento = 17";
+        }
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        String total = "0.00";
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            total = cursor.getString(0);
+        }
+
+        cursor.close();
+        if (total == null) {
+            total = "0.00";
+        }
+        return total;
+    }
+
+    // RETORNA O ID DA COBRANCA PIX
+    public String getIdCobrancaPix(String idPedido) {
+        myDataBase = this.getReadableDatabase();
+
+        String selectQuery = "SELECT fpp.id_cobranca_pix " +
+                    "FROM formas_pagamento_pedidos fpp " +
+                    "WHERE fpp.id_pedido = '" + idPedido + "' AND id_forma_pagamento = 17";
+
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        String id_cobranca = "";
+
+        if (cursor.moveToFirst()) {
+            id_cobranca = cursor.getString(0);
+        }
+        cursor.close();
+        if (id_cobranca == null) {
+            id_cobranca = "";
+        }
+        return id_cobranca;
+    }
+
+    //SOMAR O VALOR DO FINANCEIRO
+    public String getTotalItem(String idPedido) {
+        myDataBase = this.getReadableDatabase();
+        String selectQuery = "SELECT SUM(ipe.valor * ipe.quantidade) AS valor " +
+                "FROM itens_pedidos ipe " +
+                "WHERE ipe.pedido = '" + idPedido + "'";
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        String total = "0.0";
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            total = cursor.getString(0);
+        }
+
+        cursor.close();
+        if (total == null) {
+            total = "0.0";
+        }
+        return total;
+    }
+
+    //SOMAR O VALOR DO FINANCEIRO
     public String getValorTotalFinanceiro(String idPedido, boolean api_asaas) {
         myDataBase = this.getReadableDatabase();
 
@@ -2959,6 +3348,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             /*selectQuery = "SELECT SUM(valor) " +
                     "FROM formas_pagamento_pedidos " +
                     "WHERE id_pedido = '" + idPedido + "' AND status_pix = '0'";*/
+            selectQuery = "SELECT SUM(fpp.valor) AS valor " +
+                    "FROM pedidos ped " +
+                    "INNER JOIN financeiro_nfce fpp ON fpp.id_pedido = ped.id " +
+                    "WHERE ped.id_pedido_temp = '" + idPedido + "' AND fpp.status_pix = '0'";
+        } else {
+            //selectQuery = "SELECT SUM(valor) FROM formas_pagamento_pedidos WHERE id_pedido = '" + idPedido + "'";
+            selectQuery = "SELECT SUM(fpp.valor) AS valor " +
+                    "FROM pedidos ped " +
+                    "INNER JOIN financeiro_nfce fpp ON fpp.id_pedido = ped.id " +
+                    "WHERE ped.id_pedido_temp = '" + idPedido + "'";
+        }
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        String total = "0.0";
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            total = cursor.getString(0);
+        }
+
+        cursor.close();
+        if (total == null) {
+            total = "0.0";
+        }
+        return total;
+    }
+    /*public String getValorTotalFinanceiro(String idPedido, boolean api_asaas) {
+        myDataBase = this.getReadableDatabase();
+
+        String selectQuery;
+
+        if (api_asaas) {
+            *//*selectQuery = "SELECT SUM(valor) " +
+                    "FROM formas_pagamento_pedidos " +
+                    "WHERE id_pedido = '" + idPedido + "' AND status_pix = '0'";*//*
             selectQuery = "SELECT SUM(fpp.valor) AS valor " +
                     "FROM pedidos ped " +
                     "INNER JOIN formas_pagamento_pedidos fpp ON fpp.id_pedido = ped.id " +
@@ -2985,7 +3410,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             total = "0.0";
         }
         return total;
-    }
+    }*/
 
     public int getProximoIdPedido() {
         int id = 1;
@@ -3012,7 +3437,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public String getUltimoIdPedido() {
         myDataBase = this.getReadableDatabase();
-        String sql = "SELECT ped.id FROM pedidos_temp ped inner join pedidos p on p.id = ped.id ORDER BY  ped.id DESC LIMIT 1";
+        String sql = "SELECT ped.id FROM pedidos_temp ped ORDER BY ped.id DESC LIMIT 1";
         Cursor cursor = myDataBase.rawQuery(sql, null);
         String total = "";
         try {
@@ -3074,6 +3499,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return total;
+    }
+
+    //PEGA O ULTIMO ID DA TABELA DE PEDIDOS
+    public String getIdPedidoTemp() {
+        myDataBase = this.getReadableDatabase();
+        String selectQuery = "SELECT ped.id FROM pedidos_temp ped ORDER BY ped.id DESC LIMIT 1";
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+        String id = "";
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                id = cursor.getString(0);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
     //SOMAR O VALOR DO FINANCEIRO
@@ -3251,9 +3694,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     PrintPixDomain ultimoPIX() {
         PrintPixDomain printPixDomain = null;
         myDataBase = this.getReadableDatabase();
-        String query = "SELECT fpp.id_pedido, fpp.valor, fpp.id_cobranca_pix, ped.data, ped.hora " +
+        String query = "SELECT fpp.id_pedido, fpp.valor, fpp.id_cobranca_pix " +
                 "FROM formas_pagamento_pedidos fpp " +
-                "INNER JOIN pedidos ped ON ped.id = fpp.id_pedido " +
                 "WHERE fpp.id_cobranca_pix != '' AND fpp.status_pix = '0' " +
                 "ORDER BY fpp.id DESC " +
                 "LIMIT 1";
@@ -3264,8 +3706,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 printPixDomain.id_pedido = cursor.getString(cursor.getColumnIndexOrThrow("id_pedido"));
                 printPixDomain.valor = cursor.getString(cursor.getColumnIndexOrThrow("valor"));
                 printPixDomain.id_cobranca_pix = cursor.getString(cursor.getColumnIndexOrThrow("id_cobranca_pix"));
-                printPixDomain.data = cursor.getString(cursor.getColumnIndexOrThrow("data"));
-                printPixDomain.hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
+                //printPixDomain.data = cursor.getString(cursor.getColumnIndexOrThrow("data"));
+                //printPixDomain.hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+
+        return printPixDomain;
+    }
+
+    //
+    PrintPixDomain ultimoPIXFinanceiroNfce() {
+        PrintPixDomain printPixDomain = null;
+        myDataBase = this.getReadableDatabase();
+        String query = "SELECT fpp.id_pedido, fpp.valor, fpp.id_cobranca_pix " +
+                "FROM financeiro_nfce fpp " +
+                "WHERE fpp.id_cobranca_pix != '' AND fpp.status_pix = '0' " +
+                "ORDER BY fpp.id DESC " +
+                "LIMIT 1";
+        Cursor cursor = myDataBase.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            printPixDomain = new PrintPixDomain();
+            do {
+                printPixDomain.id_pedido = cursor.getString(cursor.getColumnIndexOrThrow("id_pedido"));
+                printPixDomain.valor = cursor.getString(cursor.getColumnIndexOrThrow("valor"));
+                printPixDomain.id_cobranca_pix = cursor.getString(cursor.getColumnIndexOrThrow("id_cobranca_pix"));
+                //printPixDomain.data = cursor.getString(cursor.getColumnIndexOrThrow("data"));
+                //printPixDomain.hora = cursor.getString(cursor.getColumnIndexOrThrow("hora"));
             } while (cursor.moveToNext());
         }
 
@@ -3303,6 +3771,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         myDataBase.update("pedidos", values, "id=" + idPedido, null);
     }
 
+    // DIMINUI O VALOR DO FINANCEIRO NFCE DINHEIRO
+    void updateValorFinanceiroPedidoDinheiro(String idPedido, String valor) {
+        myDataBase = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("valor", valor);
+        myDataBase.update("formas_pagamento_pedidos", values, "id_pedido=" + idPedido + " AND id_forma_pagamento = 1", null);
+    }
+
+    // DIMINUI O VALOR DO FINANCEIRO NFCE PIX
+    void updateValorFinanceiroPedidoPix(String idPedido, String valor) {
+        myDataBase = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("valor", valor);
+        myDataBase.update("formas_pagamento_pedidos", values, "id_pedido=" + idPedido + " AND id_forma_pagamento = 17", null);
+    }
+
+    // ZERAR O VALOR DO FINANCEIRO NFCE DINHEIRO E PIX
+    void zerarFinanceiroPedidoTemp(String idPedido) {
+        myDataBase = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("valor", "0.00");
+        myDataBase.update("formas_pagamento_pedidos", values, "id_pedido=" + idPedido, null);
+    }
+
     // SALVA O ID DO PAGAMENTO PIX RETORNADO DA API ASAAS
     void updateFormPagPIX(String id_cobranca_pix, String id) {
         myDataBase = this.getWritableDatabase();
@@ -3333,7 +3828,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getString(2), cursor.getString(3),
                 cursor.getString(4), cursor.getString(5),
                 cursor.getString(6), cursor.getString(7),
-                cursor.getString(8)
+                cursor.getString(8), cursor.getString(9),
+                cursor.getString(10)
         );
     }
 
@@ -3370,6 +3866,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             values.put("nsu", formaPagamentoPedido.codigo_autorizacao);
             values.put("id_cobranca_pix", formaPagamentoPedido.id_cobranca_pix);
             values.put("status_pix", formaPagamentoPedido.status_pix);
+            values.put("parcelas", formaPagamentoPedido.parcelas);
+            values.put("vencimento", formaPagamentoPedido.vencimento);
             myDataBase.insert("financeiro_nfe", null, values);
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
@@ -3466,6 +3964,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return formasPag.toString();
     }
+    public String getPercelaFormasPagamentoNFe(String id_pedido) {
+        StringBuilder parcelasPag = new StringBuilder();
+
+        String query = "SELECT parcelas FROM financeiro_nfe WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        int q = cursor.getCount();
+        if (cursor.moveToFirst()) {
+            do {
+                parcelasPag.append(cursor.getString(0));
+
+                q--;
+                if (q != 0) {
+                    parcelasPag.append(",");
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return parcelasPag.toString();
+    }
+    public String getVencimentoFormasPagamentoNFe(String id_pedido) {
+        StringBuilder vencimentoPag = new StringBuilder();
+
+        String query = "SELECT vencimento FROM financeiro_nfe WHERE id_pedido = '" + id_pedido + "'";
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        int q = cursor.getCount();
+        if (cursor.moveToFirst()) {
+            do {
+                vencimentoPag.append(cursor.getString(0));
+
+                q--;
+                if (q != 0) {
+                    vencimentoPag.append(",");
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return vencimentoPag.toString();
+    }
 
     //LISTAR TODOS OS ITENS DO FINANCEIRO
     public String getNAutFinanceiroNfe(String id_pedido) {
@@ -3515,6 +4057,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return formasPag.toString();
     }
 
+    // ATUALIZA O PEDIDO TEMPORARIO PARA ON, INFORMANDO QUE O FINANCEIRO FOI FINALIZADO
+    public void upadtePedidoTemp(String idTemp) {
+        try {
+            myDataBase = this.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("situacao", "ON");
+            myDataBase.update("pedidos_temp", values, "id=" + idTemp, null);
+        } catch (Exception e) {
+            Log.e(TAG, Objects.requireNonNull(e.getMessage()));
+        }
+    }
 
     public List<String> getMinMaxFracionamentoProduto(String codigo) {
         List<String> minMax = new ArrayList<>();

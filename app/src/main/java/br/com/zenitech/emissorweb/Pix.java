@@ -225,6 +225,8 @@ public class Pix extends AppCompatActivity {
                             llcConsultarPix.setVisibility(View.GONE);
                             llcPagarPix.setVisibility(View.GONE);
                             llcPixPago.setVisibility(View.VISIBLE);
+
+                            prefs.edit().putString("DataHoraPix", infoPix.getDataHora()).apply();
                             //_finalizarPagamento();
                             //infoPix.getStatus()
                             //Toast.makeText(getBaseContext(), "RECEBIDO", Toast.LENGTH_SHORT).show();
@@ -278,6 +280,8 @@ public class Pix extends AppCompatActivity {
                             bd.updateFormPagPIXRecebido(idLisForPag);
                             llcConsultarPix.setVisibility(View.GONE);
                             llcPixPago.setVisibility(View.VISIBLE);
+
+                            prefs.edit().putString("DataHoraPix", infoPix.getDataHora()).apply();
 
                             esperaFechar();
                             //finish();
