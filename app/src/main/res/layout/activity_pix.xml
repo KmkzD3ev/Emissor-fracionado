@@ -18,20 +18,106 @@
         <LinearLayout
             android:id="@+id/print_comprovante_pix"
             android:layout_width="190dp"
-            android:layout_height="160dp"
+            android:layout_height="170dp"
+            android:background="@android:color/white"
             android:orientation="vertical"
-            android:paddingTop="8dp"
-            android:background="@android:color/white">
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/txtEmpresaPix"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="center"
+                android:text="EMPRESA"
+                android:textColor="@android:color/black"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtCNPJPix"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="center"
+                android:text="CNPJ: 00.000.000/0001-00"
+                android:textColor="@android:color/black"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/verdana"
+                    android:gravity="start"
+                    android:text="POS: "
+                    android:textColor="@android:color/black"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtPOS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/verdana"
+                    android:gravity="start"
+                    android:text=""
+                    android:textColor="@android:color/black"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/verdana"
+                    android:gravity="start"
+                    android:text="BANCO: "
+                    android:textColor="@android:color/black"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txtBancoPix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/verdana"
+                    android:gravity="start"
+                    android:text=""
+                    android:textColor="@android:color/black"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:background="@android:color/black" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:fontFamily="@font/verdana"
                 android:gravity="center"
-                android:layout_margin="8dp"
-                android:fontFamily="sans-serif-black"
-                android:text="Comprovante Pix"
+                android:text="COMPROVANTE PIX"
                 android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textSize="9sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -48,121 +134,137 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_margin="4dp"
-                    android:fontFamily="sans-serif-black"
-                    android:text="Via do Lojista"
+                    android:fontFamily="@font/verdana"
+                    android:gravity="end"
+                    android:text="Via Lojista"
                     android:textColor="@android:color/black"
-                    android:textSize="10sp" />
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
 
-                <!-- Pedido -->
-                <LinearLayout
-                    android:visibility="gone"
+                <TextView
+                    android:id="@+id/txtReimpressaoPix"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/verdana"
+                    android:gravity="end"
+                    android:text="REIMPRESSAO"
+                    android:textColor="@android:color/black"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="start"
-                        android:text="Pedido:"
-                        android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:id="@+id/txtPedido"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="0"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <!-- Identificador -->
-                <LinearLayout
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
-                    android:orientation="vertical"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
+                        android:fontFamily="@font/verdana"
                         android:gravity="start"
-                        android:text="Identificador:"
+                        android:text="Valor: "
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:id="@+id/txtIdentificador"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="0"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <!-- Valor Pix -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="start"
-                        android:text="Valor:"
-                        android:textColor="@android:color/black"
-                        android:textSize="12sp" />
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/txtValorPix"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
+                        android:fontFamily="@font/verdana"
+                        android:gravity="start"
                         android:text="0,00"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
 
-                </LinearLayout>
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
-                <!-- Data / Hora -->
-                <LinearLayout
+                <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/verdana"
+                        android:gravity="start"
+                        android:text="Pedido: "
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtNPedido"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/verdana"
+                        android:gravity="start"
+                        android:text="0"
+                        android:textColor="@android:color/black"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/verdana"
+                        android:gravity="start"
+                        android:text="Identificado: "
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtIdentificadoPix"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/verdana"
+                        android:gravity="start"
+                        android:text=""
+                        android:textColor="@android:color/black"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/verdana"
+                        android:gravity="start"
+                        android:text="Data/Hora:"
+                        android:textColor="@android:color/black"
+                        android:textSize="8sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtDataHoraPix"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="start"
-                        android:text="Data/Hora"
+                        android:fontFamily="@font/verdana"
+                        android:gravity="end"
+                        android:text="00/00/0000 - 00:00:00"
                         android:textColor="@android:color/black"
-                        android:textSize="9sp" />
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/txtDataHora"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="center"
-                        android:text="00/00/00 00:00:00"
-                        android:textColor="@android:color/black"
-                        android:textSize="9sp" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
 
-                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

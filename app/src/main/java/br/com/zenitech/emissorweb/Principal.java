@@ -623,16 +623,14 @@ public class Principal extends AppCompatActivity
             Configuracoes configuracoes = new Configuracoes();
 
             if (bd.ultimoPIX() != null) {
-                if (configuracoes.GetDevice()) {
-                    Intent i = new Intent(context, ImpressoraPOS.class);
-                    i.putExtra("imprimir", "comprovante_pix_reimp");
-                    startActivity(i);
-                } else {
-                    //
-                    Intent i = new Intent(context, Impressora.class);
-                    i.putExtra("imprimir", "comprovante_pix_reimp");
-                    startActivity(i);
-                }
+                Intent i;
+                if (configuracoes.GetDevice())
+                    i = new Intent(context, ImpressoraPOS.class);
+                else
+                    i = new Intent(context, Impressora.class);
+                i.putExtra("imprimir", "comprovante_pix_reimp");
+                i.putExtra("impressao_pix", false);
+                startActivity(i);
             } else
                 makeText(context, "Nada para imprimir", LENGTH_SHORT).show();
         }

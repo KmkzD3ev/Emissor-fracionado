@@ -452,6 +452,7 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
                     ));
                 }
             } else {
+
                 bd.addFormasPagamentoPedidosTemp(new FormaPagamentoPedido(
                         "",
                         String.valueOf(idTemp), //ID PEDIDO
@@ -814,6 +815,7 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
             if (!listPro.isEmpty()) {
                 String[] iList = listPro.get(0).split(",");
                 List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
+
                 if (!minMaxFrac.get(0).equals("0") && !minMaxFrac.get(1).equals("0")) {
                     int min = Integer.parseInt(minMaxFrac.get(0));
                     int max = Integer.parseInt(minMaxFrac.get(1));
@@ -910,22 +912,22 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
         if (NotaFracionada.equals("1")) {
 
             //region REGRA PARA FRACIONAR O FINANCEIRO EM DINHEIRO
-         /*
-         SE O VALOR DA FORMA DE PAGAMENTO DINEIRO FOR MAIOR OU IGUAL AO TOTAL DA NOTA ADICIONA DINHEIRO
-         E SUBTRAI O VALOR DA FORMA DE PAGAMENTO DINHEIRO
-         */
+             /*
+             SE O VALOR DA FORMA DE PAGAMENTO DINEIRO FOR MAIOR OU IGUAL AO TOTAL DA NOTA ADICIONA DINHEIRO
+             E SUBTRAI O VALOR DA FORMA DE PAGAMENTO DINHEIRO
+             */
             //endregion
             //region REGRA PARA FRACIONAR O FINANCEIRO EM PIX
-         /*
-         SE O VALOR DA FORMA DE PAGAMENTO PIX FOR MAIOR OU IGUAL AO TOTAL DA NOTA ADICIONA PIX
-         E SUBTRAI O VALOR DA FORMA DE PAGAMENTO PIX
-         */
+             /*
+             SE O VALOR DA FORMA DE PAGAMENTO PIX FOR MAIOR OU IGUAL AO TOTAL DA NOTA ADICIONA PIX
+             E SUBTRAI O VALOR DA FORMA DE PAGAMENTO PIX
+             */
             //endregion
             //region REGRA PARA ADICIONAR O FINANCEIRO DA ULTIMA NOTA
-         /*
-         PEGAR O VALOR RESTANTE DA FORMAS DE PAGAMENTO DINHEIRO E PIX E SOMAR CRIANDO O VALOR TOTAL
-         DA ULTIMA NOTA. ZERAR AS DUAS FORMAS DE PAGAMENTO NAS FORMAS DE PAGAMENTO DO PEDIDO.
-         */
+             /*
+             PEGAR O VALOR RESTANTE DA FORMAS DE PAGAMENTO DINHEIRO E PIX E SOMAR CRIANDO O VALOR TOTAL
+             DA ULTIMA NOTA. ZERAR AS DUAS FORMAS DE PAGAMENTO NAS FORMAS DE PAGAMENTO DO PEDIDO.
+             */
             //endregion
 
             // TOTAL FINANCEIRO DINHEIRO
@@ -933,16 +935,16 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
             // TOTAL FINANCEIRO PIX
             String _totalPix = bd.getTotalFinanceiroPix(String.valueOf(idTemp), api_asaas);
             //  TOTAL DO ITEM
-            String _total_item = bd.getTotalItem(String.valueOf(id));
+            String _total_item = bd.getTotalItem(String.valueOf(id)); //id
             // RECEBE O ID DA COBRANCA PIX
             String id_cobranca_pix = bd.getIdCobrancaPix(String.valueOf(idTemp));
 
-            cAux.ShowMsgLog("FinNFCe", "---------");
+            /*cAux.ShowMsgLog("FinNFCe", "---------");
             cAux.ShowMsgLog("FinNFCe", "DINHEIRO: " + _totalDinheiro);
             cAux.ShowMsgLog("FinNFCe", "PIX: " + _totalPix);
             cAux.ShowMsgLog("FinNFCe", "ITEM: " + _total_item);
             cAux.ShowMsgLog("FinNFCe", "ID COB. PIX: " + id_cobranca_pix);
-            cAux.ShowMsgLog("FinNFCe", "---------");
+            cAux.ShowMsgLog("FinNFCe", "---------");*/
 
             FormaPagamentoPedido fpp = new FormaPagamentoPedido(null, null, null, null, null, null, null, null, null);
             fpp.id_pedido = String.valueOf(id);

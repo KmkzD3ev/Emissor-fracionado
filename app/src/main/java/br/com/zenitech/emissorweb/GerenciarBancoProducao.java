@@ -258,6 +258,7 @@ public class GerenciarBancoProducao extends AppCompatActivity {
                     String quantidadesProdutosPedido = bd.getQuantidadesProdutosPedido(pedidos.getId()).replace(".", "");
                     String valorProdutosPedido = bd.getValorProdutosPedido(pedidos.getId()).replace(".", "");
 
+                    Log.i(TAG, valorFormaPGPedido + " - " + idFormaPGPedido + " - " + nAutoCartao + " - " + bandeiraFPG + " - " + nsuFPG);
                     // SE FOR PINPAD OU POS A CREDENCIADORA SERÁ STONE
                     /*if (!unidades.getCodloja().equalsIgnoreCase("")) {
                         credenciadora = "STONE";

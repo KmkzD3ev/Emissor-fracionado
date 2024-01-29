@@ -1,5 +1,7 @@
 package br.com.zenitech.emissorweb.pagamentos;
 
+import static br.com.zenitech.emissorweb.MaskUtil.maskCnpj;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -350,10 +352,23 @@ public class PagamentoPix extends AppCompatActivity {
         });
 
         //IMPRIMIR CABEÇALHO
-        TextView txtPedido = findViewById(R.id.txtPedido);
-        TextView txtIdentificador = findViewById(R.id.txtIdentificador);
+        TextView txtEmpresaPix, txtCNPJPix, txtBancoPix, txtPOS;
+        txtEmpresaPix = findViewById(R.id.txtEmpresaPix);
+        txtCNPJPix = findViewById(R.id.txtCNPJPix);
+        txtBancoPix = findViewById(R.id.txtBancoPix);
+        txtPOS = findViewById(R.id.txtPOS);
+        txtPOS.setText(prefs.getString("serial_app", ""));
+
+        elementosUnidades = bd.getUnidades();
+        unidades = elementosUnidades.get(0);
+        txtEmpresaPix.setText(unidades.getRazao_social());
+        txtCNPJPix.setText("CNPJ: " + maskCnpj(unidades.getCnpj()));
+        txtBancoPix.setText(unidades.getBanco_pix());
+
+        TextView txtPedido = findViewById(R.id.txtNPedido);
+        TextView txtIdentificador = findViewById(R.id.txtIdentificadoPix);
         TextView txtValorPix = findViewById(R.id.txtValorPix);
-        TextView txtDataHora = findViewById(R.id.txtDataHora);
+        TextView txtDataHora = findViewById(R.id.txtDataHoraPix);
         //
         txtPedido.setText(pedido);
         txtIdentificador.setText(idPagamento);

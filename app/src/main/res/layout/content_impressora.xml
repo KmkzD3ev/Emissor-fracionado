@@ -2321,7 +2321,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/verdana"
             android:gravity="center"
-            android:text="DEPOSITO DE GAS SAO TOME LTDA"
+            android:text="EMPRESA"
             android:textColor="@android:color/black"
             android:textSize="7sp"
             android:textStyle="bold" />
@@ -2336,6 +2336,34 @@
             android:textColor="@android:color/black"
             android:textSize="7sp"
             android:textStyle="bold" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text="POS: "
+                android:textColor="@android:color/black"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtPOS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/verdana"
+                android:gravity="start"
+                android:text=""
+                android:textColor="@android:color/black"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
