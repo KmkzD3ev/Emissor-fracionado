@@ -766,8 +766,8 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 elementosItens = bd.getItensPedido(pedidos.getId());
                 itensPedidos = elementosItens.get(0);
 
-                String dataEmissao = cAux.exibirData(pedidos.getData());
-                String horaEmissao = pedidos.getHora();
+                String dataEmissao = (!pedidos.getData().equals("") ? cAux.exibirData(pedidos.getData()) : "");
+                String horaEmissao = (!pedidos.getHora().equals("")? pedidos.getHora() : "");
 
                 //
                 txtCorpoRel1.setText(String.format("Numero:%s      Emissao:%s %s", pedidos.getId(), dataEmissao, horaEmissao));

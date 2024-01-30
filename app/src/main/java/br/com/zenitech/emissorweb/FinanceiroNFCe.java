@@ -336,6 +336,13 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
             }
         });
 
+        findViewById(R.id.BtnEditarProduto).setOnClickListener(v -> {
+            Intent i = new Intent(this, FormPedidos.class);
+            i.putExtra("EditarProduto", true);
+            startActivity(i);
+            finish();
+        });
+
 
         /*listaFinanceiroCliente = bd.getFinanceiroPedidoTemp(idTemp);
         adapterFPG = new FormasPagamentoPedidosAdapter(this, listaFinanceiroCliente, elementos, idTemp, bd);

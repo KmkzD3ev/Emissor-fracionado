@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,10 +54,27 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         bd = new DatabaseHelper(context);
         aux = new ClassAuxiliar();
-        //
-        idTemp = bd.getProximoIdPedido();
-        //
-        bd.addPedidosTemp(String.valueOf(idTemp));
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            Bundle params = intent.getExtras();
+            if (params != null) {
+                if (params.getBoolean("EditarProduto")) {
+                    idTemp = Integer.parseInt(bd.getUltimoIdPedido());
+                    Toast.makeText(context, "Id Temo = " + idTemp, Toast.LENGTH_SHORT).show();
+                } else {
+//
+                    idTemp = bd.getProximoIdPedido();
+                    //
+                    bd.addPedidosTemp(String.valueOf(idTemp));
+                }
+            }
+        } else {
+            //
+            idTemp = bd.getProximoIdPedido();
+            //
+            bd.addPedidosTemp(String.valueOf(idTemp));
+        }
     }
     //endregion
 
@@ -144,6 +162,8 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
                         txtPrecoMinMax.setText("");
                         txtPrecoMinMax.setVisibility(View.GONE);
                     }
+
+                    //kleilson
                     quant = bd.getQuantProdutoRemessa(parent.getItemAtPosition(position).toString());
                 } else
                     txtPrecoMinMax.setVisibility(View.GONE);
@@ -365,8 +385,12 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
             aux.ShowMsgToast(context, "Selecione um produto.");
         } else if (etQuantidade.getText().toString().equals("") || etQuantidade.getText().toString().equals("0")) {
             aux.ShowMsgToast(context, "Informe a quantidade.");
+        } else if (quant == 0) {
+            msgErroFracionar.setText(MessageFormat.format("Os produtos {0} estão atualmente esgotados.", quant));
+            msgErroFracionar.setVisibility(View.VISIBLE);
         } else if (Integer.parseInt(etQuantidade.getText().toString()) > quant) {
-            aux.ShowMsgToast(context, "Restam apenas " + quant + " itens. Diminua a quantidade!");
+            msgErroFracionar.setText(MessageFormat.format("A quantidade disponível é de apenas {0} itens. Por favor, ajuste a quantidade para um valor menor.", quant));
+            msgErroFracionar.setVisibility(View.VISIBLE);
         } else if (etPreco.getText().toString().equals("") || valEtPreco.equals("R$ 0,00") || valEtPreco.equals("0.0") || valEtPreco.equals("0.00")) {
             aux.ShowMsgToast(context, "Informe o valor unitário.");
         } else {
@@ -431,11 +455,48 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
         produto.valor = valorUnit;
         produto.total = total;
         produto.desconto = valorDesc;
-        bd.addProdutoPedido(produto);
-        //
-        etDesconto.setText(R.string.zero_reais);
-        //
-        AtualizarListaProdutos();
+
+        // VERIFICA SE O PRODUTO JÁ FOI INSERIDO E ESTÁ COM MESMO VALOR
+
+        ProdutosPedidoDomain comp = bd.getProdutoPedidoTemp(idTemp, produto.produto);
+        if (comp.valor != null) {
+
+            if (aux.comparar(new String[]{comp.valor, valorUnit}) == 0) {
+                int quantComp = Integer.parseInt(produto.quantidade) + Integer.parseInt(comp.quantidade);
+
+                Toast.makeText(context, "Quantidade Restante: " + quantComp, Toast.LENGTH_LONG).show();
+                if (quantComp > quant) {
+                    msgErroFracionar.setText(MessageFormat.format("A quantidade disponível é de apenas {0} itens. Por favor, ajuste a quantidade para um valor menor.", quant));
+                    msgErroFracionar.setVisibility(View.VISIBLE);
+                    return;
+                }
+
+                String val = String.valueOf(aux.somar(new String[]{comp.valor, valorUnit}));
+                String tot = String.valueOf(aux.multiplicar(new String[]{val, String.valueOf(quantComp)}));
+                bd.updateProdutoPedidoTemp(
+                        String.valueOf(idTemp),
+                        comp.id_produto,
+                        String.valueOf(quantComp),
+                        tot
+                );
+
+                //
+                etDesconto.setText(R.string.zero_reais);
+                //
+                AtualizarListaProdutos();
+                return;
+            } else {
+                msgErroFracionar.setText(MessageFormat.format("Atenção: O produto {0} já está presente na lista. Por favor, considere excluí-lo antes de adicionar novamente, ou certifique-se de adicionar com o mesmo valor unitário para evitar duplicatas.", produto.produto));
+                msgErroFracionar.setVisibility(View.VISIBLE);
+                return;
+            }
+        } else {
+            bd.addProdutoPedido(produto);
+            //
+            etDesconto.setText(R.string.zero_reais);
+            //
+            AtualizarListaProdutos();
+        }
     }
 
     private void AtualizarListaProdutos() {

@@ -185,7 +185,7 @@ public class FormasPagamentoPedidosAdapter extends RecyclerView.Adapter<FormasPa
         // Notifica os observadores sobre a mudança nos dados
         for (IFinanceiroNFCeObserver observer : observers) {
             observer.onFinanceiroNFCeChanged();
-            classAuxiliar.ShowMsgToast(context, "Observou");
+            //classAuxiliar.ShowMsgToast(context, "Observou");
         }
 
         //

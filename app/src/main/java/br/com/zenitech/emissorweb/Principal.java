@@ -290,7 +290,10 @@ public class Principal extends AppCompatActivity
             Log.e("testeCampoDesconto:", e.getMessage());
             return;
         }
-        startActivity(new Intent(context, FormPedidos.class));
+
+        Intent i = new Intent(context, FormPedidos.class);
+        i.putExtra("EditarProduto", false);
+        startActivity(i);
         //startActivity(new Intent(context, FinanceiroNFCe.class));
     }
 
@@ -753,7 +756,7 @@ public class Principal extends AppCompatActivity
 
         final Call<Sincronizador> call = iSincronizar.ativarDesativarPOS("desativar", prefs.getString("serial_app", ""));
 
-        call.enqueue(new Callback<Sincronizador>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Sincronizador> call, @NonNull Response<Sincronizador> response) {
 
@@ -774,8 +777,8 @@ public class Principal extends AppCompatActivity
                             Toast.makeText(context, "Remessa finalizada com sucesso!", Toast.LENGTH_LONG).show();
 
                             //APAGA O BANCO DE DADOS E VAI PARA TELA INICIAL DE SINCRONIZAÇÃO
-                            bd.FecharConexao();
-                            context.deleteDatabase("emissorwebDB");
+                            bd.FecharConexao(context);
+
                             //Intent i = new Intent(context, Sincronizar.class);
                             Intent i = new Intent(context, AppFinalizado.class);
                             if (initAuto) {

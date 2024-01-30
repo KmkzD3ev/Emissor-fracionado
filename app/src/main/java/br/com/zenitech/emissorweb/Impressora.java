@@ -2384,8 +2384,8 @@ public class Impressora extends AppCompatActivity {
 
                     Log.i("auxKle", pedidos.getData() + " - " + pedidos.getHora());
 
-                    String dataEmissao = cAux.exibirData(pedidos.getData());
-                    String horaEmissao = pedidos.getHora();
+                    String dataEmissao = (!pedidos.getData().equals("") ? cAux.exibirData(pedidos.getData()) : "");
+                    String horaEmissao = (!pedidos.getHora().equals("")? pedidos.getHora() : "");
 
                     //
                     textBuffer.append(tamFont).append("Numero:").append(pedidos.getId()).append("   Emissao:").append(dataEmissao).append(" ").append(horaEmissao).append("{br}");

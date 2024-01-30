@@ -1333,6 +1333,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return produtos;
     }
 
+    public ProdutosPedidoDomain getProdutoPedidoTemp(int id_pedido, String produto) {
+        ProdutosPedidoDomain produtoPedido = new ProdutosPedidoDomain();
+
+        try {
+            String idProduto = this.getIdProduto(produto);
+            String query = "SELECT id_produto, quantidade, valor " +
+                    "FROM produtos_pedido " +
+                    "WHERE id_pedido = '" + id_pedido + "' AND id_produto = '" + idProduto + "'";
+            Log.e("SQL", "getProdutosPedido - " + query);
+            myDataBase = this.getReadableDatabase();
+            Cursor cursor = myDataBase.rawQuery(query, null);
+
+            if (cursor.moveToFirst()) {
+                produtoPedido.id_produto = cursor.getString(0);
+                produtoPedido.quantidade = cursor.getString(1);
+                produtoPedido.valor = cursor.getString(2);
+            }
+            cursor.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return produtoPedido;
+    }
+
     public ArrayList<ProdutosPedidoDomain> getProdutosPedidoNFe(String id_pedido) {
         ArrayList<ProdutosPedidoDomain> produtos = new ArrayList<>();
 
@@ -3381,28 +3406,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return total;
     }
 
-    public String getTotalItemPedidoTemp(String idPedido) {
-        myDataBase = this.getReadableDatabase();
-        String selectQuery = "SELECT SUM(ipe.valor * ipe.quantidade) AS valor " +
-                "FROM itens_pedidos ipe " +
-                "WHERE ipe.pedido = '" + idPedido + "'";
-
-        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
-
-        String total = "0.0";
-
-        if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            total = cursor.getString(0);
-        }
-
-        cursor.close();
-        if (total == null) {
-            total = "0.0";
-        }
-        return total;
-    }
-
     //SOMAR O VALOR DO FINANCEIRO
     public String getValorTotalFinanceiro(String idPedido, boolean api_asaas) {
         myDataBase = this.getReadableDatabase();
@@ -3829,6 +3832,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    public void updateProdutoPedidoTemp(String idPedido, String idProduto, String quantidade, String total) {
+        myDataBase = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("quantidade", quantidade);
+        values.put("total", total);
+        myDataBase.update("produtos_pedido", values, "id_pedido=" + idPedido + " AND id_produto = '" + idProduto + "'", null);
+    }
+
     void updateValorPedido(String idPedido, String valor) {
         myDataBase = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -4167,9 +4178,88 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return minMax;
     }
 
-    public void FecharConexao() {
+
+    private void apagarDadosGerais(String idPedido) {
+        myDataBase = this.getWritableDatabase();
+
+        //
+        myDataBase.delete(
+                "formas_pagamento_pedidos",
+                "id_pedido = ?",
+                new String[]{idPedido}
+        );
+
+        //
+        myDataBase.delete(
+                "itens_pedidos",
+                "pedido = ?",
+                new String[]{idPedido}
+        );
+
+        //
+        myDataBase.delete(
+                "pedidos_temp",
+                "id = ?",
+                new String[]{idPedido}
+        );
+
+        //
+        myDataBase.delete(
+                "pedidos",
+                "id = ?",
+                new String[]{idPedido}
+        );
+
+
+        /*int i = myDataBase.delete(
+                "pedidos",
+                ID_PEDIDOS + " = ?",
+                new String[]{idPedido}
+        );
+        db.close();
+        return i;*/
+    }
+
+    public void deleteAllTables() {
+        // Lista de todas as tabelas no seu banco de dados
+        String[] allTables = {
+                "android_metadata",
+                "autorizacoes",
+                "autorizacoes_pinpad",
+                "boletos",
+                "clientes",
+                "contas_bancarias",
+                "credenciadoras",
+                "financeiro_nfce",
+                "financeiro_nfe",
+                "formas_pagamento_pedidos",
+                "itens_pedidos",
+                "itens_pedidosNFE",
+                "pedidos",
+                "pedidos_temp",
+                "pedidosNFE",
+                "pos",
+                "produtos",
+                "produtos_pedido",
+                "produtos_pedido_nfe",
+                "unidades"
+        };
+
+        // Iterar sobre a lista de tabelas e excluir cada uma delas
+        for (String table : allTables) {
+            String deleteTableQuery = "DROP TABLE IF EXISTS " + table + ";";
+            myDataBase.execSQL(deleteTableQuery);
+        }
+    }
+
+    public void FecharConexao(Context context) {
         try {
+            // DELETA TODAS AS TABELAS
+            deleteAllTables();
+            // FECHAR A CONEXÃO COM BANCO
             myDataBase.close();
+            // EXCLUI O BANCO DE DADOS
+            context.deleteDatabase("emissorwebDB");
         } catch (Exception e) {
             Log.e("Banco", e.getMessage());
         }
