@@ -294,6 +294,7 @@ public class Principal extends AppCompatActivity
         Intent i = new Intent(context, FormPedidos.class);
         i.putExtra("EditarProduto", false);
         startActivity(i);
+        finish();
         //startActivity(new Intent(context, FinanceiroNFCe.class));
     }
 
@@ -373,6 +374,8 @@ public class Principal extends AppCompatActivity
             Intent i = new Intent(context, FinanceiroNFCe.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
+
+            finish();
         });
         alerta = builder.create();
         alerta.show();
@@ -383,6 +386,7 @@ public class Principal extends AppCompatActivity
         try {
             //getVerificarFinanceiroUltimoPedido
             if (bd.getFinanceiroUltimoPedido(bd.getIdPedidoTemp())) {
+                //makeText(context, "Teste Edit", LENGTH_SHORT).show();
                 pedidoNaoFinalizadoDialog();
             }
         } catch (Exception ignored) {

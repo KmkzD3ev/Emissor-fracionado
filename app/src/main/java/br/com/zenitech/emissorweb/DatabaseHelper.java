@@ -286,14 +286,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //
+    public boolean getProdutoNcmGas(String produto) {
+        myDataBase = this.getWritableDatabase();
+
+        //
+        Cursor produtos;
+        String query_pos = "SELECT pro.nome " +
+                " FROM produtos pro " +
+                "WHERE pro.nome = '" + produto + "' AND pro.ncm = '27111910' LIMIT 1";
+        produtos = myDataBase.rawQuery(query_pos, null);
+        if (produtos.getCount() > 0) {
+            //produtos.moveToFirst();
+            produtos.close();
+            return true;
+        }
+        produtos.close();
+        return false;
+    }
+
+    //
+    public boolean getProdutoNcmOutros(String produto) {
+        myDataBase = this.getWritableDatabase();
+
+        //
+        Cursor produtos;
+        String query_pos = "SELECT pro.nome " +
+                " FROM produtos pro " +
+                "WHERE pro.nome = '" + produto + "' AND pro.ncm != '27111910' AND pro.ncm != '' LIMIT 1";
+        produtos = myDataBase.rawQuery(query_pos, null);
+        if (produtos.getCount() > 0) {
+            //produtos.moveToFirst();
+            produtos.close();
+            return true;
+        }
+        produtos.close();
+        return false;
+    }
+
+    //
     public String getNomeProduto(String idProduto) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        myDataBase = this.getWritableDatabase();
         String id = null;
 
         //
         Cursor produtos;
         String query_pos = "SELECT " + NOME_PRODUTO + " FROM " + TABELA_PRODUTOS + " WHERE " + CODIGO_PRODUTO + " = '" + idProduto + "' LIMIT 1";
-        produtos = db.rawQuery(query_pos, null);
+        produtos = myDataBase.rawQuery(query_pos, null);
         if (produtos.moveToFirst()) {
             do {
 
@@ -1351,7 +1389,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 produtoPedido.valor = cursor.getString(2);
             }
             cursor.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -1408,7 +1446,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         myDataBase = this.getReadableDatabase();
         Cursor cursor = myDataBase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                if (cursor.getString(0) != null) {
+                    quant = Integer.parseInt(cursor.getString(0));
+                }
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return quant;
+    }
+
+    public int getQuantProdutosPedidoNCMOutros(int id_pedido) {
+        int quant = 0;
+
+        String query = "SELECT  SUM(prp.quantidade) " +
+                "FROM produtos_pedido prp " +
+                "INNER JOIN produtos pro ON pro.codigo = prp.id_produto " +
+                "WHERE prp.id_pedido = '" + id_pedido + "' AND pro.ncm != '27111910'";
+
+        myDataBase = this.getReadableDatabase();
+        Cursor cursor = myDataBase.rawQuery(query, null);
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
             do {
                 if (cursor.getString(0) != null) {
                     quant = Integer.parseInt(cursor.getString(0));
@@ -2366,12 +2429,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "ORDER BY pet.id DESC " +
                 "LIMIT 1";
 
-        Log.e("FinanceiroUltimoPedido", query);
+
 
         myDataBase = this.getReadableDatabase();
         Cursor cursor = myDataBase.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
+        Log.e("FinanceiroUltimoPedido", query);
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
             result = true;
         }
         cursor.close();
@@ -3381,6 +3447,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             id_cobranca = "";
         }
         return id_cobranca;
+    }
+
+    //VERIFICAR SE TEM FINANCEIRO DIFERENTE DE DINHEIRO E PIX NO PEDIDO TEMP
+    public boolean getFianceiroDiferenteDeDinheiroPix(String idPedido) {
+        myDataBase = this.getReadableDatabase();
+
+        String selectQuery = "SELECT fpp.id_forma_pagamento " +
+                "FROM formas_pagamento_pedidos fpp " +
+                "WHERE fpp.id_pedido = '" + idPedido + "' AND id_forma_pagamento != 1 AND id_forma_pagamento != 17";
+
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        if (cursor.getCount() > 0) {
+            cursor.close();
+            return true;
+        }
+
+        cursor.close();
+        return false;
     }
 
     //SOMAR O VALOR DO FINANCEIRO

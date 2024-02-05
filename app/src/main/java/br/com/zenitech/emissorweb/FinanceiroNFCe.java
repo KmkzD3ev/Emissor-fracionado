@@ -366,7 +366,7 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
     final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
-            sair();
+            cAux.ShowMsgToast(context, "Não é possível voltar!");
         }
     };
 
@@ -746,7 +746,7 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            sair();
+            cAux.ShowMsgToast(context, "Não é possível voltar!");
         }
         return super.onOptionsItemSelected(item);
     }

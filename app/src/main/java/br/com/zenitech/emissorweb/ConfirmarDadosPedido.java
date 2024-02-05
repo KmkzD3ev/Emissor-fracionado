@@ -14,6 +14,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -155,7 +156,11 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     idUltPedido = bd.getUltimoIdPedido();
                     infoPedido = bd.getPedido(idUltPedido);
                     //cpfCnpj_cliente.setText(params.getString("cpfCnpj_cliente"));
-                    cpfCnpj_cliente.setText(infoPedido.getCpf_cliente());
+                    try {
+                        cpfCnpj_cliente.setText(infoPedido.getCpf_cliente());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     formaPagamento.setText(bd.getFormasPagamentoPedidoPrint(idUltPedido));
                     //produto.setText(params.getString("produto"));
                     produto.setText(bd.getProdutosPedidoConfirmacao(Integer.parseInt(infoPedido.getId()), cAux));
@@ -250,6 +255,9 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
             startActivity(i);
             finish();
         });
+
+        // Add the callback to the back stack
+        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
     }
 
     private void transmitirNota() {
@@ -415,7 +423,7 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         } else {
             if (erroTransmitir) {
                 Toast.makeText(contexto, "Encontramos erro ao transmitir uma ou mais notas!", Toast.LENGTH_LONG).show();
-            }else{
+            } else {
                 Toast.makeText(contexto, "NFC-e transmitida com sucesso!", Toast.LENGTH_LONG).show();
             }
         }
@@ -587,6 +595,9 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 break;
             }
             case R.id.btn_fechar: {
+                Intent i = new Intent(contexto, Principal.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
                 finish();
                 break;
             }
@@ -613,4 +624,14 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         //Exibe
         alerta.show();
     }
+
+    OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            Intent i = new Intent(contexto, Principal.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            finish();
+        }
+    };
 }

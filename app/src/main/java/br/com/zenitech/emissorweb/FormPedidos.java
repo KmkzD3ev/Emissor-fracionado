@@ -61,7 +61,7 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
             if (params != null) {
                 if (params.getBoolean("EditarProduto")) {
                     idTemp = Integer.parseInt(bd.getUltimoIdPedido());
-                    Toast.makeText(context, "Id Temo = " + idTemp, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Id Temo = " + idTemp, Toast.LENGTH_SHORT).show();
                 } else {
 //
                     idTemp = bd.getProximoIdPedido();
@@ -351,7 +351,10 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
     OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
-            Sair();
+            Intent i = new Intent(context, Principal.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            finish();
         }
     };
 
@@ -456,6 +459,18 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
         produto.total = total;
         produto.desconto = valorDesc;
 
+        //
+        if (VerificarFracionamento()) {
+            //Toast.makeText(context, "Vai fracionar", Toast.LENGTH_SHORT).show();
+
+            if (bd.getFianceiroDiferenteDeDinheiroPix(String.valueOf(idTemp))) {
+                //Toast.makeText(context, "Tem Financeiro diferente", Toast.LENGTH_SHORT).show();
+                msgErroFracionar.setText("Um método de pagamento diferente de dinheiro ou Pix já foi adicionado, impossibilitando o fracionamento.");
+                msgErroFracionar.setVisibility(View.VISIBLE);
+                return;
+            }
+        }
+
         // VERIFICA SE O PRODUTO JÁ FOI INSERIDO E ESTÁ COM MESMO VALOR
 
         ProdutosPedidoDomain comp = bd.getProdutoPedidoTemp(idTemp, produto.produto);
@@ -464,15 +479,15 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
             if (aux.comparar(new String[]{comp.valor, valorUnit}) == 0) {
                 int quantComp = Integer.parseInt(produto.quantidade) + Integer.parseInt(comp.quantidade);
 
-                Toast.makeText(context, "Quantidade Restante: " + quantComp, Toast.LENGTH_LONG).show();
+                //Toast.makeText(context, "Quantidade Restante: " + quantComp, Toast.LENGTH_LONG).show();
                 if (quantComp > quant) {
                     msgErroFracionar.setText(MessageFormat.format("A quantidade disponível é de apenas {0} itens. Por favor, ajuste a quantidade para um valor menor.", quant));
                     msgErroFracionar.setVisibility(View.VISIBLE);
                     return;
                 }
 
-                String val = String.valueOf(aux.somar(new String[]{comp.valor, valorUnit}));
-                String tot = String.valueOf(aux.multiplicar(new String[]{val, String.valueOf(quantComp)}));
+                //String val = String.valueOf(aux.somar(new String[]{comp.valor, valorUnit}));
+                String tot = String.valueOf(aux.multiplicar(new String[]{valorUnit, String.valueOf(quantComp)}));
                 bd.updateProdutoPedidoTemp(
                         String.valueOf(idTemp),
                         comp.id_produto,
@@ -513,6 +528,68 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
         etPreco.setText(R.string.zero_reais);
     }
 
+    private boolean VerificarFracionamento() {
+
+        String prod = spProduto.getSelectedItem().toString();
+
+        if (bd.getProdutoNcmGas(prod)) {
+            // RECEBE A QUANTIDADE DE PRODUTOS COM O NCM = 27111910
+            int quantGas = bd.getQuantProdutosPedidoNCMGas(idTemp);
+
+            // QUANTIDADE DE GÁS
+            if (quantGas > 0) {
+                quantGas = bd.getQuantProdutosPedidoNCMGas(idTemp) + Integer.parseInt(etQuantidade.getText().toString());
+                if (quantGas > 5) {
+                    return true;
+                }
+            } else {
+
+                if (bd.getProdutoNcmGas(prod) && Integer.parseInt(etQuantidade.getText().toString()) > 5) {
+                    return true;
+                }
+            }
+        }
+
+        if (bd.getProdutoNcmOutros(prod)) {
+
+            // RECEBE A QUANTIDADE DE PRODUTOS COM O NCM != 27111910
+            List<String> listPro = bd.getQuantProdutosPedidoNCM(idTemp);
+            if (!listPro.isEmpty()) {
+                for (int i = 0; listPro.size() > i; i++) {
+                    String[] iList = listPro.get(i).split(",");
+                    List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
+                    int quant = Integer.parseInt(iList[1]) + Integer.parseInt(etQuantidade.getText().toString());                      // QUANTIDADE DE GÁS
+                    Toast.makeText(context, ""+quant, Toast.LENGTH_SHORT).show();
+                    int max = Integer.parseInt(minMaxFrac.get(1));
+                    if(quant > max){
+                        return true;
+                    }
+                    /*if (!minMaxFrac.get(0).equals("0") && quant != 0) {
+
+
+                        if (Integer.parseInt(iList[1]) > max) {
+                            return true;
+                        }
+                    }*/
+                }
+            } else {
+                String idProduto = bd.getIdProduto(prod);
+                int maxFrac = Integer.parseInt(bd.getMinMaxFracionamentoProduto(idProduto).get(1));
+                if (Integer.parseInt(etQuantidade.getText().toString()) > maxFrac) {
+                    return true;
+                }
+            }
+        }
+
+        // SE TIVER MAIS DE UM PRODUTO RETORNA VERDADEIRO E NÃO PODE ADICIONAR
+        /*ArrayList<ProdutosPedidoDomain> prodPedido = bd.getProdutosPedido(idTemp);
+        if (!prodPedido.get(0).produto.equals(prod)) {
+            //return true;
+        }*/
+
+        return false;
+    }
+
     private void formsView() {
         prefs.edit().putString("cpf_cnpj", cpf_cnpj_cliente.getText().toString()).apply();
         startActivity(new Intent(context, FinanceiroNFCe.class));
@@ -522,7 +599,10 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            Sair();
+            Intent i = new Intent(context, Principal.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(i);
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }

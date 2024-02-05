@@ -234,4 +234,5 @@
     <string name="iniciar_pagamento">INICIAR PAGAMENTO</string>
     <string name="finalizar">FINALIZAR</string>
     <string name="numero_um">1</string>
+    <string name="editar_produtos">Editar Produtos</string>
 </resources>
