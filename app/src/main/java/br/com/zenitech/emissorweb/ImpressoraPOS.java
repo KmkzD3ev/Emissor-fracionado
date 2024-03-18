@@ -14,10 +14,12 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.Toolbar;
 
 import com.datecs.api.BuildInfo;
@@ -34,6 +36,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -42,6 +45,7 @@ import br.com.stone.posandroid.providers.PosPrintProvider;
 import br.com.stone.posandroid.providers.PosPrintReceiptProvider;
 import br.com.stone.posandroid.providers.PosReprintReceiptProvider;
 import br.com.stone.posandroid.providers.PosTransactionProvider;
+import br.com.zenitech.emissorweb.adapters.DescricaoProdutosNFCeAdapter;
 import br.com.zenitech.emissorweb.controller.PrintController;
 import br.com.zenitech.emissorweb.controller.PrintControllerReprint;
 import br.com.zenitech.emissorweb.controller.PrintViewHelper;
@@ -51,6 +55,7 @@ import br.com.zenitech.emissorweb.domains.Pedidos;
 import br.com.zenitech.emissorweb.domains.PedidosNFE;
 import br.com.zenitech.emissorweb.domains.PixDomain;
 import br.com.zenitech.emissorweb.domains.PrintPixDomain;
+import br.com.zenitech.emissorweb.domains.ProdutosDescricaoNFCe;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import stone.application.StoneStart;
 import stone.application.enums.Action;
@@ -167,7 +172,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
                 linhaProduto = new String[]{
                         "1 " + id_produto + "      " + produto,
-                        "" + quantidade + "     " + "UN     " + valorUnit + "   " + valor,
+                        quantidade + "     " + "UN     " + valorUnit + "   " + valor,
                         valor,
                         protocolo,
                         cliente,
@@ -233,7 +238,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
             } else {
 
                 //Imprimir nota fiscal eletronica
-                printNFCE(linhaProduto);
+                printNFCE();
             }
         } catch (
                 FileNotFoundException e) {
@@ -364,7 +369,184 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
     }
 
     // --------------------     IMPRESSÃO DE NFC-e      --------------------------------------------
-    private void printNFCE(final String[] texto) throws FileNotFoundException {
+    private void printNFCE() throws FileNotFoundException{
+        //#region RECEBE A UI
+        LinearLayoutCompat descricaoNota = findViewById(R.id.descricaoNota);
+        ListView descricaoProdutoListView = findViewById(R.id.descricaoProdutoListView);
+
+        // ********************** IMPRIMIR CABEÇALHO
+        TextView txtCab1 = findViewById(R.id.txtCab1);
+        TextView txtCab2 = findViewById(R.id.txtCab2);
+        TextView txtCab3 = findViewById(R.id.txtCab3);
+
+        // ********************** INFOR. VALORES
+        TextView txtInfoVal1 = findViewById(R.id.txtInfoVal1);
+        TextView txtInfoVal2 = findViewById(R.id.txtInfoVal2);
+        TextView txtInfoVal3 = findViewById(R.id.txtInfoVal3);
+        TextView txtInfoVal4 = findViewById(R.id.txtInfoVal4);
+
+        // ********************** TRIBUTOS TOTAIS
+        TextView txtTributos = findViewById(R.id.txtTributos);
+        TextView txtTributosN = findViewById(R.id.txtTributosN);
+        TextView txtTributosE = findViewById(R.id.txtTributosE);
+        TextView txtTributosM = findViewById(R.id.txtTributosM);
+
+        // ********************** EMISSÃO
+        TextView txtEmissao1 = findViewById(R.id.txtEmissao1);
+        TextView txtEmissao2 = findViewById(R.id.txtEmissao2);
+        TextView txtEmissao3 = findViewById(R.id.txtEmissao3);
+        TextView txtEmissao4 = findViewById(R.id.txtEmissao4);
+
+        // ********************** COSULTA NA RECEITA
+        TextView txtConsRec1 = findViewById(R.id.txtConsRec1);
+        TextView txtConsRec2 = findViewById(R.id.txtConsRec2);
+        TextView txtConsRec4 = findViewById(R.id.txtConsRec4);
+
+
+        //#endregion
+
+        //#region DEFINE AS VARIAVEIS DA NOTA
+        //
+        String serie, url, urlConsulta, urlQRCode, idCSC, CSC, hashSHA1;
+        String idPedido, chave, protocolo, valorTotal;
+        String razao_social, cnpj, endereco, bairro, cep;
+        String cliente;
+        String tributos, tributosN, tributosE, tributosM;
+        Unidades unidade;
+
+        //#endregion
+
+        //#region SETA OS VALORS DAS VARIAVEIS
+        serie = bd.getSeriePOS();
+        unidade = bd.getUnidades().get(0);
+        urlConsulta = unidade.getUrl_consulta();
+        urlQRCode = unidade.getUrl_qrcode();
+        idCSC = unidade.getIdCSC();
+        CSC = unidade.getCSC();
+
+        //
+        idPedido = bd.getUltimoIdPedido();
+        chave = bd.gerarChave(Integer.parseInt(idPedido));
+        Pedidos pedido = bd.getPedido(idPedido);
+        //valorTotal = cAux.maskMoney(new BigDecimal(pedido.getValor_total()));
+        valorTotal = cAux.maskMoney(new BigDecimal(bd.getValorTotalPedido(idPedido, "0")));
+
+        // -- CABEÇALHO
+        txtCab1.setText(unidade.getRazao_social());
+        txtCab2.setText(String.format("CNPJ: %s I.E.: %s", unidade.getCnpj(), unidade.getIe()));
+        txtCab3.setText(MessageFormat.format("{0}, {1} {2} {3}, {4} {5} {6}", unidade.getEndereco(), unidade.getNumero(), unidade.getBairro(), unidade.getCidade(), unidade.getUf(), unidade.getCep(), unidade.getTelefone()));
+
+        // -- DESCRIÇÃO PRODUTOS
+        List<ProdutosDescricaoNFCe> produtos;
+        produtos = bd.getItensPedidoIntegracao(idPedido);
+        DescricaoProdutosNFCeAdapter adapterDesc = new DescricaoProdutosNFCeAdapter(context, produtos, cAux);
+        descricaoProdutoListView.setAdapter(adapterDesc);
+
+        // -- EMISSÃO
+        txtEmissao1.setText(idPedido);
+        txtEmissao2.setText(serie);
+        txtEmissao3.setText(cAux.exibirDataAtual());
+        txtEmissao4.setText(cAux.horaAtual());
+
+        //
+        String c = bd.gerarChave(Integer.parseInt(idPedido));
+        txtConsRec1.setText(urlConsulta);
+        txtConsRec2.setText(c);
+        txtConsRec4.setText(pedido.getProtocolo().equals("Emitida em contigencia") ? "EMITIDA EM CONTINGENCIA" : pedido.getProtocolo() + "\n" + pedido.getData_protocolo() + " - " + pedido.getHora_protocolo());
+        Log.e("PROTOCOLO", pedido.getProtocolo());
+        // -- INFOR. VALORES
+        //
+        txtInfoVal1.setText(MessageFormat.format("{0}", produtos.size()));
+        txtInfoVal2.setText(valorTotal);
+        txtInfoVal3.setText(cAux.removerAcentos(bd.getFormasPagamentoPedidoPrint(idPedido)));
+        txtInfoVal4.setText(valorTotal);
+
+        // -- TRIBUTOS
+        String tributo = "0";
+        String tributoN = "0";
+        String tributoE = "0";
+        String tributoM = "0";
+        for (int i = 0; i < produtos.size(); i++) {
+            tributo = String.valueOf(cAux.somar(new String[]{tributo, String.valueOf(bd.getTributosProduto(produtos.get(i).produto, produtos.get(i).total))}));
+            tributoN = String.valueOf(cAux.somar(new String[]{tributoN, String.valueOf(bd.getTributosNProduto(produtos.get(i).produto, produtos.get(i).total))}));
+            tributoE = String.valueOf(cAux.somar(new String[]{tributoE, String.valueOf(bd.getTributosEProduto(produtos.get(i).produto, produtos.get(i).total))}));
+            tributoM = String.valueOf(cAux.somar(new String[]{tributoM, String.valueOf(bd.getTributosMProduto(produtos.get(i).produto, produtos.get(i).total))}));
+        }
+
+
+        txtTributos.setText(cAux.maskMoney(new BigDecimal(tributo)));
+        txtTributosN.setText(cAux.maskMoney(new BigDecimal(tributoN)));
+        txtTributosE.setText(cAux.maskMoney(new BigDecimal(tributoE)));
+        txtTributosM.setText(cAux.maskMoney(new BigDecimal(tributoM)));
+
+
+        // -- CONSUMIDOR
+        TextView txtConsumidor = findViewById(R.id.txtConsumidor);
+        txtConsumidor.setText(!pedido.getCpf_cliente().isEmpty() ? pedido.getCpf_cliente() : "CONSUMIDOR NAO IDENTIFICADO");
+
+        // -- CHAVE
+        hashSHA1 = chave + "|" + "2" + "|" + "1" + "|" + idCSC + CSC;
+        hashSHA1 = ClassAuxiliar.getSha1Hex(hashSHA1);
+
+        url = urlQRCode + "?p=" + chave + "|2|1|" + idCSC + "|" + hashSHA1;
+
+        //descricaoNota.setVisibility(View.VISIBLE);
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+        try {
+            BitMatrix bitMatrix = multiFormatWriter.encode(url, BarcodeFormat.QR_CODE, 250, 250);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
+            ImageView imgQrCode = findViewById(R.id.imgQrCode);
+            imgQrCode.setImageBitmap(bp);
+            //printManager(bp, true);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+
+        txtConsRec1.setText(urlConsulta);
+        txtConsRec2.setText(chave);
+        txtConsRec4.setText(!pedido.getProtocolo().isEmpty() ? pedido.getProtocolo() + " - " + pedido.getData_protocolo() + " " + pedido.getHora_protocolo() : "EMITIDA EM CONTINGENCIA");
+
+        // ********************** AREAS DE IMPRESSÃO
+        LinearLayout CabecalhoNFCe = findViewById(R.id.CabecalhoNFCe);
+        Bitmap bitmapCabecalhoNFCe = printViewHelper.createBitmapFromView(CabecalhoNFCe, 190, 130);//
+        LinearLayout impressora = findViewById(R.id.teste);
+        /*
+        ViewGroup.LayoutParams layoutParams = CabecalhoNFCe.getLayoutParams();
+        //int width = layoutParams.width; // Largura em pixels
+        int height = layoutParams.height; // Altura em pixels*/
+        int height = 260;
+        if (produtos.size() > 1) {
+            height = 300;
+        }
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 190, height);
+
+        //
+        LinearLayout impressoraChave = findViewById(R.id.teste3);
+        PrintViewHelper printView3 = new PrintViewHelper();
+        Bitmap bitmap3 = printView3.createBitmapFromView(impressoraChave, 190, 130);
+        LinearLayout llPrintQrCode = findViewById(R.id.llPrintQrCode);
+        Bitmap bpQrCode = printViewHelper.createBitmapFromView(llPrintQrCode, 190, 120);
+        ppp.setConnectionCallback(new StoneCallbackInterface() {
+            @Override
+            public void onSuccess() {
+                liberarImpressora();
+            }
+
+            @Override
+            public void onError() {
+                liberarImpressora();
+                Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        ppp.addBitmap(bitmapCabecalhoNFCe);
+        ppp.addBitmap(bitmap1);
+        ppp.addBitmap(bitmap3);
+        ppp.addBitmap(bpQrCode);
+        ppp.execute();
+    }
+    private void printNFCE_ANTES(final String[] texto) throws FileNotFoundException {
 
         String serie = bd.getSeriePOS();
         elementosUnidade = bd.getUnidades();
@@ -534,7 +716,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         //Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 260, 454);
         Bitmap bitmap3 = printViewHelper.createBitmapFromView(impressoraChave, 190, 130);//45
         //
-        LinearLayout impressora1 = findViewById(R.id.teste1);
+        LinearLayout impressora1 = findViewById(R.id.llPrintQrCode);
         Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 190, 120);
 
         ppp.setConnectionCallback(new StoneCallbackInterface() {
@@ -599,7 +781,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         // ********************** IMPRIMIR CABEÇALHO
         TextView txtRecebemos = findViewById(R.id.txtRecebemos);
         //
-        txtRecebemos.setText(String.format("Recebemos de %s os produtos constantes da NF-e %s Serie %s", prefs.getString("nome", ""), prefs.getString("nnf", ""), prefs.getString("serie", "")));
+        txtRecebemos.setText(String.format("DANFE SIMPLIFICADO\n\nRecebemos de %s os produtos constantes da NF-e %s Serie %s", prefs.getString("nome", ""), prefs.getString("nnf", ""), prefs.getString("serie", "")));
 
         // ********************** INFOR. VALORES
         TextView txtSerie = findViewById(R.id.txtSerie);
@@ -612,9 +794,9 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         String cl2 = c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36) + " " + c.substring(36, 40) + " " + c.substring(40, 44);
 
         //
-        txtSerie.setText(String.format("N %s          -          SERIE %s", prefs.getString("nnf", ""), prefs.getString("serie", "")));
+        txtSerie.setText(String.format("N %s  -  SERIE %s  -  TIPO %s", prefs.getString("nnf", ""), prefs.getString("serie", ""), prefs.getString("tp_nf", "0").equals("0") ? "Entrada" : "Saída"));
         txtNfeConsRec2.setText(cl1);
-        txtNfeConsRec3.setText(cl2);
+        txtNfeConsRec3.setText(MessageFormat.format("{0}\n\nProtocolo: {1}", cl2, prefs.getString("protocolo", "")));
 
         // ********************** DADOS DO EMITENTE
         TextView txtNfeCab1 = findViewById(R.id.txtNfeCab1);
@@ -660,7 +842,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
         //
         LinearLayout impressora = findViewById(R.id.printNfe);
-        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 190, 150);
+        Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 190, 180);
         //
         LinearLayout impressora1 = findViewById(R.id.printNfe1);
         Bitmap bitmap2 = printViewHelper.createBitmapFromView(impressora1, 190, 70);

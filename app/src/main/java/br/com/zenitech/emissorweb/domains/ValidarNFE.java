@@ -17,6 +17,7 @@ public class ValidarNFE {
     private String total_nota;
     private String inf_cpl;
     private String nat_op;
+    private String tp_nf;
 
 
     /*
@@ -35,7 +36,7 @@ public class ValidarNFE {
     'total_nota' =>
     */
 
-    public ValidarNFE(String protocolo, String erro, String cnpj_dest, String ie_dest, String barcode, String nome, String endereco_dest, String nnf, String serie, String chave, List<Produtos> prods_nota, String total_nota, String inf_cpl, String nat_op) {
+    public ValidarNFE(String protocolo, String erro, String cnpj_dest, String ie_dest, String barcode, String nome, String endereco_dest, String nnf, String serie, String chave, List<Produtos> prods_nota, String total_nota, String inf_cpl, String nat_op, String tp_nf) {
         this.protocolo = protocolo;
         this.erro = erro;
         this.cnpj_dest = cnpj_dest;
@@ -50,6 +51,7 @@ public class ValidarNFE {
         this.total_nota = total_nota;
         this.inf_cpl = inf_cpl;
         this.nat_op = nat_op;
+        this.tp_nf = tp_nf;
     }
 
     public String getProtocolo() {
@@ -162,5 +164,13 @@ public class ValidarNFE {
 
     public void setNat_op(String nat_op) {
         this.nat_op = nat_op;
+    }
+
+    public String getTp_nf() {
+        return tp_nf;
+    }
+
+    public void setTp_nf(String tp_nf) {
+        this.tp_nf = tp_nf;
     }
 }

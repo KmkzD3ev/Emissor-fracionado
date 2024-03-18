@@ -1915,6 +1915,7 @@ public class Impressora extends AppCompatActivity {
 
             //DANFE NF-e
             textBuffer.append("{reset}").append(tamFont).append(linhas).append("------------------------------------------------{br}");
+            textBuffer.append("{reset}{center}").append(tamFont).append("DANFE SIMPLIFICADO").append("{br}");
             textBuffer.append("{reset}{center}").append(tamFont).append("Recebemos de ").append(prefs.getString("nome", "")).append(" os produtos constantes da NF-e ").append(prefs.getString("nnf", "")).append(" Serie ").append(prefs.getString("serie", "")).append("{br}");
             textBuffer.append("{reset}{center}").append(tamFont).append("{br}");
             textBuffer.append("{reset}").append(tamFont).append("_________________________________________  _____/_____/________{br}");
@@ -1928,14 +1929,15 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append("{reset}").append(tamFont).append(linhas).append("------------------------------------------------{br}");
 
             textBuffer = new StringBuilder();
-            textBuffer.append("{reset}{center}").append(tamFont).append("N ").append(prefs.getString("nnf", "")).append("               -               SERIE ").append(prefs.getString("serie", "")).append("{br}");
+            textBuffer.append("{reset}{center}").append(tamFont).append("N ").append(prefs.getString("nnf", "")).append("  -  SERIE ").append(prefs.getString("serie", "")).append("TIPO ").append(prefs.getString("tp_nf", "0").equals("0") ? "Entrada" : "Saída").append("{br}");
 
 
             String c = prefs.getString("chave", "");// texto[6];
             String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20) + " " + c.substring(20, 24);
             String cl2 = c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36) + " " + c.substring(36, 40) + " " + c.substring(40, 44);
             textBuffer.append(cl1).append("{br}");
-            textBuffer.append(cl2).append("{br}");
+            textBuffer.append(cl2).append("{br}{br}");
+            textBuffer.append("Protocolo: ").append(prefs.getString("protocolo", "")).append("{br}");
 
             // IMPRIMIR CABECALHO
             printer.reset();
@@ -2054,6 +2056,7 @@ public class Impressora extends AppCompatActivity {
             //DANFE NF-e
             textBuffer.append(tamFont).append(" {br}");
             textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
+            textBuffer.append("{reset}{center}").append(tamFont).append("DANFE SIMPLIFICADO").append("{br}");
             textBuffer.append(tamFont).append("Recebemos de ").append(prefs.getString("nome", "")).append(" os produtos constantes da NF-e ").append(prefs.getString("nnf", "")).append(" Serie ").append(prefs.getString("serie", "")).append("{br}");
             textBuffer.append(tamFont).append("{br}");
             textBuffer.append(tamFont).append(linhas).append("___________________ _____/_____/________{br}");
@@ -2062,14 +2065,15 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
 
             //textBuffer = new StringBuilder();
-            textBuffer.append(tamFont).append("N ").append(prefs.getString("nnf", "")).append("          -          SERIE ").append(prefs.getString("serie", "")).append("{br}");
+            textBuffer.append(tamFont).append("N ").append(prefs.getString("nnf", "")).append("  -  SERIE ").append(prefs.getString("serie", "")).append("  -  TIPO ").append(prefs.getString("tp_nf", "0").equals("0") ? "Entrada" : "Saída").append("{br}");
 
 
             String c = prefs.getString("chave", "");// texto[6];
             String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20) + " " + c.substring(20, 24);
             String cl2 = c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36) + " " + c.substring(36, 40) + " " + c.substring(40, 44);
             textBuffer.append(cl1).append("{br}");
-            textBuffer.append(cl2).append("{br}");
+            textBuffer.append(cl2).append("{br}{br}");
+            textBuffer.append("Protocolo: ").append(prefs.getString("protocolo", "")).append("{br}");
 
             // IMPRIMIR CABECALHO
             printer.reset();

@@ -138,18 +138,22 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
                     double precoMinProd = bd.getPrecoMinimoProduto(parent.getItemAtPosition(position).toString());
                     precoMinimo = String.valueOf(precoMinProd);
 
-                    if (!precoMinimo.equals("0.0")) {
-                        Objects.requireNonNull(getSupportActionBar()).setSubtitle("Preço Mínimo " + aux.maskMoney(new BigDecimal(precoMinimo)));
-                    } else {
-                        Objects.requireNonNull(getSupportActionBar()).setSubtitle("");
-                    }
-
                     //
                     double precoMaxProd = bd.getPrecoMaximoProduto(parent.getItemAtPosition(position).toString());
                     precoMaximo = String.valueOf(precoMaxProd);
 
+                    if (!precoMinimo.equals("0.0")) {
+                        Objects.requireNonNull(getSupportActionBar()).setSubtitle("Preço Mín. " + aux.maskMoney(new BigDecimal(precoMinimo)) + " - Máx. " + aux.maskMoney(new BigDecimal(precoMaximo)));
+                    } else {
+                        Objects.requireNonNull(getSupportActionBar()).setSubtitle("");
+                    }
+
                     quant = bd.getQuantProdutoRemessa(parent.getItemAtPosition(position).toString());
                     Toast.makeText(getBaseContext(), "" + bd.getQuantProdutoRemessa(parent.getItemAtPosition(position).toString()), Toast.LENGTH_LONG).show();
+
+                    etPreco.setText(aux.maskMoney(new BigDecimal(bd.getPrecoProduto(parent.getItemAtPosition(position).toString()))));
+                } else {
+                    etPreco.setText(aux.maskMoney(new BigDecimal("0")));
                 }
             }
 

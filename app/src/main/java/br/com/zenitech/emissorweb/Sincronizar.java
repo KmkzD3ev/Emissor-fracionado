@@ -1,6 +1,5 @@
 package br.com.zenitech.emissorweb;
 
-import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 
 import android.Manifest;
@@ -12,7 +11,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -20,14 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
+import android.os.Looper;
 import android.os.StatFs;
 import android.text.Editable;
 import android.text.SpannableString;
@@ -43,7 +34,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.datecs.api.BuildInfo;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.getkeepsafe.taptargetview.TapTarget;
 import com.getkeepsafe.taptargetview.TapTargetSequence;
 import com.getkeepsafe.taptargetview.TapTargetView;
@@ -51,7 +48,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.Pedidos;
@@ -61,7 +57,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import stone.application.StoneStart;
-import stone.user.UserModel;
 import stone.utils.Stone;
 
 public class Sincronizar extends AppCompatActivity {
@@ -202,11 +197,18 @@ public class Sincronizar extends AppCompatActivity {
 
         //
         mgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-        registerReceiver(onComplete,
+        /*registerReceiver(onComplete,
                 new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         registerReceiver(onNotificationClick,
-                new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
+                new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));*/
+        /*registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), getApplicationContext());
+        registerReceiver(onNotificationClick, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED), getApplicationContext());
+*/
 
+        if (Build.VERSION.SDK_INT < 34) {
+            registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            registerReceiver(onNotificationClick, new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
+        }
         //
         findViewById(R.id.btn_sincronizar).setOnClickListener(view -> _iniciarVerificacoes());
 
@@ -286,8 +288,12 @@ public class Sincronizar extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        unregisterReceiver(onComplete);
-        unregisterReceiver(onNotificationClick);
+        try {
+            unregisterReceiver(onComplete);
+            unregisterReceiver(onNotificationClick);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // VERIFICA O TOTAL DE ARMAZENAMENTO DO APARELHO
@@ -594,9 +600,16 @@ public class Sincronizar extends AppCompatActivity {
                 .setDescription("BD EMISSOR WEB.")
                 .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
                         "emissorwebDB.db"));
-        // kleilson
-        //importarBD();
 
+        if (Build.VERSION.SDK_INT >= 34) {
+            // IMPORTAR BANCO
+            //IMPORTAR BANCO DE DADOS
+            //new Handler().postDelayed(this::importarBD, 2000);
+
+            // Obtém o Looper principal
+            Looper mainLooper = Looper.getMainLooper();
+            new Handler(mainLooper).postDelayed(this::importarBD, 10000);
+        }
     }
 
     /*public void queryStatus(View v) {
@@ -787,7 +800,7 @@ public class Sincronizar extends AppCompatActivity {
                 }
             }
 
-        }, 3000);
+        }, 5000);
     }
 
     void _finalizarSincronizacao() {

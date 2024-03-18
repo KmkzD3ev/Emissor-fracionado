@@ -175,6 +175,8 @@ public class ConsultarNFE extends AppCompatActivity {
                                 prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
                                 prefs.edit().putString("nat_op", sincronizacao.getNat_op()).apply();
 
+                                prefs.edit().putString("protocolo", sincronizacao.getProtocolo()).apply();
+                                prefs.edit().putString("tp_nf", sincronizacao.getTp_nf()).apply();
                                 Intent i = new Intent(context, ImpressoraPOS.class);
 
                                 ArrayList<Unidades> elementosUnidade = bd.getUnidades();

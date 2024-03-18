@@ -334,6 +334,8 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                                     prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
                                     prefs.edit().putString("nat_op", sincronizacao.getNat_op()).apply();
 
+                                    prefs.edit().putString("protocolo", sincronizacao.getProtocolo()).apply();
+                                    prefs.edit().putString("tp_nf", sincronizacao.getTp_nf()).apply();
                                     //
                                     addPedido(
                                             sincronizacao.getNnf(),
@@ -463,7 +465,7 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
     private void imprimirPedido() {
         //double v0 = Double.parseDouble(total);
         //double v1 = bd.getTributosProduto(produto.getText().toString()) / 100;
-        double tributo = bd.getTributosProduto(produto.getText().toString(), total);
+        String tributo = bd.getTributosProduto(produto.getText().toString(), total);
         Intent i;
         if (new Configuracoes().GetDevice()) {
             prefs.edit().putString("tamPapelImpressora", "58mm").apply();

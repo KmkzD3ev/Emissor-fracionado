@@ -445,10 +445,10 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 if (new Configuracoes().GetDevice()) {
                     prefs.edit().putString("tamPapelImpressora", "58mm").apply();
 
-                    double tributo = bd.getTributosProduto(produto.getText().toString(), total);
-                    double tributoN = bd.getTributosNProduto(produto.getText().toString(), total);
-                    double tributoE = bd.getTributosEProduto(produto.getText().toString(), total);
-                    double tributoM = bd.getTributosMProduto(produto.getText().toString(), total);
+                    String tributo = bd.getTributosProduto(produto.getText().toString(), total);
+                    String tributoN = bd.getTributosNProduto(produto.getText().toString(), total);
+                    String tributoE = bd.getTributosEProduto(produto.getText().toString(), total);
+                    String tributoM = bd.getTributosMProduto(produto.getText().toString(), total);
                     Intent i = new Intent(contexto, ImpressoraPOS.class);
 
                     ArrayList<Unidades> elementosUnidade = bd.getUnidades();
