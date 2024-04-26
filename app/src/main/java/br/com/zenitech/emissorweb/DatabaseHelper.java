@@ -3591,7 +3591,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String IdEditarPedido() {
 
         myDataBase = this.getReadableDatabase();
-        String selectQuery = "SELECT ped.id_pedido_temp FROM pedidos ped WHERE ped.situacao = 'OFF' ORDER BY  ped.id DESC LIMIT 1";
+        String selectQuery = "SELECT ped.id_pedido_temp FROM pedidos ped WHERE ped.situacao = 'OFF' ORDER BY ped.id DESC LIMIT 1";
 
         Cursor cursor = myDataBase.rawQuery(selectQuery, null);
 
@@ -3609,6 +3609,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return total;
+    }
+
+    public int IdEditarPedidoTemp() {
+
+        myDataBase = this.getReadableDatabase();
+        String selectQuery = "SELECT ped.id FROM pedidos_temp ped WHERE ped.situacao = 'OFF' ORDER BY ped.id DESC LIMIT 1";
+
+        Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+
+        int result = 0;
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                result = cursor.getInt(0);
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     //PEGA O ULTIMO ID DA TABELA DE PEDIDOS

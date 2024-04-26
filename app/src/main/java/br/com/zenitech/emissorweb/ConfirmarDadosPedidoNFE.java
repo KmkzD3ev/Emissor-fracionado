@@ -324,16 +324,16 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                                     prefs.edit().putString("serie", sincronizacao.getSerie()).apply();
                                     prefs.edit().putString("chave", sincronizacao.getChave()).apply();
                                     StringBuilder textBuffer = new StringBuilder();
-                                    for (int ind = 0; ind < sincronizacao.getProds_nota().size(); ind++) {
-                                        textBuffer.append(sincronizacao.getProds_nota().get(ind).getNome()).append("{br}");
+                                    for (int ind = 0; ind < sincronizacao.desc_produtos.size(); ind++) {
+                                        textBuffer.append(sincronizacao.desc_produtos.get(ind).desc_produtos).append("\n");
+                                        textBuffer.append(sincronizacao.info_produtos.get(ind).info_produtos).append("\n");
                                     }
                                     prefs.edit().putString("prods_nota", textBuffer.toString()).apply();
-                                    //prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
-                                    //prefs.edit().putString("prods_nota", sincronizacao.getProds_nota()).apply();
                                     prefs.edit().putString("total_nota", sincronizacao.getTotal_nota()).apply();
                                     prefs.edit().putString("inf_cpl", sincronizacao.getInf_cpl()).apply();
                                     prefs.edit().putString("nat_op", sincronizacao.getNat_op()).apply();
 
+                                    prefs.edit().putString("data_emissao", sincronizacao.data_emissao).apply();
                                     prefs.edit().putString("protocolo", sincronizacao.getProtocolo()).apply();
                                     prefs.edit().putString("tp_nf", sincronizacao.getTp_nf()).apply();
                                     //
@@ -345,7 +345,7 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                                             cAux.horaAtual(),
                                             sincronizacao.getTotal_nota(),
                                             cpfCnpj_cliente.getText().toString()
-                                    );//sincronizacao.getNome()
+                                    );
 
                                     msg("NFe transmitida com sucesso!");
 

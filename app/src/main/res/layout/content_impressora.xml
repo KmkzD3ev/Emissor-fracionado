@@ -15,7 +15,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:padding="16dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <!--<ImageView
             android:layout_width="match_parent"
@@ -891,7 +891,8 @@
                         android:gravity="center"
                         android:text="0000  0000  0000  0000  0000"
                         android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/txtNfeConsRec3"
@@ -912,8 +913,8 @@
                 android:id="@+id/printNfe1"
                 android:layout_width="190dp"
                 android:layout_height="70dp"
-                android:layout_gravity="center_horizontal"
                 android:background="@android:color/white"
+                android:gravity="center"
                 android:orientation="vertical">
 
                 <!-- QRCODE DA NOTA -->
@@ -922,7 +923,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_gravity="center_horizontal"
-                    android:background="@android:color/white" />
+                    android:background="@android:color/white"
+                    android:contentDescription="@string/app_name" />
             </LinearLayout>
             <!-- FIM CODIGO DE BARRA NF-e -->
 
@@ -1075,7 +1077,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:gravity="center"
-                    android:text="NATUREZA DA OPRACAO"
+                    android:text="NATUREZA DA OPERACAO"
                     android:textColor="@android:color/black"
                     android:textSize="9sp" />
 
@@ -1179,16 +1181,23 @@
                         android:textColor="@android:color/black"
                         android:textSize="9sp" />
 
-                    <TextView
-                        android:id="@+id/txtNFeDescProduto"
+                    <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="sans-serif-black"
-                        android:gravity="end"
-                        android:text=""
-                        android:textColor="@android:color/black"
-                        android:textSize="9sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txtNFeDescProduto"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-black"
+                            android:gravity="end"
+                            android:text=""
+                            android:textColor="@android:color/black"
+                            android:textSize="9sp" />
+                    </androidx.appcompat.widget.LinearLayoutCompat>
+
 
                 </LinearLayout>
 
@@ -2471,4 +2480,191 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <!-- MODELO DE IMPRESSÃO CUPOM PROMOCIONAL -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/modelImpressaoCupomPromocional"
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:orientation="vertical">
+
+            <!-- CABECALHO DA NOTA -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:text="PROMOÇÃO GÁS DA SORTE"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:text="CONCORRA A UM CARRO 0KM E PRÊMIOS INSTANTANEOS"
+                    android:textColor="@android:color/black"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+            <!-- FIM CABECALHO DA NOTA -->
+
+            <!-- ************************* -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:background="@android:color/black" />
+
+            <!-- DANFE NFC-e -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif-black"
+                android:gravity="center"
+                android:text="VOCÊ GANHOU 2\nCHAVES DA SORTE"
+                android:textColor="@android:color/black"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@drawable/bg_promocao"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:gravity="center"
+                    android:text="A2345B567\nA238BC73B"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+            <!-- FIM DANFE NFC-e -->
+
+            <!-- ************************* -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:background="@android:color/black" />
+
+            <!--Print teste 1-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <!-- COSULTA NA RECEITA -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="ZENITECH INFORMATICA LTDA"
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="CNPJ: 10552850000156 I.E.: 20217"
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+                    <TextView
+                        android:id="@+id/doc_cupom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="Doc. Fiscal - Serie - N°"
+                        android:textColor="@android:color/black"
+                        android:textSize="9sp" />
+
+
+                    <!-- FIM COSULTA NA RECEITA -->
+
+                    <!-- ************************* -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.8dp"
+                        android:background="@android:color/black" />
+
+                    <!-- CONSUMIDOR -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="sans-serif-black"
+                        android:gravity="center"
+                        android:text="APONTE A CÂMERA DO SEU CELULAR PARA O QRCODE ABAIXO E GERE SEUS CUPONS"
+                        android:textColor="@android:color/black"
+                        android:textSize="10sp" />
+                    <!-- FIM CONSUMIDOR -->
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!--Print teste 2-->
+            <LinearLayout
+                android:id="@+id/llPrintQrCodeCupom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:gravity="top|center"
+                android:orientation="vertical">
+
+                <!-- QRCODE DA NOTA -->
+                <ImageView
+                    android:id="@+id/imgQrCodeCupom"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="26/04/2024 | 10:00 - Kleilson"
+                    android:textColor="@android:color/black"
+                    android:textSize="9sp" />
+
+                <!-- ************************* -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:background="@android:color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>

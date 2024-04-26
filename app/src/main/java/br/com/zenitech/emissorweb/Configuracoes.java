@@ -32,7 +32,11 @@ public class Configuracoes {
     }
 
     public String GetUrlServer() {
-        return "https://emissorweb.com.br/";
+        //return "http://191.243.199.164/";
+        //return "https://newemissorweb.jelastic.saveincloud.net/";
+        return "http://191.243.197.5/";
+        //return "https://emissorweb.com.br/";
+        //return "https://emissorfiscalweb.com.br";
     }
 
     public String GetUFCeara() {
@@ -47,7 +51,6 @@ public class Configuracoes {
 
     //
     public static String token_authorization;
-
 
 
     public static OkHttpClient okHttpClient = new OkHttpClient.Builder()

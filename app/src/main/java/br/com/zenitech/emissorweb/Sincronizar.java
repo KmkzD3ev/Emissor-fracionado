@@ -318,6 +318,7 @@ public class Sincronizar extends AppCompatActivity {
         erro = false;
         fabWhatsapp.setVisibility(View.GONE);
         txtTotMemoria.setText("");
+        String cod = cod1.getText().toString() + cod2.getText().toString() + cod3.getText().toString();
 
         // ESCONDE O TECLADO
         try {
@@ -328,8 +329,11 @@ public class Sincronizar extends AppCompatActivity {
         }
 
         // VERIFICA SE O USUÁRIO INSERIU O SERIAL
-        if (serial.getText().toString().equals("") || serial.getText().toString().length() <= 8) {
+        if (serial.getText().toString().isEmpty() || serial.getText().toString().length() <= 8) {
             txtTotMemoria.setText(R.string.informe_um_serial);
+
+        } else if ((cod.isEmpty() || cod.length() < 9) && !prefs.getBoolean("cod_instalacao", false)) {
+            txtTotMemoria.setText(R.string.informe_um_codigo_instalacao);
 
         } else {
             // SE JÁ TIVER PERMISSÃO PARA MEMÓRIA INTERNA INICIA O SINCRONISMO
@@ -406,10 +410,11 @@ public class Sincronizar extends AppCompatActivity {
         final Call<Sincronizador> call = iSincronizar.verificarSerial(
                 "verificar_serial_emissor2", serial.getText().toString());
 
-        call.enqueue(new Callback<Sincronizador>() {
+        call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Sincronizador> call, @NonNull Response<Sincronizador> response) {
 
+                Log.e("Sincronizar", response.message() + "/" + response.code());
                 //
                 final Sincronizador sincronizacao = response.body();
 
@@ -426,7 +431,8 @@ public class Sincronizar extends AppCompatActivity {
                 } else {
                     String cod = cod1.getText().toString() + cod2.getText().toString() + cod3.getText().toString();
 
-                    if (!Objects.requireNonNull(sincronizacao).getErro().equalsIgnoreCase("erro")
+
+                    if (!sincronizacao.getErro().equalsIgnoreCase("erro")
                             && cod.equalsIgnoreCase("*0101010#")) {
                         gerarBancoOnline(serial.getText().toString());
                     } else {

@@ -95,6 +95,7 @@
     <string name="verificando_serial">Validando serial…</string>
     <string name="ativando_serial">Ativando POS…</string>
     <string name="informe_um_serial">Informe um serial válido!</string>
+    <string name="informe_um_codigo_instalacao">Informe um código de instalação válido!</string>
     <string name="sincronizado">POS Iniciado!</string>
     <string name="oops">Oops!</string>
     <string name="txt_app_finalizado">App Finalizado!\nPressione \"INICIAR POS\", para iniciar a remessa</string>
@@ -235,4 +236,5 @@
     <string name="finalizar">FINALIZAR</string>
     <string name="numero_um">1</string>
     <string name="editar_produtos">Editar Produtos</string>
+    <string name="editando">* Editando *</string>
 </resources>

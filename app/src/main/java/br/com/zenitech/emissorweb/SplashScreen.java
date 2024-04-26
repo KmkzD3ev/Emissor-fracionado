@@ -18,10 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 import br.com.zenitech.emissorweb.domains.Sincronizador;
 import br.com.zenitech.emissorweb.interfaces.ISincronizar;
+import br.com.zenitech.emissorweb.util.ConnectionHelper;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -81,6 +83,13 @@ public class SplashScreen extends AppCompatActivity {
             }
         }
 
+        /*ConnectionHelper.checkInternetConnection(isConnected -> {
+            if (isConnected) {
+                // Conexão com a internet está disponível
+            } else {
+                // Não foi possível conectar à internet
+            }
+        });*/
 
         // ESPERA 2.3 SEGUNDOS PARA  SAIR DO SPLASH
         /*new Handler().postDelayed(() -> {
@@ -88,6 +97,7 @@ public class SplashScreen extends AppCompatActivity {
             avancar();
 
         }, time);*/
+
 
         final ISincronizar iSincronizar = ISincronizar.retrofit.create(ISincronizar.class);
 
@@ -99,13 +109,26 @@ public class SplashScreen extends AppCompatActivity {
         call.enqueue(new Callback<Sincronizador>() {
             @Override
             public void onResponse(@NonNull Call<Sincronizador> call, @NonNull Response<Sincronizador> response) {
-                final Sincronizador sincronizacao = response.body();
-                if (Objects.requireNonNull(sincronizacao).getErro().equalsIgnoreCase("ok")) {
-                    resetarApp();
-                } else {
-                    /*txtMsgReset.setText("Não foi possível resetar o App, verifique as informações e tente novamente.");
-                    erro();*/
-                    avancar();
+
+                if(response.isSuccessful()) {
+                    final Sincronizador sincronizacao = response.body();
+                    if (Objects.requireNonNull(sincronizacao).getErro().equalsIgnoreCase("ok")) {
+                        resetarApp();
+                    } else {
+                    //txtMsgReset.setText("Não foi possível resetar o App, verifique as informações e tente novamente.");
+                    //erro();
+                        avancar();
+                    }
+                }else{
+                    // A requisição não foi bem-sucedida, trate o erro conforme necessário
+                    try {
+                        String errorMessage = "Erro: "+response.errorBody().string() + "\nMensagem: " + response.message() + "\n" + response.code();
+                        Log.e("ResetApp", "Erro na requisição: " + errorMessage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Log.e("ResetApp", "Erro na requisição: ");
+                    }
+                    avancar(); // Ou realize outra ação
                 }
             }
 

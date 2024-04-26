@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,7 +32,7 @@ import br.com.zenitech.emissorweb.domains.ProdutosPedidoDomain;
 import br.com.zenitech.emissorweb.interfaces.IProdutosPedidoObserver;
 
 public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObserver {
-    //region ARRAYS, ADAPTERS, RECYCLERVIEW E BUTTONS
+    //region ARRAYS, ADAPTERS, RECYCLERVIEW, BUTTONS E LINEAR LAYOUT COMPAT
     private Context context;
     private DatabaseHelper bd;
     private SharedPreferences prefs;
@@ -45,6 +46,8 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
     private TextView txtCpfCnpjCli, txtPrecoMinMax, msgErroFracionar;
     // *** BTNs
     private Button btnPagamentoForm, btnAddProdutoLista;
+    // *** LINEAR LAYOUT COMPAT
+    private LinearLayoutCompat llcInfoEditando;
     //endregion
 
     //region START CONFIGURACOES
@@ -55,15 +58,17 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
         bd = new DatabaseHelper(context);
         aux = new ClassAuxiliar();
 
+        llcInfoEditando.setVisibility(View.GONE);
         Intent intent = getIntent();
         if (intent != null) {
             Bundle params = intent.getExtras();
             if (params != null) {
                 if (params.getBoolean("EditarProduto")) {
-                    idTemp = Integer.parseInt(bd.getUltimoIdPedido());
-                    //Toast.makeText(context, "Id Temo = " + idTemp, Toast.LENGTH_SHORT).show();
+                    llcInfoEditando.setVisibility(View.VISIBLE);
+                    idTemp = bd.IdEditarPedidoTemp();
+                    //Toast.makeText(context, "Id Temp = " + idTemp, Toast.LENGTH_SHORT).show();
                 } else {
-//
+                    //
                     idTemp = bd.getProximoIdPedido();
                     //
                     bd.addPedidosTemp(String.valueOf(idTemp));
@@ -92,6 +97,7 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
         btnPagamentoForm = findViewById(R.id.btnPagamentoForm);
         btnAddProdutoLista = findViewById(R.id.btnAddProdutoLista);
         spProduto = findViewById(R.id.spProdutos);
+        llcInfoEditando = findViewById(R.id.llcInfoEditando);
     }
     //endregion
 
@@ -111,10 +117,10 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
         setSupportActionBar(findViewById(R.id.toolbar));
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        // INICIA AS CLASSES AUXILIARES
-        startConfig();
         // INICIA OS IDS DOS ELEMENTOS DA UI
         startIds();
+        // INICIA AS CLASSES AUXILIARES
+        startConfig();
 
         rvProdutosPedido.setLayoutManager(new LinearLayoutManager(this));
         cpf_cnpj_cliente.addTextChangedListener(MaskUtil.insert(cpf_cnpj_cliente, MaskUtil.MaskType.AUTO));
@@ -559,9 +565,9 @@ public class FormPedidos extends AppCompatActivity implements IProdutosPedidoObs
                     String[] iList = listPro.get(i).split(",");
                     List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
                     int quant = Integer.parseInt(iList[1]) + Integer.parseInt(etQuantidade.getText().toString());                      // QUANTIDADE DE GÁS
-                    Toast.makeText(context, ""+quant, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "" + quant, Toast.LENGTH_SHORT).show();
                     int max = Integer.parseInt(minMaxFrac.get(1));
-                    if(quant > max){
+                    if (quant > max) {
                         return true;
                     }
                     /*if (!minMaxFrac.get(0).equals("0") && quant != 0) {

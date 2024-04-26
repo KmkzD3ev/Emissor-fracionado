@@ -369,7 +369,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
     }
 
     // --------------------     IMPRESSÃO DE NFC-e      --------------------------------------------
-    private void printNFCE() throws FileNotFoundException{
+    private void printNFCE() throws FileNotFoundException {
         //#region RECEBE A UI
         LinearLayoutCompat descricaoNota = findViewById(R.id.descricaoNota);
         ListView descricaoProdutoListView = findViewById(R.id.descricaoProdutoListView);
@@ -497,6 +497,10 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
             ImageView imgQrCode = findViewById(R.id.imgQrCode);
+            //
+            ImageView imgQrCodeCupom = findViewById(R.id.imgQrCodeCupom);
+            imgQrCodeCupom.setImageBitmap(bp);
+
             imgQrCode.setImageBitmap(bp);
             //printManager(bp, true);
         } catch (WriterException e) {
@@ -521,6 +525,13 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         }
         Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 190, height);
 
+        // modelImpressaoCupomPromocional
+
+        TextView doc_cupom = findViewById(R.id.doc_cupom);
+        doc_cupom.setText(MessageFormat.format("Doc. Fiscal - Serie {0} - N° {1}", serie, idPedido));
+        LinearLayout llCupom = findViewById(R.id.modelImpressaoCupomPromocional);
+        Bitmap bm_cupom = printViewHelper.createBitmapFromView(llCupom, 190, 400);
+
         //
         LinearLayout impressoraChave = findViewById(R.id.teste3);
         PrintViewHelper printView3 = new PrintViewHelper();
@@ -544,8 +555,17 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         ppp.addBitmap(bitmap1);
         ppp.addBitmap(bitmap3);
         ppp.addBitmap(bpQrCode);
+        //
+        ppp.addLine("");
+        ppp.addLine("");
+        ppp.addLine("");
+        ppp.addLine("--------------------------------");
+        ppp.addLine("");
+        ppp.addLine("");
+        ppp.addBitmap(bm_cupom);
         ppp.execute();
     }
+
     private void printNFCE_ANTES(final String[] texto) throws FileNotFoundException {
 
         String serie = bd.getSeriePOS();
@@ -795,8 +815,8 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
 
         //
         txtSerie.setText(String.format("N %s  -  SERIE %s  -  TIPO %s", prefs.getString("nnf", ""), prefs.getString("serie", ""), prefs.getString("tp_nf", "0").equals("0") ? "Entrada" : "Saída"));
-        txtNfeConsRec2.setText(cl1);
-        txtNfeConsRec3.setText(MessageFormat.format("{0}\n\nProtocolo: {1}", cl2, prefs.getString("protocolo", "")));
+        //txtNfeConsRec2.setText(cl1);
+        txtNfeConsRec3.setText(MessageFormat.format("Protocolo: {0}\nData e hora: {1}\n\n{2}\n{3}", prefs.getString("protocolo", ""), prefs.getString("data_emissao", ""), cl1, cl2));
 
         // ********************** DADOS DO EMITENTE
         TextView txtNfeCab1 = findViewById(R.id.txtNfeCab1);
@@ -949,7 +969,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 itensPedidos = elementosItens.get(0);
 
                 String dataEmissao = (!pedidos.getData().equals("") ? cAux.exibirData(pedidos.getData()) : "");
-                String horaEmissao = (!pedidos.getHora().equals("")? pedidos.getHora() : "");
+                String horaEmissao = (!pedidos.getHora().equals("") ? pedidos.getHora() : "");
 
                 //
                 txtCorpoRel1.setText(String.format("Numero:%s      Emissao:%s %s", pedidos.getId(), dataEmissao, horaEmissao));

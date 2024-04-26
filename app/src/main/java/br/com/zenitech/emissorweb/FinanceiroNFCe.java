@@ -337,8 +337,10 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
         });
 
         findViewById(R.id.BtnEditarProduto).setOnClickListener(v -> {
+            Log.e("EDIT_FINANCEIRO_ID:", " " + idTemp);
             Intent i = new Intent(this, FormPedidos.class);
             i.putExtra("EditarProduto", true);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
             finish();
         });

@@ -357,15 +357,29 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/llcInfoEditando"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/info"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/editando"
+                        android:textColor="@android:color/white" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
                 <TextView
                     android:id="@+id/msgErroFracionar"
-                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
                     android:text="@string/msg_erro_fracionamento"
-                    android:textSize="14sp"
                     android:textColor="@color/colorErro"
+                    android:textSize="14sp"
+                    android:visibility="gone"
                     tools:ignore="RtlSymmetry" />
 
                 <LinearLayout
@@ -501,10 +515,10 @@
 
                 <TextView
                     android:id="@+id/txtPrecoMinMax"
-                    android:textColor="@android:color/black"
-                    android:layout_marginStart="16dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:textColor="@android:color/black" />
 
                 <Spinner
                     android:id="@+id/spProdutos"

@@ -19,22 +19,9 @@ public class ValidarNFE {
     private String nat_op;
     private String tp_nf;
 
-
-    /*
-    'erro' => 'ok',
-    'protocolo' => '' . ($xml->protNFe->infProt->nProt) . '',
-    'barcode' => '' . $arq . '',
-    'cnpj_dest' => '' . ($xml->NFe->infNFe->dest->CNPJ) . '',
-    'ie_dest' => '' . ($xml->NFe->infNFe->dest->IE) . '',
-    'nome' => '' . ($xml->NFe->infNFe->dest->xNome) . '',
-    'endereco_dest' => "".($xml->NFe->infNFe->dest->enderDest->xLgr) . "," . ($xml->NFe->infNFe->dest->enderDest->nro) . "-"
-    . ($xml->NFe->infNFe->dest->enderDest->xBairro) . "-" . ($xml->NFe->infNFe->dest->enderDest->xMun) . "/" . ($xml->NFe->infNFe->dest->enderDest->UF)."",
-    'nnf' => '' . ($xml->NFe->infNFe->ide->nNF) . '',
-    'serie' => '' . ($xml->NFe->infNFe->ide->serie) . '',
-    'chave' => '' . ($xml->protNFe->infProt->chNFe) . ''
-    'prods_nota' => '' . $pdt . ' | ' . $uprod . ' | ' . $qprod . ' | ' . $vl_unit_p . ' | ' . $vl_tot_p . '',
-    'total_nota' =>
-    */
+    public List<Produtos> desc_produtos;
+    public List<Produtos> info_produtos;
+    public String data_emissao;
 
     public ValidarNFE(String protocolo, String erro, String cnpj_dest, String ie_dest, String barcode, String nome, String endereco_dest, String nnf, String serie, String chave, List<Produtos> prods_nota, String total_nota, String inf_cpl, String nat_op, String tp_nf) {
         this.protocolo = protocolo;

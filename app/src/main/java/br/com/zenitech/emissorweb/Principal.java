@@ -43,6 +43,7 @@ import com.getkeepsafe.taptargetview.TapTargetView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -371,7 +372,9 @@ public class Principal extends AppCompatActivity
         //define um botão como positivo
         builder.setPositiveButton("Finalizar Pedido", (arg0, arg1) -> {
             //Intent i = new Intent(Principal.this, EditarPedido.class);
-            Intent i = new Intent(context, FinanceiroNFCe.class);
+            //Intent i = new Intent(context, FinanceiroNFCe.class);
+            Intent i = new Intent(this, FormPedidos.class);
+            i.putExtra("EditarProduto", true);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
 
@@ -385,6 +388,7 @@ public class Principal extends AppCompatActivity
         //ABRI A TELA DE SINCRONIZAR
         try {
             //getVerificarFinanceiroUltimoPedido
+            //asfdsfdsfasd
             if (bd.getFinanceiroUltimoPedido(bd.getIdPedidoTemp())) {
                 //makeText(context, "Teste Edit", LENGTH_SHORT).show();
                 pedidoNaoFinalizadoDialog();
@@ -763,37 +767,46 @@ public class Principal extends AppCompatActivity
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Sincronizador> call, @NonNull Response<Sincronizador> response) {
+                if (response.isSuccessful()) {
+                    //
+                    final Sincronizador sincronizacao = response.body();
+                    if (sincronizacao != null) {
 
-                //
-                final Sincronizador sincronizacao = response.body();
-                if (sincronizacao != null) {
+                        Log.i(TAG, sincronizacao.getErro());
 
-                    Log.i(TAG, sincronizacao.getErro());
+                        if (sincronizacao.getErro().equalsIgnoreCase("0")) {
 
-                    if (sincronizacao.getErro().equalsIgnoreCase("0")) {
+                            //
+                            runOnUiThread(() -> {
 
-                        //
-                        runOnUiThread(() -> {
+                                prefs.edit().putBoolean("sincronizado", false).apply();
+                                prefs.edit().putInt("id_pedido", 0).apply();
 
-                            prefs.edit().putBoolean("sincronizado", false).apply();
-                            prefs.edit().putInt("id_pedido", 0).apply();
+                                Toast.makeText(context, "Remessa finalizada com sucesso!", Toast.LENGTH_LONG).show();
 
-                            Toast.makeText(context, "Remessa finalizada com sucesso!", Toast.LENGTH_LONG).show();
+                                //APAGA O BANCO DE DADOS E VAI PARA TELA INICIAL DE SINCRONIZAÇÃO
+                                bd.FecharConexao(context);
 
-                            //APAGA O BANCO DE DADOS E VAI PARA TELA INICIAL DE SINCRONIZAÇÃO
-                            bd.FecharConexao(context);
-
-                            //Intent i = new Intent(context, Sincronizar.class);
-                            Intent i = new Intent(context, AppFinalizado.class);
-                            if (initAuto) {
-                                i.putExtra("initAuto", true);
-                            }
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(i);
-                            finish();
-                        });
-                    } else {
-                        Toast.makeText(getBaseContext(), "Não conseguimos finalizar, tente novamente.", Toast.LENGTH_LONG).show();
+                                //Intent i = new Intent(context, Sincronizar.class);
+                                Intent i = new Intent(context, AppFinalizado.class);
+                                if (initAuto) {
+                                    i.putExtra("initAuto", true);
+                                }
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(i);
+                                finish();
+                            });
+                        } else {
+                            Toast.makeText(getBaseContext(), "Não conseguimos finalizar, tente novamente.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } else {
+                    // A requisição não foi bem-sucedida, trate o erro conforme necessário
+                    try {
+                        String errorMessage = "Erro: " + response.errorBody().string() + "\nMensagem: " + response.message() + "\n" + response.code();
+                        Log.e("FinalizarRemessa", "Erro na requisição: " + errorMessage);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }

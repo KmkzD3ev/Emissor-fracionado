@@ -2,6 +2,8 @@ package br.com.zenitech.emissorweb.domains;
 
 public class Produtos {
 
+    public String desc_produtos;
+    public String info_produtos;
     private String codigo;
     private String nome;
     private String tributos;
