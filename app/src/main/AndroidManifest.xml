@@ -55,6 +55,10 @@
         tools:replace="allowBackup"
         tools:targetApi="UPSIDE_DOWN_CAKE">
         <activity
+            android:name=".PromocaoCopaEnergia"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".FinanceiroNFCe"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />

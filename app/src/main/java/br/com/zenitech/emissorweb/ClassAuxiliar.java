@@ -186,32 +186,11 @@ public class ClassAuxiliar {
 
     //
     public String maskMoney(BigDecimal valor) {
-        /*NumberFormat formato1 = NumberFormat.getCurrencyInstance();
-        NumberFormat formato2 = NumberFormat.getCurrencyInstance(new Locale("en", "EN"));
-        NumberFormat formato3 = NumberFormat.getIntegerInstance();
-        NumberFormat formato4 = NumberFormat.getPercentInstance();
-        NumberFormat formato5 = new DecimalFormat(".##");
-        NumberFormat formato6 = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-
-        //
-        String valorFormat = valor;
-
-        valorFormat = formato5.format(valor);*/
-
-        //
-        //texto.setText(formato1.format(valor));
-        /*Log.i("Moeda atual", formato1.format(valor));
-        Log.i("Moeda EUA", formato2.format(valor));
-        Log.i("Número inteiro", formato3.format(valor));
-        Log.i("Porcentagem", formato4.format(valor));
-        Log.i("Decimal", formato5.format(valor));
-*/
         NumberFormat nf = NumberFormat.getCurrencyInstance();
         DecimalFormatSymbols decimalFormatSymbols = ((DecimalFormat) nf).getDecimalFormatSymbols();
         decimalFormatSymbols.setCurrencySymbol("");
         ((DecimalFormat) nf).setDecimalFormatSymbols(decimalFormatSymbols);
         nf.setMinimumFractionDigits(2);
-        //System.out.println(nf.format(12345.124).trim());
 
         return nf.format(valor);
     }
@@ -675,6 +654,7 @@ public class ClassAuxiliar {
                 "5X SEM JUROS", "6X SEM JUROS", "7X SEM JUROS", "8X SEM JUROS", "9X SEM JUROS",
                 "10X SEM JUROS", "11X SEM JUROS", "12X SEM JUROS"};
     }
+
     public String[] ParcelasDuplicatas() {
         return new String[]{
                 "1",

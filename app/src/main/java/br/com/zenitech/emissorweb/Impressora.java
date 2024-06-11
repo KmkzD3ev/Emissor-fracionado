@@ -296,14 +296,14 @@ public class Impressora extends AppCompatActivity {
                     }
                     //printPage();
                 } else if (tipoImpressao.equals("nfe")) {
-
+                    printNFE58mm(linhaProduto);
                     //Imprimir nota fiscal eletronica
 
-                    if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("58mm")) {
+                    /*if (prefs.getString("tamPapelImpressora", "").equalsIgnoreCase("58mm")) {
                         printNFE58mm(linhaProduto);
                     } else {
                         printNFE(linhaProduto);
-                    }
+                    }*/
 
                     //printImage();
                     //printBarcode();
@@ -2042,7 +2042,7 @@ public class Impressora extends AppCompatActivity {
         //Log.d(LOG_TAG, "Print NFC-e");
 
         runTask((dialog, printer) -> {
-            printer.reset();
+            //printer.reset();
 
             //tamFont = "{s}";
             String linhas = "";
@@ -2055,33 +2055,35 @@ public class Impressora extends AppCompatActivity {
 
             //DANFE NF-e
             textBuffer.append(tamFont).append(" {br}");
-            textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
             textBuffer.append("{reset}{center}").append(tamFont).append("DANFE SIMPLIFICADO").append("{br}");
-            textBuffer.append(tamFont).append("Recebemos de ").append(prefs.getString("nome", "")).append(" os produtos constantes da NF-e ").append(prefs.getString("nnf", "")).append(" Serie ").append(prefs.getString("serie", "")).append("{br}");
+            textBuffer.append(tamFont).append("Recebemos de ").append(prefs.getString("razao_social", "")).append(" os produtos constantes da NF-e ").append(prefs.getString("nnf", "")).append(" Serie ").append(prefs.getString("serie", "")).append("{br}");
             textBuffer.append(tamFont).append("{br}");
-            textBuffer.append(tamFont).append(linhas).append("___________________ _____/_____/________{br}");
-            textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
-
-            textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
-
+            textBuffer.append(tamFont).append(linhas).append("--------------------------------{br}");
+            textBuffer.append(tamFont).append(linhas).append("            _____/_____/________{br}");
+            textBuffer.append(tamFont).append("{br}");
             //textBuffer = new StringBuilder();
-            textBuffer.append(tamFont).append("N ").append(prefs.getString("nnf", "")).append("  -  SERIE ").append(prefs.getString("serie", "")).append("  -  TIPO ").append(prefs.getString("tp_nf", "0").equals("0") ? "Entrada" : "Saída").append("{br}");
+            //textBuffer.append(tamFont).append("N ").append(prefs.getString("nnf", "")).append("  -  SERIE ").append(prefs.getString("serie", "")).append("  -  TIPO ").append(prefs.getString("tp_nf", "0").equals("0") ? "Entrada" : "Saída").append("{br}");
+            textBuffer.append(String.format("N %s  -  SERIE %s  -  TIPO %s", prefs.getString("nnf", ""), prefs.getString("serie", ""), prefs.getString("tp_nf", "0").equals("0") ? "Entrada" : "Saida")).append("{br}");
+            //txtNfeConsRec2.setText(cl1);
+            textBuffer.append(tamFont).append("{br}");
 
 
             String c = prefs.getString("chave", "");// texto[6];
             String cl1 = c.substring(0, 4) + " " + c.substring(4, 8) + " " + c.substring(8, 12) + " " + c.substring(12, 16) + " " + c.substring(16, 20) + " " + c.substring(20, 24);
             String cl2 = c.substring(24, 28) + " " + c.substring(28, 32) + " " + c.substring(32, 36) + " " + c.substring(36, 40) + " " + c.substring(40, 44);
-            textBuffer.append(cl1).append("{br}");
-            textBuffer.append(cl2).append("{br}{br}");
-            textBuffer.append("Protocolo: ").append(prefs.getString("protocolo", "")).append("{br}");
+            //textBuffer.append(cl1).append("{br}");
+            //textBuffer.append(cl2).append("{br}{br}");
+            //textBuffer.append("Protocolo: ").append(prefs.getString("protocolo", "")).append("{br}");
+            textBuffer.append(MessageFormat.format("Protocolo: {0}\nData e hora: {1}\n\n{2}\n{3}\n\n", prefs.getString("protocolo", ""), cAux.removerAcentos(prefs.getString("data_emissao", "")), cl1, cl2));
+
 
             // IMPRIMIR CABECALHO
-            printer.reset();
+            //printer.reset();
             printer.selectPageMode();
             printer.setPageXY(0, 0);
             printer.setAlign(1);
             printer.printTaggedText(textBuffer.toString(), "UTF-8");
-            printer.feedPaper(38);
+            //printer.feedPaper(38);
 
             // IMPRIMIR COD BARRA
             Bitmap bp = null;
@@ -2103,13 +2105,13 @@ public class Impressora extends AppCompatActivity {
             bp.recycle();
 
             // IMPRIMIR CÓDIGO DE BARRAS
-            printer.reset();
+            //printer.reset();
             printer.printImage(argb, width, height, Printer.ALIGN_CENTER, true);
-            printer.feedPaper(38);
+            //printer.feedPaper(38);
 
             textBuffer = new StringBuilder();
-            textBuffer.append(tamFont).append("");
-            textBuffer.append(tamFont).append(linhas).append("{br}-----------------------------------------{br}");
+            textBuffer.append(tamFont).append("\n\n");
+            textBuffer.append(tamFont).append(linhas).append("{br}--------------------------------{br}");
             //
             textBuffer.append("DADOS DO EMITENTE{br}");
             textBuffer.append(tamFont).append("NOME/RAZAO SOCIAL:{br}");
@@ -2120,29 +2122,29 @@ public class Impressora extends AppCompatActivity {
             textBuffer.append(tamFont).append(texto[11]).append("{br}");
             textBuffer.append(tamFont).append(texto[8]).append("{br}");
             //
-            textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
+            textBuffer.append(tamFont).append(linhas).append("--------------------------------{br}");
             //
             textBuffer.append("DESTINATARIO{br}");
             textBuffer.append(tamFont).append("NOME/RAZAO SOCIAL:{br}");
             textBuffer.append(tamFont).append(prefs.getString("nome", "")).append("{br}");
             textBuffer.append(tamFont).append("ENDERECO:{br}");
             textBuffer.append(tamFont).append(prefs.getString("endereco_dest", "")).append("{br}");
-            textBuffer.append(tamFont).append("CNPJ:    IE:     {br}");
-            textBuffer.append(tamFont).append(prefs.getString("cnpj_dest", "")).append("     -     ").append(prefs.getString("ie_dest", "")).append("{br}");
+            textBuffer.append(tamFont).append("CNPJ:            IE:{br}");
+            textBuffer.append(tamFont).append(prefs.getString("cnpj_dest", "")).append("  |  ").append(prefs.getString("ie_dest", "")).append("{br}");
             //
-            textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
+            textBuffer.append(tamFont).append(linhas).append("--------------------------------{br}");
             //
             textBuffer.append(tamFont).append("NATUREZA DA OPRACAO{br}");
             textBuffer.append(tamFont).append(prefs.getString("nat_op", "")).append("{br}");
             //
-            textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
+            textBuffer.append(tamFont).append(linhas).append("--------------------------------{br}");
             //
             textBuffer.append("PRODUTOS{br}");
-            textBuffer.append(tamFont).append("DESC PROD | UN | QTD | VL UN | VL TOTAL{br}");
+            textBuffer.append(tamFont).append("DESC P. | UN | QTD | V UN | V TOTAL{br}");
             textBuffer.append(tamFont).append(prefs.getString("prods_nota", "")).append("{br}{br}");
             textBuffer.append(tamFont).append("VALOR TOTAL DA NOTA => ").append(prefs.getString("total_nota", "")).append("{br}");
             //
-            textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
+            textBuffer.append(tamFont).append(linhas).append("--------------------------------{br}");
             //
             textBuffer.append("DADOS ADICIONAIS{br}");
             /*
@@ -2156,7 +2158,7 @@ public class Impressora extends AppCompatActivity {
             * */
             textBuffer.append(tamFont).append(prefs.getString("inf_cpl", "")).append("{br}");
             //
-            textBuffer.append(tamFont).append(linhas).append("-----------------------------------------{br}");
+            textBuffer.append(tamFont).append(linhas).append("--------------------------------{br}");
             //
             textBuffer.append(tamFont).append("RESERVADO AO FISCO{br}{br}{br}");
             //
@@ -2167,7 +2169,8 @@ public class Impressora extends AppCompatActivity {
             printer.setPageXY(0, 0);
             printer.setAlign(1);
             printer.printTaggedText(textBuffer.toString(), "UTF-8");
-            printer.feedPaper(38);
+            printer.printText("\n\n");
+            //printer.feedPaper(38);
 
             printer.flush();
 

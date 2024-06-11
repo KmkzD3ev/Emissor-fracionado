@@ -66,6 +66,7 @@
     <string name="msg_invalid_identity">Invalid identity</string>
     <string name="msg_downloading_image">Downloading image&#8230;</string>
     <string name="msg_printing_nfce">Imprimindo NFC-e&#8230;</string>
+    <string name="msg_printing_nfe">Imprimindo NF-e&#8230;</string>
     <string name="msg_printing_comp_pag_cartao_nfce">Imprimindo Comprovante Pagamento&#8230;</string>
     <string name="msg_printing_comp_pag_pix">Imprimindo Comprovante Pagamento Pix&#8230;</string>
 

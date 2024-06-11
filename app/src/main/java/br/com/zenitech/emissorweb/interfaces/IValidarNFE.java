@@ -30,7 +30,8 @@ public interface IValidarNFE {
             @Field("BANDEIRA") String bandeira,
             @Field("VERSAO") int VERSAO,
             @Field("PARCELA") String parcela,
-            @Field("VENCIMENTO") String vencimento
+            @Field("VENCIMENTO") String vencimento,
+            @Field("DOCUMENTO") String nfeDocumento
     );
 
     // REIMPRIMIR NOTA

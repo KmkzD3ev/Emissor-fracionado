@@ -15,14 +15,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:padding="16dp"
-        android:visibility="gone">
-
-        <!--<ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:alpha="0.0"
-            android:scaleType="centerCrop"
-            android:src="@drawable/bgtopo" />-->
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/txt_version"
@@ -31,7 +24,7 @@
             android:layout_margin="16dp"
             android:gravity="center_horizontal"
             android:text=""
-            android:textAlignment="center" />
+            android:textAlignment="center" />                                                       
 
         <ImageView
             android:id="@+id/qrcode"
@@ -2487,7 +2480,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/modelImpressaoCupomPromocional"
@@ -2495,6 +2488,11 @@
             android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:src="@drawable/logo_copa_energia_preto" />
 
             <!-- CABECALHO DA NOTA -->
             <LinearLayout
@@ -2554,7 +2552,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
                     android:gravity="center"
-                    android:text="A2345B567\nA238BC73B"
+                    android:text="A5432B56C\nA5578C72A"
                     android:textColor="@android:color/black"
                     android:textSize="14sp" />
 
@@ -2585,18 +2583,18 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
                         android:gravity="center"
-                        android:text="ZENITECH INFORMATICA LTDA"
+                        android:text="ZENIGÁS REVENDA DE GÁS LTDA"
                         android:textColor="@android:color/black"
-                        android:textSize="9sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
                         android:gravity="center"
-                        android:text="CNPJ: 10552850000156 I.E.: 20217"
+                        android:text="CNPJ: 10552850000156"
                         android:textColor="@android:color/black"
-                        android:textSize="9sp" />
+                        android:textSize="10sp" />
 
                     <TextView
                         android:id="@+id/doc_cupom"
@@ -2608,7 +2606,7 @@
                         android:gravity="center"
                         android:text="Doc. Fiscal - Serie - N°"
                         android:textColor="@android:color/black"
-                        android:textSize="9sp" />
+                        android:textSize="11sp" />
 
 
                     <!-- FIM COSULTA NA RECEITA -->
@@ -2652,12 +2650,14 @@
                     android:background="@android:color/white" />
 
                 <TextView
+                    android:id="@+id/dataHora"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif-black"
                     android:text="26/04/2024 | 10:00 - Kleilson"
                     android:textColor="@android:color/black"
-                    android:textSize="9sp" />
+                    android:textSize="11sp" />
 
                 <!-- ************************* -->
                 <View

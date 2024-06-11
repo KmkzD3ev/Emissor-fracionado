@@ -235,6 +235,9 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
             } else if (tipoImpressao.equals("comprovante_pix_reimp")) {
 
                 ComprovantePixReimpressao();
+            } else if (tipoImpressao.equals("promocao_copa_energia")) {
+
+                printCupom();
             } else {
 
                 //Imprimir nota fiscal eletronica
@@ -526,11 +529,13 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         Bitmap bitmap1 = printViewHelper.createBitmapFromView(impressora, 190, height);
 
         // modelImpressaoCupomPromocional
+        TextView dataHora = findViewById(R.id.dataHora);
+        dataHora.setText(MessageFormat.format("{0} | {1} - Kleilson", cAux.exibirDataAtual(), cAux.horaAtual()));
 
         TextView doc_cupom = findViewById(R.id.doc_cupom);
         doc_cupom.setText(MessageFormat.format("Doc. Fiscal - Serie {0} - N° {1}", serie, idPedido));
         LinearLayout llCupom = findViewById(R.id.modelImpressaoCupomPromocional);
-        Bitmap bm_cupom = printViewHelper.createBitmapFromView(llCupom, 190, 400);
+        Bitmap bm_cupom = printViewHelper.createBitmapFromView(llCupom, 190, 450);
 
         //
         LinearLayout impressoraChave = findViewById(R.id.teste3);
@@ -538,10 +543,21 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         Bitmap bitmap3 = printView3.createBitmapFromView(impressoraChave, 190, 130);
         LinearLayout llPrintQrCode = findViewById(R.id.llPrintQrCode);
         Bitmap bpQrCode = printViewHelper.createBitmapFromView(llPrintQrCode, 190, 120);
+
+        // teste impressao promoca copa energia
+        prefs.edit().putString("cpfPromo", pedido.getCpf_cliente()).apply();
+        prefs.edit().putString("seriePromo", serie).apply();
+        prefs.edit().putString("numeroPromo", idPedido).apply();
+        prefs.edit().putString("quantPromo", "2").apply();
         ppp.setConnectionCallback(new StoneCallbackInterface() {
             @Override
             public void onSuccess() {
                 liberarImpressora();
+
+                /*Intent i = new Intent(ImpressoraPOS.this, PromocaoCopaEnergia.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+                finish();*/
             }
 
             @Override
@@ -556,13 +572,66 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         ppp.addBitmap(bitmap3);
         ppp.addBitmap(bpQrCode);
         //
-        ppp.addLine("");
+        /*ppp.addLine("");
         ppp.addLine("");
         ppp.addLine("");
         ppp.addLine("--------------------------------");
         ppp.addLine("");
         ppp.addLine("");
+        ppp.addBitmap(bm_cupom);*/
+        ppp.execute();
+    }
+
+    private void printCupom() throws FileNotFoundException {
+        //#region RECEBE A UI
+        //LinearLayoutCompat descricaoNota = findViewById(R.id.descricaoNota);
+        //ListView descricaoProdutoListView = findViewById(R.id.descricaoProdutoListView);
+
+        // ********************** IMPRIMIR CABEÇALHO
+        //TextView txtCab1 = findViewById(R.id.txtCab1);
+        int quantidade = 2;
+
+        MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+        try {
+            BitMatrix bitMatrix = multiFormatWriter.encode("promo_copa_energia", BarcodeFormat.QR_CODE, 250, 250);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bp = barcodeEncoder.createBitmap(bitMatrix);
+            //
+            ImageView imgQrCodeCupom = findViewById(R.id.imgQrCodeCupom);
+            imgQrCodeCupom.setImageBitmap(bp);
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+
+        int height = 450;
+        if (quantidade > 2) {
+            height = 470;
+        }
+
+        // modelImpressaoCupomPromocional
+        TextView dataHora = findViewById(R.id.dataHora);
+        dataHora.setText(MessageFormat.format("{0} | {1} - Kleilson", cAux.exibirDataAtual(), cAux.horaAtual()));
+        TextView doc_cupom = findViewById(R.id.doc_cupom);
+        doc_cupom.setText(MessageFormat.format("Doc. Fiscal - Serie {0} - N° {1}", prefs.getString("seriePromo", ""), prefs.getString("numeroPromo", "")));
+        LinearLayout llCupom = findViewById(R.id.modelImpressaoCupomPromocional);
+        Bitmap bm_cupom = printViewHelper.createBitmapFromView(llCupom, 190, height);
+
+        ppp.setConnectionCallback(new StoneCallbackInterface() {
+            @Override
+            public void onSuccess() {
+                liberarImpressora();
+            }
+
+            @Override
+            public void onError() {
+                liberarImpressora();
+                Toast.makeText(context, "Erro ao imprimir: " + ppp.getListOfErrors(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         ppp.addBitmap(bm_cupom);
+        ppp.addLine("");
+        ppp.addLine("");
         ppp.execute();
     }
 
@@ -801,7 +870,7 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         // ********************** IMPRIMIR CABEÇALHO
         TextView txtRecebemos = findViewById(R.id.txtRecebemos);
         //
-        txtRecebemos.setText(String.format("DANFE SIMPLIFICADO\n\nRecebemos de %s os produtos constantes da NF-e %s Serie %s", prefs.getString("nome", ""), prefs.getString("nnf", ""), prefs.getString("serie", "")));
+        txtRecebemos.setText(String.format("DANFE SIMPLIFICADO\n\nRecebemos de %s os produtos constantes da NF-e %s Serie %s", prefs.getString("razao_social", ""), prefs.getString("nnf", ""), prefs.getString("serie", "")));
 
         // ********************** INFOR. VALORES
         TextView txtSerie = findViewById(R.id.txtSerie);

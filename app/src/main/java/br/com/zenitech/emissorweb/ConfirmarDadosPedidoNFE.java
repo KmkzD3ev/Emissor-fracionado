@@ -243,7 +243,7 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                 String nAutoCartao = bd.getNAutFinanceiroNfe("1").replace(".", "");
 
                 //
-                String parcela = bd.getPercelaFormasPagamentoNFe("1").replace(".", "");
+                String parcela = bd.getParcelaFormasPagamentoNFe("1").replace(".", "");
                 String vencimento = bd.getVencimentoFormasPagamentoNFe("1").replace(".", "");
 
 
@@ -283,7 +283,8 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                         bandeiraFPG,
                         76,
                         parcela,
-                        vencimento
+                        vencimento,
+                        prefs.getString("nfeDocumento", "")
                 );
 
                 call.enqueue(new Callback<>() {

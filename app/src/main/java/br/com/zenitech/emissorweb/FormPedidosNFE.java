@@ -64,7 +64,7 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
     String[] listaFormasPagamento = {"DINHEIRO"};
 
     private Spinner spProduto, spFormasPagamento;
-    private EditText cpf_cnpj_cliente, nome_cliente, etQuantidade, etPreco;
+    private EditText cpf_cnpj_cliente, nome_cliente, etQuantidade, etPreco, etDocumento;
     private DatabaseHelper bd;
     SharedPreferences prefs;
     SharedPreferences.Editor ed;
@@ -100,6 +100,7 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
         prefs = getSharedPreferences("preferencias", MODE_PRIVATE);
         ed = prefs.edit();
 
+        prefs.edit().putString("nfeDocumento", "").apply();
         //
         bd = new DatabaseHelper(this);
         aux = new ClassAuxiliar();
@@ -119,6 +120,8 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
         //
         rvProdutosPedido = findViewById(R.id.rvProdutosPedido);
         rvProdutosPedido.setLayoutManager(new LinearLayoutManager(this));
+
+        etDocumento = findViewById(R.id.etDocumento);
 
 
         //
@@ -469,6 +472,7 @@ public class FormPedidosNFE extends AppCompatActivity implements AdapterView.OnI
     }
 
     private void confirmar() {
+        prefs.edit().putString("nfeDocumento", etDocumento.getText().toString()).apply();
         //Intent i = new Intent(getBaseContext(), ConfirmarDadosPedidoNFE.class);
         Intent i = new Intent(getBaseContext(), FinanceiroNFe.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -151,6 +151,7 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
         financeiroNFeAdapter.registerObserver(this);
         //rvFinanceiro.setAdapter(financeiroNFeAdapter);
         llParcelasDuplicata = findViewById(R.id.llParcelasDuplicata);
+
         // FORMAS DE PAGAMENTO
         ArrayAdapter<String> adapterFormasPagamento = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, aux.FormasDePagamentoEmissorNFe(mostrarFpgDuplicata));
         adapterFormasPagamento.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -293,6 +294,7 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
         boolean cartaoCredito = FormPG.equalsIgnoreCase("CARTÃO DE CRÉDITO");
         boolean cartaoDebito = FormPG.equalsIgnoreCase("CARTÃO DE DÉBITO");
         boolean duplicata = FormPG.equalsIgnoreCase("DUPLICATA MERCANTIL");
+        boolean boleto = FormPG.equalsIgnoreCase("BOLETO");
 
         tilVencimento.setVisibility(View.GONE);
         llParcelasDuplicata.setVisibility(View.GONE);
@@ -301,6 +303,13 @@ public class FinanceiroNFe extends AppCompatActivity implements AdapterView.OnIt
             tilVencimento.setVisibility(View.VISIBLE);
             llParcelasDuplicata.setVisibility(View.VISIBLE);
             txtVencimentoFormaPagamento.setText(aux.dataFutura(1));
+        }
+
+        if (boleto) {
+            tilVencimento.setVisibility(View.VISIBLE);
+            llParcelasDuplicata.setVisibility(View.GONE);
+            spParcelas.setSelection(0);
+            txtVencimentoFormaPagamento.setText(aux.dataFutura(5));
         }
 
         // SE EXISTIR STONE CODE OU OUTRO MEIO DE PAGAMENTO COM A MAQUININHA

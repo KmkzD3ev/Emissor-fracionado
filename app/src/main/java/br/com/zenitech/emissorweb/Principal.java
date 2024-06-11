@@ -132,6 +132,7 @@ public class Principal extends AppCompatActivity
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
+        // KLEILSON - ATENÇÃO PARA AESSE CÓDIGO ELE PODE ESTAR DANIFICANDO OS PEDIDOS
         try {
             //
             pedidos = bd.getPedidos();
@@ -266,7 +267,11 @@ public class Principal extends AppCompatActivity
         }
 
         //
-        userList = StoneStart.init(context);
+        try {
+            userList = StoneStart.init(context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // APAGA TODOS OS PAGAMENTOS PIX COM STATUS 1
         bd.deleteFormPagPIX();

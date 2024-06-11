@@ -161,16 +161,16 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    formaPagamento.setText(bd.getFormasPagamentoPedidoPrint(idUltPedido));
+                    formaPagamento.setText(bd.getFormasPagamentoPedidoPrint(bd.getIdPedidoTemp()));
                     //produto.setText(params.getString("produto"));
-                    produto.setText(bd.getProdutosPedidoConfirmacao(Integer.parseInt(infoPedido.getId()), cAux));
+                    produto.setText(bd.getProdutosPedidoConfirmacao(Integer.parseInt(bd.getIdPedidoTemp()), cAux));
                     //qnt.setText(params.getString("qnt"));
                     //vlt.setText(params.getString("vlt"));
                     //Log.e("Desconto", bd.getItensPedido(idUltPedido).get(0).getDesconto());
                     //desconto.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(bd.getItensPedido(idUltPedido).get(0).getDesconto()))));//des
-                    idFormaPagamento = bd.getFormasPagamentoPedido(idUltPedido);
+                    idFormaPagamento = bd.getFormasPagamentoPedido(bd.getIdPedidoTemp());
 
-                    String v = bd.getValorTotalFinanceiro(idUltPedido, false);
+                    String v = bd.getValorTotalFinanceiro(bd.getIdPedidoTemp(), false);
                     vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(v))));
                     total = v;
 

@@ -524,7 +524,7 @@ public class GerenciarPagamentoCartaoPOS extends AppCompatActivity implements St
     // Iniciar o Stone
     void iniciarStone() {
         // O primeiro passo é inicializar o SDK.
-        userList = StoneStart.init(context);
+        userList = StoneStart.init(getApplicationContext());
         /*Em seguida, é necessário chamar o método setAppName da classe Stone,
         que recebe como parâmetro uma String referente ao nome da sua aplicação.*/
         Stone.setAppName(getApplicationName(context));

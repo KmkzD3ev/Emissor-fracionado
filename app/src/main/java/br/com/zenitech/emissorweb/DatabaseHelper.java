@@ -1351,7 +1351,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //LISTAR TODOS OS ITENS DO FINANCEIRO
     public String getProdutosPedidoConfirmacao(int id_pedido, ClassAuxiliar aux) {
-        String produtos = "";
+        StringBuilder produtos = new StringBuilder();
 
         String query = "SELECT * FROM produtos_pedido WHERE id_pedido = '" + id_pedido + "'";
         Log.e("SQL", "getProdutosPedido - " + query);
@@ -1361,12 +1361,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 ProdutosPedidoDomain pro = cursorProdutoPedido(cursor);
-                produtos += pro.produto + " " + pro.quantidade + "x" + aux.maskMoney(new BigDecimal(pro.valor)) + "\n";
+                produtos.append(pro.produto).append(" ").append(pro.quantidade).append("x").append(aux.maskMoney(new BigDecimal(pro.valor))).append("\n");
             } while (cursor.moveToNext());
         }
 
         cursor.close();
-        return produtos;
+        return produtos.toString();
     }
 
     //LISTAR TODOS OS ITENS DO FINANCEIRO
@@ -2357,9 +2357,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Boolean getFinanceiroUltimoPedido(String idPedido) {
         boolean result = false;
-        String query = "SELECT pet.id " +
+        String query = "SELECT pet.id, prp.id_produto, fpp.id_forma_pagamento " +
                 "FROM pedidos_temp pet " +
-                "INNER JOIN produtos_pedido prp ON prp.id_pedido = pet.id " +
+                "LEFT JOIN produtos_pedido prp ON prp.id_pedido = pet.id " +
+                "LEFT JOIN formas_pagamento_pedidos fpp ON fpp.id_pedido = pet.id " +
                 "WHERE pet.id = '" + idPedido + "' AND (pet.situacao = 'OFF' OR pet.situacao = '') " +
                 "ORDER BY pet.id DESC " +
                 "LIMIT 1";
@@ -2372,7 +2373,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.getCount() > 0) {
             cursor.moveToFirst();
-            result = true;
+
+            Log.e("SQL:", cursor.getString(1) + " - " + cursor.getString(2));
+
+            if (cursor.getString(1) != null || cursor.getString(2) != null) {
+                result = true;
+            }
         }
         cursor.close();
 
@@ -3481,15 +3487,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selectQuery;
 
         if (api_asaas) {
-            /*selectQuery = "SELECT SUM(valor) " +
-                    "FROM formas_pagamento_pedidos " +
-                    "WHERE id_pedido = '" + idPedido + "' AND status_pix = '0'";*/
             selectQuery = "SELECT SUM(fpp.valor) AS valor " +
                     "FROM pedidos ped " +
                     "INNER JOIN financeiro_nfce fpp ON fpp.id_pedido = ped.id " +
                     "WHERE ped.id_pedido_temp = '" + idPedido + "' AND fpp.status_pix = '0'";
         } else {
-            //selectQuery = "SELECT SUM(valor) FROM formas_pagamento_pedidos WHERE id_pedido = '" + idPedido + "'";
             selectQuery = "SELECT SUM(fpp.valor) AS valor " +
                     "FROM pedidos ped " +
                     "INNER JOIN financeiro_nfce fpp ON fpp.id_pedido = ped.id " +
@@ -3852,7 +3854,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         PrintPixDomain printPixDomain = null;
         myDataBase = this.getReadableDatabase();
         String query = "SELECT fpp.id_pedido, fpp.valor, fpp.id_cobranca_pix, ped.data, ped.hora " +
-                "FROM formas_pagamento_pedidos fpp " +
+                "FROM financeiro_nfce fpp " +
                 "INNER JOIN pedidos ped ON ped.id = fpp.id_pedido " +
                 "WHERE fpp.id_cobranca_pix != '' AND fpp.status_pix = '0' " +
                 "ORDER BY fpp.id DESC " +
@@ -4131,7 +4133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return formasPag.toString();
     }
 
-    public String getPercelaFormasPagamentoNFe(String id_pedido) {
+    public String getParcelaFormasPagamentoNFe(String id_pedido) {
         StringBuilder parcelasPag = new StringBuilder();
 
         String query = "SELECT parcelas FROM financeiro_nfe WHERE id_pedido = '" + id_pedido + "'";

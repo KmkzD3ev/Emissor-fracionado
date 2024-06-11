@@ -13,6 +13,7 @@
         android:id="@+id/llIdNomeCli"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="visible"
         android:layout_weight="1">
 
     <androidx.core.widget.NestedScrollView
@@ -299,6 +300,34 @@
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/etDocumento"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:hint="N° Pedido"
+                        android:imeActionLabel="Avançar"
+                        android:imeOptions="actionNext"
+                        android:inputType="numberDecimal"
+                        android:maxLines="1" />
+                    <!--android:imeOptions="actionSend"-->
+
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
 
