@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -138,6 +139,8 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
         cAux = new ClassAuxiliar();
         context = this;
 
+        StoneStart.init(context);
+
         imprimindo = findViewById(R.id.imprimindo);
         total = findViewById(R.id.total);
         qrcode = findViewById(R.id.qrcode);
@@ -247,7 +250,6 @@ public class ImpressoraPOS extends AppCompatActivity implements StoneActionCallb
                 FileNotFoundException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override

@@ -7,7 +7,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/GitHub_Projects.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/GitHub_Projects.app.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/GitHub_Projects.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/GitHub_Projects.app.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/GitHub_Projects.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/GitHub_Projects.app.unitTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.GitHub_Projects.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.GitHub_Projects.app.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.GitHub_Projects.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.GitHub_Projects.app.unitTest.iml" />
     </modules>
   </component>
