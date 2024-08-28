@@ -142,6 +142,12 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
                 }
 
                 if (siac) {
+                    /*
+                    String valorUnit = params.getString("valor_unit");
+                    String quantidade = params.getString("quantidade");
+
+                    Log.d(TAG, "RECEBENDO Valor unitário recebido: " + valorUnit);
+                    Log.d(TAG, "RECEBEdoQuantidade recebida: " + quantidade);*/
 
                     //DADOS SIAC WEB
                     cpfCnpj_cliente.setText(getString(R.string.consumidor_nao_identificado));
@@ -264,7 +270,9 @@ public class ConfirmarDadosPedido extends AppCompatActivity implements View.OnCl
         //ESCODER O TECLADO
         try {
             InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            Objects.requireNonNull(imm).hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
+            if (imm != null && getCurrentFocus() != null) {
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

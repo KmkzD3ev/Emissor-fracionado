@@ -161,8 +161,12 @@ public class ConfirmarDadosPedidoNFE extends AppCompatActivity implements View.O
                 String pro = bd.getNomeProdutosPedidoNFe("1");
                 produto.setText(pro);
 
+
                 String v =  bd.getValorTotalPedidoNFe("1");
                 vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(v))));
+
+                /*String v2 =  bd.getValorTotalPedidoNFe("0");
+                vltTotal.setText(String.format("R$%s", cAux.maskMoney(new BigDecimal(v2))));*/
 
                 btnPrint = findViewById(R.id.btnPrint);
                 btnPrint.setOnClickListener(this);

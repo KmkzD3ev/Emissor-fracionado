@@ -1,49 +1,18 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 //apply plugin: 'kotlin-android-extensions'
-apply from: '../positivo/positivo-signing-config.gradle'
+//apply from: '../positivo/positivo-signing-config.gradle'
 
 android {
-    signingConfigs {
-        /*debug {
-            storeFile file('E:\\Projetos de jogos\\SSD\\Arquivos SSD W\\Documentos\\PROJETOS ANDROID\\ZENITECH\\EMISSOR_WEB_VERSSIONADO\\keystore_emissorweb_imp_dpp350.jks')
-            storePassword 'Zenitech2017!#!'
-            keyPassword 'Zenitech2017!#!'
-            keyAlias 'zenitech'
-        }
-        config {
-            keyAlias 'zenitech'
-            keyPassword 'Zenitech2017!#!'
-            storeFile file('E:\\Projetos de jogos\\SSD\\Arquivos SSD W\\Documentos\\PROJETOS ANDROID\\ZENITECH\\EMISSOR_WEB_VERSSIONADO\\keystore_emissorweb_imp_dpp350.jks')
-            storePassword 'Zenitech2017!#!'
-        }*/
-
-        // REDE ITAÚ
-        debug {
-            storeFile file('F:\\Projetos de Jogos\\SSD\\Arquivos SSD W\\APP_ZENITECH_INTEGRACAO\\ZENITECH_INTEGRACAO\\development_gertecdeveloper_customer_app_29_19.JKS')
-            storePassword 'Development@GertecDeveloper2018'
-            keyPassword 'Development@GertecDeveloper2018'
-            keyAlias 'developmentgertecdeveloper_customerapp'
-        }
-        config {
-            storeFile file('F:\\Projetos de jogos\\SSD\\Arquivos SSD W\\APP_ZENITECH_INTEGRACAO\\ZENITECH_INTEGRACAO\\development_gertecdeveloper_customer_app_29_19.JKS')
-            storePassword 'Development@GertecDeveloper2018'
-            keyPassword 'Development@GertecDeveloper2018'
-            keyAlias 'developmentgertecdeveloper_customerapp'
-        }
-    }
     compileSdk 34
 
     defaultConfig {
         applicationId "br.com.zenitech.emissorweb"
         minSdkVersion 22
-        maxSdkVersion 34
         targetSdk 34
         versionCode 90
         versionName '3.9.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
-        signingConfig signingConfigs.debug
 
         // Multidex **
         multiDexEnabled true
@@ -52,10 +21,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
+            // Para o release, se não for necessário assinar, comente a linha abaixo
+            // signingConfig signingConfigs.config
         }
         debug {
-            signingConfig signingConfigs.debug
+            // O debug usa o keystore padrão do Android Studio, então não precisa especificar um signingConfig
         }
     }
     productFlavors {
@@ -85,20 +55,14 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.3'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
     implementation 'androidx.activity:activity-ktx:1.9.0'
     androidTestImplementation('androidx.test.espresso:espresso-core:3.6.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation files('libs/printerlibs.jar')
     implementation files('libs/commons-net-3.3.jar')
-    //
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -109,14 +73,13 @@ dependencies {
     implementation 'com.getkeepsafe.taptargetview:taptargetview:1.13.3'
     implementation 'androidx.cardview:cardview:1.0.0'
     testImplementation 'junit:junit:4.13.2'
-    //Impressora DPP-350 BT
     implementation files('libs/com.datecs.api.jar')
 
     // QRcode
     implementation 'com.google.zxing:core:3.5.3'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0@aar'
 
-    /*/ Stone POS - PIN PAD 4.8.7 ***/
+    // Stone POS - PIN PAD 4.8.7
     implementation "br.com.stone:stone-sdk:$stone_sdk_version"
     implementation "br.com.stone:stone-sdk-posandroid:$stone_sdk_version"
     implementation "br.com.stone:stone-sdk-posandroid-positivo:$stone_sdk_version"

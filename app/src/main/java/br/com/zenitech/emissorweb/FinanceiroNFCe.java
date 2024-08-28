@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +47,7 @@ import br.com.zenitech.emissorweb.domains.ProdutosPedidoDomain;
 import br.com.zenitech.emissorweb.domains.Unidades;
 import br.com.zenitech.emissorweb.interfaces.IFinanceiroNFCeObserver;
 import br.com.zenitech.emissorweb.util.AuxFinanceiroNFCe;
+
 
 public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCeObserver {
 
@@ -101,6 +104,7 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
     private Spinner spFormasPagamento, spDescricaoCredenciadora, spBandeiraCredenciadora;
     private EditText etCodAutorizacao, etNsuCeara;
     private TextInputLayout TiNsuCeara;
+    private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1; //PERMISSAO TEMPORARIA
 
     //region START CONFIGURACOES
     private void startConfig() {
@@ -150,13 +154,29 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
     }
     //endregion
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_financeiro_nfce);
 
+
         // INICIA AS CLASSES AUXILIARES
         startConfig();
+
+        /****************** Solicitar permissões Bluetooth temporaria *****************/
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.BLUETOOTH_CONNECT,
+                    android.Manifest.permission.BLUETOOTH_SCAN
+            }, REQUEST_BLUETOOTH_PERMISSIONS);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.BLUETOOTH,
+                    android.Manifest.permission.BLUETOOTH_ADMIN,
+            }, REQUEST_BLUETOOTH_PERMISSIONS);
+        }
 
         // INICIA OS IDS DOS ELEMENTOS DA UI
         startIds();
@@ -164,10 +184,11 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
         textIdTemp.setText(MessageFormat.format("Id Temp: \n{0}", idTemp));
 
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
+        /******************* CONDIÇAO DE FRACIONAMENTO DA NOTA **************/
         if (bd.getQuantProdutosPedidoNCMGas(idTemp) > 5) {
             quantidade = bd.getQuantProdutosPedidoNCMGas(idTemp);
             NotaFracionada = "1";
+            Log.d("Fracionamento", "Nota marcada para fracionamento devido à quantidade de produtos de gás: " + quantidade);
         } else {
             List<String> listPro = bd.getQuantProdutosPedidoNCM(idTemp);
             if (listPro != null) {
@@ -176,12 +197,18 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
                     quantidade = Integer.parseInt(iList[1]);
                     List<String> minMaxFrac = bd.getMinMaxFracionamentoProduto(iList[0]);
 
+                    Log.d("Fracionamento", "Quantidade: " + quantidade);
+                    Log.d("Fracionamento", "Limites de Fracionamento - Mínimo: " + minMaxFrac.get(0) + ", Máximo: " + minMaxFrac.get(1));
+
+
 
                     if (!minMaxFrac.get(0).equals("0") && !minMaxFrac.get(1).equals("0")) {
                         int min = Integer.parseInt(minMaxFrac.get(0));
                         int max = Integer.parseInt(minMaxFrac.get(1));
                         if (quantidade > max) {
                             NotaFracionada = "1";
+                            Log.d("Fracionamento", "Nota marcada para fracionamento. Quantidade excede o máximo permitido: " + max);
+
                         }
                     }
 
@@ -690,6 +717,12 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
             // APAGA TODOS OS PAGAMENTOS PIX COM STATUS 1
             bd.deleteFormPagPIX();
 
+            // Obtém o valor que será passado
+            String valorTotal = String.valueOf(cAux.converterValores(txtTotalItemFinanceiro.getText().toString()));
+
+// Adiciona um log para verificar o valor que está sendo passado
+            Log.d("PASSANDO VALORES", "Valor total passado para ConfirmarDadosPedido: " + valorTotal);
+
             //
             Intent i = new Intent(getBaseContext(), ConfirmarDadosPedido.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -920,109 +953,8 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
         }
         if (NotaFracionada.equals("1")) {
 
-            //region REGRA PARA FRACIONAR O FINANCEIRO EM DINHEIRO
-             /*
-             SE O VALOR DA FORMA DE PAGAMENTO DINEIRO FOR MAIOR OU IGUAL AO TOTAL DA NOTA ADICIONA DINHEIRO
-             E SUBTRAI O VALOR DA FORMA DE PAGAMENTO DINHEIRO
-             */
-            //endregion
-            //region REGRA PARA FRACIONAR O FINANCEIRO EM PIX
-             /*
-             SE O VALOR DA FORMA DE PAGAMENTO PIX FOR MAIOR OU IGUAL AO TOTAL DA NOTA ADICIONA PIX
-             E SUBTRAI O VALOR DA FORMA DE PAGAMENTO PIX
-             */
-            //endregion
-            //region REGRA PARA ADICIONAR O FINANCEIRO DA ULTIMA NOTA
-             /*
-             PEGAR O VALOR RESTANTE DA FORMAS DE PAGAMENTO DINHEIRO E PIX E SOMAR CRIANDO O VALOR TOTAL
-             DA ULTIMA NOTA. ZERAR AS DUAS FORMAS DE PAGAMENTO NAS FORMAS DE PAGAMENTO DO PEDIDO.
-             */
-            //endregion
+         ajustarFinanceiroFracionado();
 
-            // TOTAL FINANCEIRO DINHEIRO
-            String _totalDinheiro = bd.getTotalFinanceiroDinheiro(String.valueOf(idTemp), api_asaas);
-            // TOTAL FINANCEIRO PIX
-            String _totalPix = bd.getTotalFinanceiroPix(String.valueOf(idTemp), api_asaas);
-            //  TOTAL DO ITEM
-            String _total_item = bd.getTotalItem(String.valueOf(id)); //id
-            // RECEBE O ID DA COBRANCA PIX
-            String id_cobranca_pix = bd.getIdCobrancaPix(String.valueOf(idTemp));
-
-            /*cAux.ShowMsgLog("FinNFCe", "---------");
-            cAux.ShowMsgLog("FinNFCe", "DINHEIRO: " + _totalDinheiro);
-            cAux.ShowMsgLog("FinNFCe", "PIX: " + _totalPix);
-            cAux.ShowMsgLog("FinNFCe", "ITEM: " + _total_item);
-            cAux.ShowMsgLog("FinNFCe", "ID COB. PIX: " + id_cobranca_pix);
-            cAux.ShowMsgLog("FinNFCe", "---------");*/
-
-            FormaPagamentoPedido fpp = new FormaPagamentoPedido(null, null, null, null, null, null, null, null, null);
-            fpp.id_pedido = String.valueOf(id);
-            fpp.status_pix = "0";
-
-            int compararDinheiro = new BigDecimal(_totalDinheiro).compareTo(new BigDecimal(_total_item));
-            int compararPix = new BigDecimal(_totalPix).compareTo(new BigDecimal(_total_item));
-
-            String _valFinanceiro;
-            // VERIFICA SE O VALOR É MAIOR OU IGUAL A FORMA DE PAGAMENTO DINHEIRO
-            if (compararDinheiro >= 0) {
-                _valFinanceiro = _total_item;
-                String[] mValor = {_totalDinheiro, _total_item};
-                String vD = String.valueOf(cAux.subitrair(mValor));
-                cAux.ShowMsgLog("FinNFCe", "RESTANTE DINHEIRO: " + vD);
-                fpp.id_forma_pagamento = "1";
-
-                bd.updateValorFinanceiroPedidoDinheiro(String.valueOf(idTemp), vD);
-
-                //
-                fpp.valor = String.valueOf(_valFinanceiro);
-                bd.addFinanceiroNFCe(fpp);
-            }
-            // VERIFICA SE O VALOR É MAIOR OU IGUAL A FORMA DE PAGAMENTO PIX
-            else if (compararPix >= 0) {
-                _valFinanceiro = _total_item;
-                String[] mValor = {_totalPix, _total_item};
-                String vP = String.valueOf(cAux.subitrair(mValor));
-                cAux.ShowMsgLog("FinNFCe", "RESTANTE PIX: " + vP);
-                fpp.id_forma_pagamento = "17";
-                fpp.id_cobranca_pix = id_cobranca_pix;
-                bd.updateValorFinanceiroPedidoPix(String.valueOf(idTemp), vP);
-
-                //
-                fpp.valor = String.valueOf(_valFinanceiro);
-                bd.addFinanceiroNFCe(fpp);
-            }
-            // SOMA O RESTANTE DAS DUAS FORMAS DE PAGAMENTO
-            else {
-                // SE TIVER SOBRADO VALOR EM DINHEIRO ADICIONA O RESTANTE
-                if (!_totalDinheiro.equals("0.00")) {
-                    fpp.id_forma_pagamento = "1";
-                    fpp.valor = _totalDinheiro;
-                    bd.addFinanceiroNFCe(fpp);
-                }
-                // SE TIVER SOBRADO VALOR EM PIX ADICIONA O RESTANTE
-                if (!_totalPix.equals("0.00")) {
-                    fpp.id_forma_pagamento = "17";
-                    fpp.id_cobranca_pix = id_cobranca_pix;
-                    fpp.valor = _totalPix;
-                    bd.addFinanceiroNFCe(fpp);
-                }
-
-                // ZERA O FINANCEIRO TEMPORARIO
-                bd.zerarFinanceiroPedidoTemp(String.valueOf(idTemp));
-            }
-
-            // ADICIONAR O FINANCEIRO DA NFCe
-
-        /*
-            values.put("id_pedido", formaPagamentoPedido.id_pedido);
-            values.put("id_forma_pagamento", formaPagamentoPedido.id_forma_pagamento);
-            values.put("valor", formaPagamentoPedido.valor);
-            values.put("codigo_autorizacao", formaPagamentoPedido.codigo_autorizacao);
-            values.put("bandeira", formaPagamentoPedido.cardBrand);
-            values.put("nsu", formaPagamentoPedido.codigo_autorizacao);
-            values.put("id_cobranca_pix", formaPagamentoPedido.id_cobranca_pix);
-            values.put("status_pix", formaPagamentoPedido.status_pix);
-        */
         } else {
             for (FormaPagamentoPedido fpp : bd.getFinanceiroCliente(idTemp)) {
                 bd.addFinanceiroNFCe(fpp);
@@ -1033,4 +965,111 @@ public class FinanceiroNFCe extends AppCompatActivity implements IFinanceiroNFCe
         }
 
     }
+
+    /********* METODO PRA DIVIDIR VALOR ENTRE AS NOTAS ******************/
+
+
+    private void ajustarFinanceiroFracionado() {
+        // Obter os totais financeiros temporários
+        String _totalDinheiro = bd.getTotalFinanceiroDinheiro(String.valueOf(idTemp), api_asaas);
+        String _totalPix = bd.getTotalFinanceiroPix(String.valueOf(idTemp), api_asaas);
+        String _total_item = bd.getTotalItem(String.valueOf(id));
+        String id_cobranca_pix = bd.getIdCobrancaPix(String.valueOf(idTemp));
+
+        // Logando valores obtidos
+        Log.d("ajustarFinanceiro", "Total em Dinheiro: " + _totalDinheiro);
+        Log.d("ajustarFinanceiro", "Total em Pix: " + _totalPix);
+        Log.d("ajustarFinanceiro", "Total de Itens: " + _total_item);
+        Log.d("ajustarFinanceiro", "ID Cobrança Pix: " + id_cobranca_pix);
+
+        FormaPagamentoPedido fpp = new FormaPagamentoPedido(null, null, null, null, null, null, null, null, null);
+        fpp.id_pedido = String.valueOf(id);
+        fpp.status_pix = "0";
+
+        BigDecimal totalDinheiro = new BigDecimal(_totalDinheiro);
+        BigDecimal totalPix = new BigDecimal(_totalPix);
+        BigDecimal totalItem = new BigDecimal(_total_item);
+
+        // Verifica se há dinheiro suficiente para cobrir o valor do item
+        if (totalDinheiro.compareTo(totalItem) >= 0) {
+            // Caso dinheiro seja suficiente
+            fpp.id_forma_pagamento = "1"; // Dinheiro
+            fpp.valor = totalItem.toString();
+
+            // Subtrai o valor total do item do total em dinheiro
+            totalDinheiro = totalDinheiro.subtract(totalItem);
+
+            // Adiciona financeiro da NFCe com Dinheiro
+            Log.d("ajustarFinanceiro", "Adicionando financeiro NFCe com Dinheiro, valor: " + totalItem.toString());
+            bd.addFinanceiroNFCe(fpp);
+
+            // Atualiza o valor restante de dinheiro no banco de dados
+            Log.d("ajustarFinanceiro", "Atualizando valor em Dinheiro no banco: " + totalDinheiro.toString());
+            bd.updateValorFinanceiroPedidoDinheiro(String.valueOf(idTemp), totalDinheiro.toString());
+        } else {
+            // ######### Início da Mudança: Verificação de esgotamento total do dinheiro #########
+            if (totalDinheiro.compareTo(BigDecimal.ZERO) > 0) {
+                // Primeiro usa todo o dinheiro disponível
+                fpp.id_forma_pagamento = "1"; // Dinheiro
+                fpp.valor = totalDinheiro.toString();
+
+                // Log da parte em dinheiro da nota mista
+                Log.d("ajustarFinanceiro", "Emitindo nota mista: Dinheiro restante utilizado, valor: " + totalDinheiro.toString());
+
+
+                // Adiciona financeiro da NFCe com todo o Dinheiro disponível
+                bd.addFinanceiroNFCe(fpp);
+
+                // Subtrai o valor em dinheiro do totalItem
+                totalItem = totalItem.subtract(totalDinheiro);
+                totalDinheiro = BigDecimal.ZERO;
+
+                // Atualiza o valor de dinheiro para zero no banco de dados
+                Log.d("ajustarFinanceiro", "Dinheiro esgotado, atualizando no banco.");
+                bd.updateValorFinanceiroPedidoDinheiro(String.valueOf(idTemp), totalDinheiro.toString());
+            }
+            // ######### Fim da Mudança #########
+
+            // Agora cobre o restante com Pix
+            if (totalItem.compareTo(BigDecimal.ZERO) > 0) { // ######### Condição ajustada para usar Pix após esgotar dinheiro #########
+                              if (totalPix.compareTo(totalItem) >= 0) {
+                    fpp.id_forma_pagamento = "17"; // PIX
+                    fpp.valor = totalItem.toString();
+
+                    // Subtrai o valor restante do Pix
+                    totalPix = totalPix.subtract(totalItem);
+
+                    // Atualiza o valor restante de Pix no banco de dados
+                    Log.d("ajustarFinanceiro", "Adicionando financeiro NFCe com Pix, valor: " + totalItem.toString());
+                    bd.addFinanceiroNFCe(fpp);
+                    Log.d("ajustarFinanceiro", "Atualizando valor em Pix no banco: " + totalPix.toString());
+                    bd.updateValorFinanceiroPedidoPix(String.valueOf(idTemp), totalPix.toString());
+                } else {
+                    // Pix insuficiente, usa todo o Pix disponível
+                    fpp.id_forma_pagamento = "17"; // PIX
+                    fpp.valor = totalPix.toString();
+
+                    // Adiciona financeiro da NFCe com todo o Pix disponível
+                    Log.d("ajustarFinanceiro", "Pix insuficiente, adicionando valor restante do Pix.");
+                    bd.addFinanceiroNFCe(fpp);
+
+                    // Atualiza o valor de Pix para zero no banco de dados
+                    totalPix = BigDecimal.ZERO;
+                    bd.updateValorFinanceiroPedidoPix(String.valueOf(idTemp), totalPix.toString());
+                }
+            }
+        }
+
+        // Loga os valores restantes após a atualização
+        Log.d("ajustarFinanceiro", "Dinheiro Restante: " + totalDinheiro.toString());
+        Log.d("ajustarFinanceiro", "Pix Restante: " + totalPix.toString());
+
+        // Zera os valores financeiros temporários apenas se ambos forem zero
+        if (totalDinheiro.compareTo(BigDecimal.ZERO) == 0 && totalPix.compareTo(BigDecimal.ZERO) == 0) {
+            Log.d("ajustarFinanceiro", "Zerando valores financeiros temporários.");
+            bd.zerarFinanceiroPedidoTemp(String.valueOf(idTemp));
+        }
+    }
+
+
 }

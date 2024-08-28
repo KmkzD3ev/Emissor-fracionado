@@ -1919,7 +1919,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return listaPedidos;
     }
 
-    //PEGAR O VALOR TOTAL
+    /***************** ALTERAÇAO PARA RETORNO NULL DE CONSULTA *****************/
+
+    // PEGAR O VALOR TOTAL
     public String getValorTotalPedido(String id, String desconto) {
 
         ClassAuxiliar aux = new ClassAuxiliar();
@@ -1929,7 +1931,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String total = "0.00";
 
         try {
-            String query = "SELECT SUM((prp.valor * prp.quantidade)) - " + desconto + " " + // / 100
+            String query = "SELECT SUM((prp.valor * prp.quantidade)) - " + desconto + " " +
                     "FROM produtos_pedido prp " +
                     "WHERE prp.id_pedido = " + id;
 
@@ -1937,10 +1939,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             Cursor cursor = myDataBase.rawQuery(query, null);
 
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-
-                total = String.valueOf(Double.parseDouble(cursor.getString(0)));
+            if (cursor.moveToFirst()) {
+                String value = cursor.getString(0);
+                if (value != null) {
+                    total = String.valueOf(Double.parseDouble(value));
+                } else {
+                    Log.e("DatabaseHelper", "Valor nulo retornado na consulta para getValorTotalPedido.");
+                }
             }
 
             cursor.close();
@@ -1951,11 +1956,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return total;
     }
 
-    //PEGAR O VALOR TOTAL
+    /******** ALTERAÇAO NULLPOINTER *********/
+
     public String getValorTotalPedidoNFe(String id) {
-
         ClassAuxiliar aux = new ClassAuxiliar();
-
         myDataBase = this.getReadableDatabase();
         String total = "0.00";
 
@@ -1968,15 +1972,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             Cursor cursor = myDataBase.rawQuery(query, null);
 
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-
-                total = String.valueOf(Double.parseDouble(cursor.getString(0)));
+            if (cursor.moveToFirst()) {  // Usar if em vez de getCount > 0 para ir diretamente ao primeiro registro
+                double result = cursor.getDouble(0);  // Uso de getDouble para capturar diretamente o valor
+                total = String.format("%.2f", result);  // Formatar a string para manter consistência
+            } else {
+                Log.e("DatabaseHelper", "Nenhum valor retornado para o pedido com ID: " + id);
             }
 
             cursor.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("DatabaseHelper", "Erro ao calcular o valor total do pedido NFe", e);
         }
 
         return total;
@@ -2354,6 +2359,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return false;
     }
+
+/********** metodo pra atualizar valores evitando erro na tela pricipal  ****************/
+
+    public void updatePedidoComFinanceiro(String idPedido, String total, String idFormaPagamento) {
+        ContentValues cv = new ContentValues();
+        cv.put("valor_total", total);
+        cv.put("id_forma_pagamento", idFormaPagamento);
+
+        // Atualiza a tabela pedidos_temp com as novas informações financeiras
+        myDataBase.update("pedidos_temp", cv, "id = ?", new String[]{idPedido});
+    }
+
 
     public Boolean getFinanceiroUltimoPedido(String idPedido) {
         boolean result = false;
