@@ -1956,7 +1956,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return total;
     }
 
-    /******** ALTERAÇAO NULLPOINTER *********/
+    /*********************** ALTERAÇAO NULLPOINTER **************************/
 
     public String getValorTotalPedidoNFe(String id) {
         ClassAuxiliar aux = new ClassAuxiliar();
